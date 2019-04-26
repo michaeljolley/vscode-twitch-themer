@@ -1,0 +1,103 @@
+{
+	"name": "vscode-twitch-themer",
+	"displayName": "VSCode Twitch Themer",
+	"description": "Change your vscode theme via the twitch chat client",
+	"publisher": "michaeljolley",
+	"license": "MIT",
+	"author": {
+		"name": "Michael Jolley",
+		"email": "mike@sparcapp.io"
+	},
+	"icon": "resources/themerIcon.png",
+	"version": "0.0.1",
+	"preview": true,
+	"engines": {
+		"vscode": "^1.32.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/michaeljolley/vscode-twitch-themer"
+	},
+	"homepage": "https://github.com/michaeljolley/vscode-twitch-themer/blob/master/README.md",
+	"categories": [
+		"Other"
+	],
+	"keywords": [
+		"theme",
+		"twitch",
+		"color",
+		"workspace"
+	],
+	"activationEvents": [
+		"*",
+		"onCommand:twitchThemer.signIn",
+		"onCommand:twitchThemer.signOut",
+		"onCommand:twitchThemer.chatConnect",
+		"onCommand:twitchThemer.chatDisconnect"
+	],
+	"main": "./dist/extension",
+	"contributes": {
+		"commands": [
+			{
+				"command": "twitchThemer.chatConnect",
+				"title": "Chat Connect",
+				"category": "Twitch Themer"
+			},
+			{
+				"command": "twitchThemer.chatDisconnect",
+				"title": "Chat Disconnect",
+				"category": "Twitch Themer"
+			},
+			{
+				"command": "twitchThemer.signIn",
+				"title": "Sign In",
+				"category": "Twitch Themer"
+			},
+			{
+				"command": "twitchThemer.signOut",
+				"title": "Sign Out",
+				"category": "Twitch Themer"
+			}
+		],
+		"configuration": {
+			"title": "Twitch Themer",
+			"properties": {}
+		}
+	},
+	"scripts": {
+		"package": "npx vsce package",
+		"publish": "npx vsce publish",
+		"vscode:prepublish": "webpack --mode production",
+		"webpack": "webpack --mode none",
+		"watch": "webpack --mode none --watch",
+		"postinstall": "node node_modules/vscode/bin/install",
+		"just-test": "node node_modules/vscode/bin/test",
+		"test-compile": "tsc -p ./ && npm run && webpack",
+		"test": "npm run test-compile && node node_modules/vscode/bin/test"
+	},
+	"devDependencies": {
+		"@types/dotenv": "~4.0.3",
+		"@types/mocha": "^2.2.42",
+		"@types/node": "^10.12.21",
+		"@types/node-fetch": "^2.1.7",
+		"@types/sinon": "^7.0.7",
+		"@types/tmi.js": "~1.4.0",
+		"@types/uuid": "~3.4.3",
+		"copy-webpack-plugin": "^5.0.2",
+		"node-loader": "^0.6.0",
+		"sinon": "^7.2.5",
+		"ts-loader": "^5.3.3",
+		"tslint": "^5.12.1",
+		"typescript": "^3.3.1",
+		"vscode": "^1.1.28",
+		"webpack": "^4.29.6",
+		"webpack-cli": "^3.2.3"
+	},
+	"dependencies": {
+		"dotenv": "~7.0.0",
+		"keytar": "^4.4.1",
+		"tmi.js": "~1.4.2",
+		"uuid": "~3.3.2",
+		"node-fetch": "~2.3.0"
+	}
+}
