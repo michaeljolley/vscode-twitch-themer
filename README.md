@@ -17,7 +17,7 @@ This will send a list of installed VS Code themes to the requestor via whisper.
 ```
 !theme list
 ```
-`Note: only 1 whisper per user will be sent per day.`
+`Note: Only 1 whisper per user will be sent per day.`
 
 #### Set VS Code theme
 
@@ -26,7 +26,7 @@ This command will set the theme of the streamers' VS Code workspace to the theme
 ```
 !theme {theme name}
 ```
-`Note: the theme must be previously installed and available within VS Code.`
+`Note: The theme must be previously installed and available within VS Code.`
 
 #### Reset VS Code theme
 
@@ -51,7 +51,7 @@ This command will set the theme of the streamers' VS Code workspace back to the 
 
 ## Attribution & Credits
 
-* Thanks to [Sivamuthu Kumar](https://github.com/ksivamuthu) for the authentication code that we blatantly plagiarized.
+* Thanks to [Sivamuthu Kumar](https://github.com/ksivamuthu) for the authentication code that we blatantly plagiarized from his [VSCode Peacock Twitch Extension](https://github.com/ksivamuthu/vscode-peacock-twitch-client).
 * Thanks to [Brian Clark](https://github.com/clarkio) for his videos on creating VS Code extensions and his [VSCode Twitch Highlighter](https://github.com/clarkio/vscode-twitch-highlighter) extension that really is what brought about the idea for this extension.
 
 ## Release Notes

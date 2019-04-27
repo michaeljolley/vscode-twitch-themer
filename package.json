@@ -1,7 +1,7 @@
 {
 	"name": "vscode-twitch-themer",
 	"displayName": "VSCode Twitch Themer",
-	"description": "Change your vscode theme via the twitch chat client",
+	"description": "Allow viewers to change your vscode theme via Twitch chat",
 	"publisher": "michaeljolley",
 	"license": "MIT",
 	"author": {
