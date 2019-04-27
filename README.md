@@ -1,5 +1,5 @@
 <p align="center">
-![](./resources/logo.png)
+![](./resources/logo@0.5x.png)
 </p>
 
 # VSCode Twitch Themer Extension
