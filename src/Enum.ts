@@ -1,6 +1,4 @@
 export enum Commands {
-    listThemes = 'twitchThemer.listThemes',
-    changeTheme = 'twitchThemer.changeTheme',
     twitchSignIn = 'twitchThemer.signIn',
     twitchSignOut = 'twitchThemer.signOut',
     chatConnect = 'twitchThemer.chatConnect',

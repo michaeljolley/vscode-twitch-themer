@@ -15,11 +15,13 @@ export class Themer {
                                           f.packageJSON.contributes.themes &&
                                           f.packageJSON.contributes.themes.length > 0)
                              .forEach((fe: any) => {
+                                let iThemes = fe.packageJSON.contributes.themes.map((m: any) => {
+                                                                            return { id: fe.id, label: m.label };});
                                 this._availableThemes = (this._availableThemes.concat.apply(
                                                                                         this._availableThemes,
-                                                                                        fe.packageJSON.contributes.themes)
+                                                                                        iThemes)
                                                                                      .filter(() => true));
-                                });
+                             });
     }
 
     public async handleCommands(twitchUser: string | undefined, command: string, param: string) {
@@ -55,7 +57,7 @@ export class Themer {
             }
 
             // Get list of available themes and whisper them to user
-            let themeNames = this._availableThemes.map(m => m.theme.label);
+            let themeNames = this._availableThemes.map(m => m.label);
             this._chatClient.whisper(twitchUser, `Available themes are: ${themeNames.join(', ')}`);
         }
     }
@@ -68,7 +70,7 @@ export class Themer {
 
     private async changeTheme(twitchUser: string | undefined, themeName: string) {
         // Find theme based on themeName and change theme if it is found
-        let theme = this._availableThemes.filter(f => f.theme.label.toLowerCase() === themeName.toLowerCase())[0];
+        let theme = this._availableThemes.filter(f => f.label.toLowerCase() === themeName.toLowerCase())[0];
 
         if (theme) {  
             let x = vscode.extensions.getExtension(theme.id);
@@ -76,9 +78,9 @@ export class Themer {
             if (x !== undefined) {
                 let conf = vscode.workspace.getConfiguration();
                 x.activate().then(f => {
-                    conf.update('workbench.colorTheme', theme.theme.label, vscode.ConfigurationTarget.Global);
+                    conf.update('workbench.colorTheme', theme.label, vscode.ConfigurationTarget.Global);
                     if (twitchUser) {
-                        vscode.window.showInformationMessage(`Theme changed to ${theme.theme.label} by ${twitchUser}`);
+                        vscode.window.showInformationMessage(`Theme changed to ${theme.label} by ${twitchUser}`);
                     }
                 });
             }
@@ -88,7 +90,7 @@ export class Themer {
 
 export interface ITheme {
     id: string;
-    theme: any;
+    label: string;
 }
 
 export interface IListRecipient {
