@@ -8,7 +8,7 @@
 		"name": "Michael Jolley",
 		"email": "mike@sparcapp.io"
 	},
-	"icon": "resources/themerIcon.png",
+	"icon": "resources/logo.png",
 	"version": "0.0.1",
 	"preview": true,
 	"engines": {
