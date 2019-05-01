@@ -2,7 +2,7 @@
 ![](./resources/logo-half.png)
 </p>
 
-# VSCode Twitch Themer Extension
+# Twitch Themer Extension
 
 A Visual Studio Code extension that listens to twitch chat and allows viewers to change the streamers VS Code theme by sending **!theme**
 

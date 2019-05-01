@@ -1,6 +1,6 @@
 {
 	"name": "vscode-twitch-themer",
-	"displayName": "VSCode Twitch Themer",
+	"displayName": "Twitch Themer",
 	"description": "Allow viewers to change your vscode theme via Twitch chat",
 	"publisher": "michaeljolley",
 	"license": "MIT",
@@ -9,7 +9,7 @@
 		"email": "mike@sparcapp.io"
 	},
 	"icon": "resources/logo.png",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"preview": true,
 	"engines": {
 		"vscode": "^1.32.0"
