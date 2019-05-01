@@ -1,10 +1,12 @@
-.<p align="center">
-![](./resources/logo-half.png)
-</p>
-
-# Twitch Themer Extension
+# Twitch Themer
 
 A Visual Studio Code extension that listens to twitch chat and allows viewers to change the streamers VS Code theme by sending **!theme**
+
+| Release | vNext
+| -- | --
+| [![Build Status](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_apis/build/status/MichaelJolley.vscode-twitch-themer?branchName=master)](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_build/latest?definitionId=1&branchName=master) | [![Build Status](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_apis/build/status/vNext?branchName=master)](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_build/latest?definitionId=2&branchName=master)
+
+
 
 ![](./resources/screenshot-example.gif)  
 
