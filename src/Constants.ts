@@ -1,3 +1,3 @@
 export class Constants {
-    public static chatClientUserName: string = 'twitch-themer';
+    public static chatClientUserName: string = 'themichaeljolley';
 }

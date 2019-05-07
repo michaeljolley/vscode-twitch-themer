@@ -22,6 +22,7 @@ export default class ChatClient {
         this._client = Client(options);
         this._client.on('connected', this.onConnectedHandler.bind(this));
         this._client.on('message', this.onMessageHandler.bind(this));
+        this._client.on('join', this.onJoinHandler.bind(this));
         const status = await this._client.connect();
         this.chatClientStatusEventEmitter.fire(TwitchClientStatus.chatConnected);
         return status;
@@ -46,10 +47,12 @@ export default class ChatClient {
 
     private onConnectedHandler(address: string, port: number) {
         console.log(`Connected chat client ${address} : ${port}`);
-        
-        if (this._client) {
+    }
+
+    private onJoinHandler(channel: string, username: string, self: boolean) {
+        if (self && this._client) {
             // Tell them hello
-            this._client.say(Constants.chatClientUserName, 'Twitch Themer is ready to go. Listing for !theme list or !theme {theme name}');
+            this._client.say(channel, 'Twitch Themer is ready to go. Listening for !theme list or !theme {theme name}');
         }
     }
 

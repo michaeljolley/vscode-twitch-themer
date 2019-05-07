@@ -50,7 +50,7 @@ export class AuthenticationService {
             const accessToken = await keytar.getPassword(service, account);
             if (!accessToken) {
                 this.authStatusEventEmitter.fire(TwitchClientStatus.loggingIn);
-                vscode.window.showInformationMessage('Signing in');
+                vscode.window.showInformationMessage('Signing in to Twitch');
 
                 const state = v4();
 
@@ -71,7 +71,7 @@ export class AuthenticationService {
         if (keytar) {
             keytar.deletePassword(service, account);
         }
-        vscode.window.showInformationMessage('Signing out');
+        vscode.window.showInformationMessage('Signing out of Twitch');
         this.authStatusEventEmitter.fire(TwitchClientStatus.loggedOut);
     }
 
