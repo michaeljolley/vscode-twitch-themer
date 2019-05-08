@@ -1,13 +1,13 @@
 # Twitch Themer
 
+
+
+| Release | vNext | Contributors
+| -- | -- | --
+| [![Build Status](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_apis/build/status/MichaelJolley.vscode-twitch-themer?branchName=master)](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_build/latest?definitionId=1&branchName=master) | [![Build Status](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_apis/build/status/MichaelJolley.vscode-twitch-themer?branchName=vNext)](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_build/latest?definitionId=1&branchName=vNext) | [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors)
+
+
 A Visual Studio Code extension that listens to twitch chat and allows viewers to change the streamers VS Code theme by sending **!theme**
-
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors)
-
-| Release | vNext
-| -- | --
-| [![Build Status](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_apis/build/status/MichaelJolley.vscode-twitch-themer?branchName=master)](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_build/latest?definitionId=1&branchName=master) | [![Build Status](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_apis/build/status/MichaelJolley.vscode-twitch-themer?branchName=vNext)](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_build/latest?definitionId=1&branchName=vNext)
-
 
 ![](./resources/screenshot-example.gif)  
 
@@ -40,7 +40,6 @@ This command will set the theme of the streamers' VS Code workspace back to the 
 ```
 `Note: Everytime the extension disconnects from chat, the theme will be reset.`
 
----
 
 ## How to connect to Twitch
 
