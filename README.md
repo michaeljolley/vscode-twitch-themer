@@ -12,7 +12,7 @@ A Visual Studio Code extension that listens to twitch chat and allows viewers to
 
 ## Twitch Chat Commands
 
-#### Receive a list of available theme names
+#### Receive a list of available theme names 
 
 This will send a list of installed VS Code themes to the requestor via whisper. 
 
