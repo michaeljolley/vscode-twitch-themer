@@ -35,6 +35,8 @@ export class Themer {
             await this.sendThemes(twitchUser);
         } else if (param === 'reset') {
             this.resetTheme();
+        } else if (param === 'random') {
+            this.randomTheme(twitchUser);
         } else {
             this.changeTheme(twitchUser, param);
         }
@@ -66,6 +68,11 @@ export class Themer {
         if (this._originalTheme) {
             await this.changeTheme(undefined, this._originalTheme);
         }
+    }
+
+    public async randomTheme(twitchUser: string | undefined) {
+        const randomTheme = '';
+        await this.changeTheme(twitchUser, randomTheme);
     }
 
     private async changeTheme(twitchUser: string | undefined, themeName: string) {
