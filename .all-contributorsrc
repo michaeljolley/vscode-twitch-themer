@@ -1,0 +1,47 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "MichaelJolley",
+      "name": "Michael Jolley",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1228996?v=4",
+      "profile": "https://michaeljolley.com/",
+      "contributions": [
+        "code",
+        "doc",
+        "design",
+        "ideas",
+        "maintenance"
+      ]
+    },
+    {
+      "login": "PatPat1567",
+      "name": "PatPat1567",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/41209202?v=4",
+      "profile": "https://github.com/PatPat1567",
+      "contributions": [
+        "code",
+        "ideas",
+        "doc"
+      ]
+    },
+    {
+      "login": "cmjchrisjones",
+      "name": "Chris Jones",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/3969086?v=4",
+      "profile": "https://c-j.tech",
+      "contributions": [
+        "ideas"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "vscode-twitch-themer",
+  "projectOwner": "MichaelJolley",
+  "repoType": "github",
+  "repoHost": "https://github.com"
+}
