@@ -12,6 +12,14 @@ A Visual Studio Code extension that listens to twitch chat and allows viewers to
 
 ## Twitch Chat Commands
 
+#### Send response to chat of current theme
+
+This will send a reply to chat from users account of what the current VS Code theme is set to.
+
+```
+!theme
+```
+
 #### Receive a list of available theme names
 
 This will send a list of installed VS Code themes to the requestor via whisper. 
