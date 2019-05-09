@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import ChatClient from '../chat/ChatClient';
+import { join } from 'path';
 
 export class Themer {
 
@@ -16,7 +17,8 @@ export class Themer {
                                           f.packageJSON.contributes.themes.length > 0)
                              .forEach((fe: any) => {
                                 let iThemes = fe.packageJSON.contributes.themes.map((m: any) => {
-                                                                            return { id: fe.id, label: m.label };});
+                                                                            return { id: fe.id, label: m.label, themeId: m.id || m.label };});
+                                                                            
                                 this._availableThemes = (this._availableThemes.concat.apply(
                                                                                         this._availableThemes,
                                                                                         iThemes)
@@ -88,8 +90,8 @@ export class Themer {
         
             if (x !== undefined) {
                 let conf = vscode.workspace.getConfiguration();
-                x.activate().then(f => {
-                    conf.update('workbench.colorTheme', theme.label, vscode.ConfigurationTarget.Global);
+                x.activate().then(f => { 
+                    conf.update('workbench.colorTheme', theme.themeId, vscode.ConfigurationTarget.Global);
                     if (twitchUser) {
                         vscode.window.showInformationMessage(`Theme changed to ${theme.label} by ${twitchUser}`);
                     }
@@ -107,6 +109,7 @@ export class Themer {
 export interface ITheme {
     id: string;
     label: string;
+    themeId: string;
 }
 
 export interface IListRecipient {
