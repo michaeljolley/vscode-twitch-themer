@@ -65,6 +65,16 @@ export default class ChatClient {
         }
     }
 
+    public sendMessage(message: string) {
+        let channel: string[] | undefined;
+        if (this._options) {
+            channel = this._options.channels;
+        }
+        if (this.isConnected() && this._client && channel) {
+            this._client.say(channel[0], message);
+        }
+    }
+
     private async onMessageHandler(channel: string, userState: Userstate, message: string, self: boolean) {
         console.log(`Received ${message} from ${userState["display-name"]}`);
         if (self) { return; }
