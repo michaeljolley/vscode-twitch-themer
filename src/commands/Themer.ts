@@ -30,7 +30,9 @@ export class Themer {
         }
         param = param.toLowerCase().trim();
 
-        if (param === 'list') {
+        if (param === '') {
+            await this.currentTheme();
+        } else if (param === 'list') {
             // Whisper list of avaiable themes back to user
             await this.sendThemes(twitchUser);
         } else if (param === 'reset') {
@@ -94,6 +96,11 @@ export class Themer {
                 });
             }
         }
+    }
+
+    private async currentTheme() {
+        const currentTheme = vscode.workspace.getConfiguration().get('workbench.colorTheme');
+        this._chatClient.sendMessage(`The current theme is ${currentTheme}`);
     }
 }
 
