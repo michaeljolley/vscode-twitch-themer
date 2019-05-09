@@ -70,7 +70,7 @@ export class Themer {
         }
     }
 
-    public async randomTheme(twitchUser: string | undefined) {
+    private async randomTheme(twitchUser: string | undefined) {
         const max = this._availableThemes.length;
         const randomNumber = Math.floor(Math.random() * max);
         const chosenTheme = this._availableThemes[randomNumber].label;
