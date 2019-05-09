@@ -13,6 +13,14 @@ A Visual Studio Code extension that listens to twitch chat and allows viewers to
 
 ## Twitch Chat Commands
 
+#### Send response to chat of current theme
+
+This will send the currently active theme to Twitch chat.
+
+```
+!theme
+```
+
 #### Receive a list of available theme names
 
 This will send a list of installed VS Code themes to the requestor via whisper. 
@@ -28,6 +36,15 @@ This command will set the theme of the streamers' VS Code workspace to the theme
 
 ```
 !theme {theme name}
+```
+`Note: The theme must be previously installed and available within VS Code.`
+
+#### Set Random VS Code theme
+
+This command will set the theme of the streamers' VS Code workspace to a theme that is chosen at random.
+
+```
+!theme random
 ```
 `Note: The theme must be previously installed and available within VS Code.`
 

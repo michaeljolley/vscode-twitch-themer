@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added a new `!theme random` command that changes VS Code to a randomly selected theme.
+- Added a new `!theme` command that sends the current theme to Twitch chat.
+
+### Fixed
+
+- Solved issue when setting theme to one of the default VS Code themes.
+
 ---
 
 ## [0.0.3] - 2019-05-07
