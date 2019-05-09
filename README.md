@@ -14,7 +14,7 @@ A Visual Studio Code extension that listens to twitch chat and allows viewers to
 
 #### Send response to chat of current theme
 
-This will send a reply to chat from users account of what the current VS Code theme is set to.
+This will send the currently active theme to Twitch chat.
 
 ```
 !theme
