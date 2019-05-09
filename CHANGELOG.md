@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.0.4] - 2019-05-09
+
 ### Added
 
 - Added a new `!theme random` command that changes VS Code to a randomly selected theme.
@@ -15,8 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Solved issue when setting theme to one of the default VS Code themes.
-
----
 
 ## [0.0.3] - 2019-05-07
 
@@ -40,7 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.3...HEAD
+[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.4...HEAD
+[0.0.4]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.3...0.0.4
 [0.0.3]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.2...0.0.3
 [0.0.2]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.1...0.0.2
 [0.0.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/3239c8e...0.0.1
