@@ -33,11 +33,20 @@ function getNodeModule<T>(moduleName: string): T | undefined {
 
 const keytar: typeof keytartype | undefined = getNodeModule<typeof keytartype>('keytar');
 
+/**
+ * Manages state of current user & authenticating user with Twitch
+ */
 export class AuthenticationService {
 
     private authStatusEventEmitter = new vscode.EventEmitter<TwitchClientStatus>();
+
+    /** Event that fires on change of the authentication state of the user */
     public onAuthStatusChanged = this.authStatusEventEmitter.event;
 
+    /**
+     * Initializes the authentication service.  If the user is 
+     * already authenticated it will immediately fire the logged in status.
+     */
     async initialize() {
         const user = await this.currentUser();
         if (user) {
@@ -45,6 +54,12 @@ export class AuthenticationService {
         }
     }
 
+    /**
+     * Attempts to read the users OAuth token to authenticate.  If an 
+     * OAuth token doesn't exist then we'll open a browser to allow
+     * the user to authenticate with Twitch and return an OAuth token
+     * to the extension.
+     */
     public async handleSignIn() {
         if (keytar) {
             const accessToken = await keytar.getPassword(service, account);
@@ -66,7 +81,9 @@ export class AuthenticationService {
         }
     }
 
-
+    /**
+     * Removes any OAuth tokens stored for the user
+     */
     public handleSignOut() {
         if (keytar) {
             keytar.deletePassword(service, account);
@@ -75,6 +92,9 @@ export class AuthenticationService {
         this.authStatusEventEmitter.fire(TwitchClientStatus.loggedOut);
     }
 
+    /**
+     * If authenticated, returns the user.  Otherwise will return null
+     */
     public async currentUser() {
         if (keytar) {
             var accessToken = await keytar.getPassword(service, account);
