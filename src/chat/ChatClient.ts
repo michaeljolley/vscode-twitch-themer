@@ -7,6 +7,7 @@ import { Constants } from '../Constants';
 
 export default class ChatClient {
     private _client: Client | null;
+    private _options: Options | null;
     private readonly _themer: Themer;
 
     private chatClientStatusEventEmitter = new EventEmitter<TwitchClientStatus>();
@@ -14,12 +15,14 @@ export default class ChatClient {
 
     constructor() {
         this._client = null;
+        this._options = null;
         this._themer = new Themer(this);
     }
 
     public async connect(options: Options): Promise<[string, number]> {
+        this._options = options;
         await disconnect();
-        this._client = Client(options);
+        this._client = Client(this._options);
         this._client.on('connected', this.onConnectedHandler.bind(this));
         this._client.on('message', this.onMessageHandler.bind(this));
         this._client.on('join', this.onJoinHandler.bind(this));
@@ -59,6 +62,16 @@ export default class ChatClient {
     public whisper(twitchUser: string | undefined, message: string) {
         if (this.isConnected() && this._client && twitchUser !== undefined) {
             this._client.whisper(twitchUser, message);
+        }
+    }
+
+    public sendMessage(message: string) {
+        let channel: string[] | undefined;
+        if (this._options) {
+            channel = this._options.channels;
+        }
+        if (this.isConnected() && this._client && channel) {
+            this._client.say(channel[0], message);
         }
     }
 
