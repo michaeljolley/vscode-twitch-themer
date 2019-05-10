@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added a new `!theme refresh` command that refreshes the list of available themes.  **Can only be used by the broadcaster**
+- Added comments throughout codebase to provide better experience for future contributors
+
+
 ---
 
 ## [0.0.4] - 2019-05-09
