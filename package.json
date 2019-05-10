@@ -9,7 +9,7 @@
 		"email": "mike@sparcapp.io"
 	},
 	"icon": "resources/logo.png",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"preview": true,
 	"engines": {
 		"vscode": "^1.32.0"
