@@ -57,6 +57,15 @@ This command will set the theme of the streamers' VS Code workspace back to the 
 ```
 `Note: Everytime the extension disconnects from chat, the theme will be reset.`
 
+#### Refresh VS Code themes
+
+This command will refresh the list of available themes in the streamers VS Code instance.  Will also reset everyones ability to request the list of available themes.  Primarily used when themes are added/removed mid-stream.
+
+```
+!theme refresh
+```
+`Note: List of themes and request timers will only be reset if the command is sent from the broadcaster.`
+
 
 ## How to connect to Twitch
 
