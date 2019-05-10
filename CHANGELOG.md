@@ -49,10 +49,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.1] - 2019-04-26
 
+### Added
+
 - Pre-release version to gather feedback from the community and help identify gaps.
 
 [Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.5...HEAD
-[0.0.4]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.4...0.0.5
+[0.0.5]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.4...0.0.5
 [0.0.4]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.3...0.0.4
 [0.0.3]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.2...0.0.3
 [0.0.2]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.1...0.0.2
