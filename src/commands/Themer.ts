@@ -44,7 +44,16 @@ export class Themer {
         if (command !== '!theme') {
             return;
         }
+        
         param = param.toLowerCase().trim();
+
+        let username: string  | undefined;
+        /** Determine if the param is a (un)ban request */
+        const ban = param.match(/((?:un)?ban) (\w*)/);
+        if (ban) {
+            param = ban[1] || ''; // Change the param to 'ban' or 'unban' 
+            username = ban[2]; // The username to ban
+        }
 
         switch (param) {
             case '':
@@ -62,9 +71,62 @@ export class Themer {
             case 'refresh':
                 await this.refreshThemes(twitchUser);
                 break;
+            case 'ban':
+                await this.ban(twitchUser, username);
+                break;
+            case 'unban':
+                await this.unban(twitchUser, username);
+                break;
             default:
                 this.changeTheme(twitchUser, param);
                 break;
+        }
+    }
+
+    /**
+     * Retrieves an IListRecipient
+     * @param twitchUser The user to retrieve from the list of recipients
+     * @param banned (optional) Include only recipients that are banned
+     */
+    private getRecipient(twitchUser: string, banned?: boolean): IListRecipient | undefined {
+        return this._listRecipients.filter(f => f.username.toLowerCase() === twitchUser.toLowerCase() && f.banned === banned)[0];
+    }
+
+    /**
+     * Bans a user from using the themer plugin.
+     * @param twitchUser The user requesting the ban
+     * @param username The user to ban
+     */
+    private async ban(twitchUser: string | undefined, username: string | undefined) {
+        if (twitchUser !== undefined && 
+            twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase() &&
+            username !== undefined)  {
+            const recipient = this.getRecipient(username);
+            if (recipient === undefined) {
+                this._listRecipients.push({username: username.toLowerCase(), banned: true});
+                console.log(`${username} has been banned from using the themer plugin.`)
+                // TODO: Add banned user to a json file.
+            }
+        }
+    }
+
+    /**
+     * Unbans a user allowing them to use the themer plugin.
+     * @param twitchUser The user requesting the unban
+     * @param username The user to unban
+     */
+    private async unban(twitchUser: string | undefined, username: string | undefined) {
+        if (twitchUser !== undefined && 
+            twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase() && 
+            username !== undefined) {
+            const recipient = this.getRecipient(username, true);
+            if (recipient !== undefined) {
+                const index = this._listRecipients.indexOf(recipient);
+                recipient.banned = false;
+                this._listRecipients.splice(index, 1, recipient);
+                console.log(`${username} can now use the themer plugin.`)
+                // TODO: Remove banned user from a json file.
+            }
         }
     }
 
@@ -75,9 +137,14 @@ export class Themer {
     private async sendThemes(twitchUser: string | undefined) {
         if (twitchUser !== undefined) {
             /** Ensure that we haven't sent them the list recently. */
-            const lastSent: IListRecipient | undefined = this._listRecipients.filter(f => f.username.toLowerCase() === twitchUser.toLowerCase())[0];
+            const lastSent = this.getRecipient(twitchUser);
 
-            if (lastSent) {
+            if (lastSent && lastSent.banned && lastSent.banned === true) {
+                console.log(`${twitchUser} has been banned.`);
+                return;
+            }
+
+            if (lastSent && lastSent.lastSent) {
                 if (lastSent.lastSent.getDate() > ((new Date()).getDate() + -1)) {
                     return;
                 } else {
@@ -154,6 +221,16 @@ export class Themer {
      * @param themeName - Name of the theme to be applied
      */
     private async changeTheme(twitchUser: string | undefined, themeName: string) {
+        
+        /** Ensure the user hasn't been banned before changing the theme */
+        if (twitchUser) {
+            const recipient = this.getRecipient(twitchUser, true);
+            if (recipient && recipient.banned && recipient.banned === true) {
+                console.log(`${twitchUser} has been banned.`);
+                return;
+            }
+        }
+
         /** Find theme based on themeName and change theme if it is found */
         const theme = this._availableThemes.filter(f => f.label.toLowerCase() === themeName.toLowerCase())[0];
 
