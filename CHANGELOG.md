@@ -7,11 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+---
+
+## [0.0.6] - 2019-05-12
+
+### Added
+
+- Broadcaster can use `!theme ban {username}` or `!theme unban {username}` to ban a user from changing the theme
+
 ### Fixes
 
 - `!Theme` now recognized as a command like `!theme`
 
----
 
 ## [0.0.5] - 2019-05-10
 
@@ -56,7 +64,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.5...HEAD
+[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.6...HEAD
+[0.0.6]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.5...0.0.6
 [0.0.5]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.4...0.0.5
 [0.0.4]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.3...0.0.4
 [0.0.3]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.2...0.0.3
