@@ -116,7 +116,7 @@ export default class ChatClient {
         if (self) { return; }
         if (!message) { return; }
 
-        if (message.startsWith('!theme')) {
+        if (message.toLocaleLowerCase().startsWith('!theme')) {
             await this._themer.handleCommands(userState["display-name"], '!theme', message.replace('!theme', '').trim());
         }
     }
