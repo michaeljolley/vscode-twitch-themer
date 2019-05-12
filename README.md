@@ -66,6 +66,17 @@ This command will refresh the list of available themes in the streamers VS Code 
 ```
 `Note: List of themes and request timers will only be reset if the command is sent from the broadcaster.`
 
+#### Ban/Unban User from changing themes
+
+These commands will either ban or unban a user from changing the theme via Twitch chat.
+
+```
+!theme ban {username}
+
+!theme unban {username}
+```
+`Note: List of banned users will reset on extension activation/start up.`
+
 
 ## How to connect to Twitch
 
