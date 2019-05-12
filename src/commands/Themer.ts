@@ -49,10 +49,10 @@ export class Themer {
 
         let username: string  | undefined;
         /** Determine if the param is a (un)ban request */
-        const ban = param.match(/(?<subcommand>(?:un)?ban) (?<username>(\w)*)/);
+        const ban = param.match(/((?:un)?ban) (\w*)/);
         if (ban) {
-            param = ban.groups && ban.groups.subcommand || '';
-            username = ban.groups && ban.groups.username;
+            param = ban[1] || ''; // Change the param to 'ban' or 'unban' 
+            username = ban[2]; // The username to ban
         }
 
         switch (param) {
