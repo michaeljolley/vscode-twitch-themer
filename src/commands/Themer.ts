@@ -17,8 +17,9 @@ export class Themer {
     /**
      * constructor
      * @param _chatClient - Twitch chat client used in sending messages to users/chat
+     * @param _state - The global state of the extension
      */
-    constructor(private _chatClient: ChatClient) 
+    constructor(private _chatClient: ChatClient, private _state: vscode.Memento) 
     {
         /** 
          * Get the current theme so we can reset it later 
@@ -30,6 +31,11 @@ export class Themer {
          * Initialize the list of available themes for users
          */
         this.refreshThemes(Constants.chatClientUserName);
+
+        /**
+         * Rehydrate the banned users from the extensions global state
+         */
+        this._state.get('bannedUsers', []).forEach(username => this._listRecipients.push({ username, banned: true }));
     }
 
     /**
@@ -105,7 +111,7 @@ export class Themer {
             if (recipient === undefined) {
                 this._listRecipients.push({username: username.toLowerCase(), banned: true});
                 console.log(`${username} has been banned from using the themer plugin.`)
-                // TODO: Add banned user to a json file.
+                this._state.update('bannedUsers', this._listRecipients.map(recipient => recipient.username));
             }
         }
     }
@@ -125,7 +131,7 @@ export class Themer {
                 recipient.banned = false;
                 this._listRecipients.splice(index, 1, recipient);
                 console.log(`${username} can now use the themer plugin.`)
-                // TODO: Remove banned user from a json file.
+                this._state.update('bannedUsers', this._listRecipients.map(recipient => recipient.username));
             }
         }
     }
