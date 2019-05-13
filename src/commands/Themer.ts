@@ -99,6 +99,17 @@ export class Themer {
     }
 
     /**
+     * Updates the state of the extension
+     */
+    private updateState() {
+        const bannedUsers = this._listRecipients
+            .filter(recipient => recipient.banned && recipient.banned === true)
+            .map(recipient => recipient.username);
+
+        this._state.update('bannedUsers', bannedUsers);
+    }
+
+    /**
      * Bans a user from using the themer plugin.
      * @param twitchUser The user requesting the ban
      * @param username The user to ban
@@ -111,7 +122,7 @@ export class Themer {
             if (recipient === undefined) {
                 this._listRecipients.push({username: username.toLowerCase(), banned: true});
                 console.log(`${username} has been banned from using the themer plugin.`)
-                this._state.update('bannedUsers', this._listRecipients.map(recipient => recipient.username));
+                this.updateState();
             }
         }
     }
@@ -130,8 +141,8 @@ export class Themer {
                 const index = this._listRecipients.indexOf(recipient);
                 recipient.banned = false;
                 this._listRecipients.splice(index, 1, recipient);
-                console.log(`${username} can now use the themer plugin.`)
-                this._state.update('bannedUsers', this._listRecipients.map(recipient => recipient.username));
+                console.log(`${username} can now use the themer plugin.`);
+                this.updateState();
             }
         }
     }
