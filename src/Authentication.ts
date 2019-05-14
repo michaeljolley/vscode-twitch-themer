@@ -107,7 +107,7 @@ export class AuthenticationService {
         return null;
     }
 
-    public async twitchUser(twitchUserId: string | undefined) {
+    public async isTwitchUserFollowing(twitchUserId: string | undefined) {
         if (twitchUserId) {
             if (keytar) {
                 var accessToken = await keytar.getPassword(service, account);

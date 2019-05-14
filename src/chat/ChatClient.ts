@@ -130,7 +130,7 @@ export default class ChatClient {
                 // broadcaster cannot follow their own stream. Temporary work around to mark broadcaster as follower.
                 userFollowing = true;
             } else {
-                userFollowing = await this._authenticationService.twitchUser(userState["user-id"]);
+                userFollowing = await this._authenticationService.isTwitchUserFollowing(userState["user-id"]);
             }
             await this._themer.handleCommands(userState["display-name"], '!theme', message.replace('!theme', '').trim(), userFollowing);
         }
