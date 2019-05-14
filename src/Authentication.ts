@@ -107,6 +107,23 @@ export class AuthenticationService {
         return null;
     }
 
+    public async twitchUser(twitchUserId: string | undefined) {
+        if (twitchUserId) {
+            if (keytar) {
+                var accessToken = await keytar.getPassword(service, account);
+                if (accessToken) {
+                    const currentUser = await this.currentUser();
+                    const url = `https://api.twitch.tv/helix/users/follows?from_id=${twitchUserId}&to_id=${currentUser.id}`;
+                    const res = await fetch.default(url, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+                    const json = await res.json();
+                    return (json.data.length > 0) ? true: false;
+                }
+            }
+        }
+        console.log('no twitchUserId was passed in.');
+        return false;
+    }
+
     private async getUserDetails(token: string | null) {
         const url = 'https://api.twitch.tv/helix/users';
         const res = await fetch.default(url, { headers: { 'Authorization': `Bearer ${token}` } });
