@@ -11,26 +11,16 @@ import { Constants } from '../Constants';
 chai.should();
 
 suite('Themer Tests', function () {
+  let getConfigurationStub: sinon.SinonStub<any[], vscode.WorkspaceConfiguration>;
   let fakeState: vscode.Memento;
   let fakeWorkspaceConfiguration: vscode.WorkspaceConfiguration;
-  let getConfigurationStub: sinon.SinonStub<any[], vscode.WorkspaceConfiguration>;
-  setup(function () {
-    const stateValues: { [key: string]: any } = {
-      'bannedUsers': []
-    };
+  let fakeChatClient: ChatClient;
+  let fakeThemer: Themer;
+  suiteSetup(function(){
     const fakeConfig: {
       [key: string]: any
     } = {
       'workbench.colorTheme': 'Visual Studio Dark'
-    };
-    fakeState = {
-      get(key: string): any {
-        return stateValues[key];
-      },
-      update(key: string, value: any) {
-        stateValues[key] = value;
-        return Promise.resolve();
-      }
     };
     fakeWorkspaceConfiguration = {
       get(section: string) {
@@ -49,22 +39,37 @@ suite('Themer Tests', function () {
     };
     getConfigurationStub = sinon.stub(vscode.workspace, 'getConfiguration').returns(fakeWorkspaceConfiguration);
   });
-  teardown(function () {
+  setup(function () {
+    const stateValues: { [key: string]: any } = {
+      'bannedUsers': []
+    };
+    fakeState = {
+      get(key: string): any {
+        return stateValues[key];
+      },
+      update(key: string, value: any) {
+        stateValues[key] = value;
+        return Promise.resolve();
+      }
+    };
+    fakeChatClient = new ChatClient(fakeState);
+    fakeThemer = new Themer(fakeChatClient, fakeState);
+    getConfigurationStub.resetHistory();
+  });
+  suiteTeardown(function () {
     getConfigurationStub.restore();
   });
   test('Themer should return current theme', function (done) {
-    const chatClient = new ChatClient(fakeState);
-    const themer = new Themer(chatClient, fakeState);
     let sendMessage = '';
 
-    const sendMessageStub = sinon.stub(chatClient, 'sendMessage').callsFake((message: string) => {
+    const sendMessageStub = sinon.stub(fakeChatClient, 'sendMessage').callsFake((message: string) => {
       sendMessage = message;
     });
 
-    themer.handleCommands(Constants.chatClientUserName, '!theme', '')
+    fakeThemer.handleCommands(Constants.chatClientUserName, '!theme', '')
       .then(() => {
         try {
-          // getConfigurationStub.calledOnce.should.be.true;
+          getConfigurationStub.calledOnce.should.be.true;
           sendMessageStub.calledOnce.should.be.true;
           sendMessage.should.equal(`The current theme is Visual Studio Dark`);
           done();
@@ -76,16 +81,14 @@ suite('Themer Tests', function () {
   });
 
   test('Themer should reset theme to theme used when extension is activated', function (done) {
-    const startupTheme = fakeWorkspaceConfiguration.get('workbench.colorTheme');
-    const chatClient = new ChatClient(fakeState);
-    const themer = new Themer(chatClient, fakeState);
+    const startupTheme = fakeWorkspaceConfiguration.get('workbench.colorTheme');    
 
     fakeWorkspaceConfiguration.update('workbench.colorTheme', 'HotDog Stand');
 
-    themer.resetTheme()
+    fakeThemer.resetTheme()
       .then(() => {
         try {
-          // getConfigurationStub.calledOnce.should.be.true;
+          getConfigurationStub.calledOnce.should.be.true;
           fakeWorkspaceConfiguration.get('workbench.colorTheme')!.should.equal(startupTheme);
           done();
         } catch (error) {
