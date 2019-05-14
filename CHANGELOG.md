@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Broadcaster can use `!theme follower only` or `!theme follower only off` to activate or deactivate follower only mode
 
 ---
 
