@@ -85,12 +85,12 @@ export class Themer {
             case 'unban':
                 await this.unban(twitchUser, username);
                 break;
-            // case 'follower only':
-            //     await this.followerOnly(twitchUser, true);
-            //     break;
-            // case 'follower only off':
-            //     await this.followerOnly(twitchUser, false);
-            //     break;
+            case 'follower only':
+                await this.followerOnly(twitchUser, true);
+                break;
+            case 'follower only off':
+                await this.followerOnly(twitchUser, false);
+                break;
             default:
                 this.changeTheme(twitchUser, param, following);
                 break;
@@ -155,19 +155,19 @@ export class Themer {
         }
     }
     
-    // /**
-    //  * Activates follower only mode
-    //  * @param twitchUser - The user requesting the follower mode change
-    //  * @param activate - Set follower only mode
-    //  */
-    // private async followerOnly(twitchUser: string | undefined, activate: boolean)
-    // {
-    //     if (twitchUser !== undefined && 
-    //     twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
-    //         this._followerOnly = activate;
-    //         this._followerOnly ? console.log('Follower Only mode has been activated.') : console.log('Follower Only mode has been deactivated.');
-    //     }
-    // }
+    /**
+     * Activates follower only mode
+     * @param twitchUser - The user requesting the follower mode change
+     * @param activate - Set follower only mode
+     */
+    private async followerOnly(twitchUser: string | undefined, activate: boolean)
+    {
+        if (twitchUser !== undefined && 
+        twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
+            this._followerOnly = activate;
+            this._followerOnly ? console.log('Follower Only mode has been activated.') : console.log('Follower Only mode has been deactivated.');
+        }
+    }
 
     /**
      * Send a whisper to the requesting user with a list of available themes
