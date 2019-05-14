@@ -5,12 +5,18 @@ import { EventEmitter } from 'vscode';
 import { TwitchClientStatus } from '../Enum';
 import { Constants } from '../Constants';
 
+/**
+ * Twitch chat client used in communicating via chat/whispers
+ */
 export default class ChatClient {
+
     private _client: Client | null;
     private _options: Options | null;
     private readonly _themer: Themer;
 
     private chatClientStatusEventEmitter = new EventEmitter<TwitchClientStatus>();
+
+    /** Event that fires when the connection status of the chat client changes */
     public onStatusChanged = this.chatClientStatusEventEmitter.event;
 
     constructor() {
@@ -19,9 +25,17 @@ export default class ChatClient {
         this._themer = new Themer(this);
     }
 
+    /**
+     * Connects to Twitch chat
+     * @param options - tmi.js Options for connecting to Twitch chat 
+     */
     public async connect(options: Options): Promise<[string, number]> {
         this._options = options;
+
+        /** We're disconnecting just in case we were already 
+         * connected using different options */
         await disconnect();
+
         this._client = Client(this._options);
         this._client.on('connected', this.onConnectedHandler.bind(this));
         this._client.on('message', this.onMessageHandler.bind(this));
@@ -31,9 +45,11 @@ export default class ChatClient {
         return status;
     }
 
+    /**
+     * Disconnects from Twitch chat
+     */
     public async disconnect() {
         if (this._client) {
-            // Tell them goodbye
             this._client.say(Constants.chatClientUserName, 'Twitch Themer has left the building!');
 
             this._client.disconnect();
@@ -41,9 +57,16 @@ export default class ChatClient {
             this._client = null;
         }
 
+        /**
+         * Every time we disconnect from chat we want to reset the 
+         * theme to the streamers original theme so they can 
+         * continue working without having to manually change their
+         * theme back to their preferred theme.
+         */
         await this._themer.resetTheme();
     }
 
+    /** Is the client currently connected to Twitch chat */
     public isConnected(): boolean {
         return this._client ? this._client.readyState() === "OPEN" : false;
     }
@@ -54,23 +77,36 @@ export default class ChatClient {
 
     private onJoinHandler(channel: string, username: string, self: boolean) {
         if (self && this._client) {
-            // Tell them hello
             this._client.say(channel, 'Twitch Themer is ready to go. Listening for !theme list or !theme {theme name}');
         }
     }
 
+    /**
+     * Sends a whisper to the specified user
+     * @param twitchUser - Username of the recipient of the whisper 
+     * @param message - Message to send to the twitchUser
+     */
     public whisper(twitchUser: string | undefined, message: string) {
         if (this.isConnected() && this._client && twitchUser !== undefined) {
             this._client.whisper(twitchUser, message);
         }
     }
 
+    /**
+     * Sends a message to Twitch chat
+     * @param message - Message to send to chat
+     */
     public sendMessage(message: string) {
         let channel: string[] | undefined;
         if (this._options) {
             channel = this._options.channels;
         }
         if (this.isConnected() && this._client && channel) {
+            /**
+             * Why are we specifying channel[0] below?  While tmi.js
+             * allows us to connect to multiple channels, we will
+             * only ever be connected to one channel.
+             */
             this._client.say(channel[0], message);
         }
     }
@@ -80,7 +116,7 @@ export default class ChatClient {
         if (self) { return; }
         if (!message) { return; }
 
-        if (message.startsWith('!theme')) {
+        if (message.toLocaleLowerCase().startsWith('!theme')) {
             await this._themer.handleCommands(userState["display-name"], '!theme', message.replace('!theme', '').trim());
         }
     }

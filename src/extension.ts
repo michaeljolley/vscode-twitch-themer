@@ -11,7 +11,16 @@ import { createStatusBarItem } from './StatusBar';
 const chatClient = new ChatClient();
 const authService = new AuthenticationService();
 
+/**
+ * Handles changes in the authentication status of the user
+ */
 authService.onAuthStatusChanged(async (status) => {
+	/**
+	 * If the user is not logged in we want to attempt to authenticate
+	 * them with Twitch.
+	 * 
+	 * If they are or become, logged in, we want to immediately connect to Twitch chat
+	 */
 	if (status === TwitchClientStatus.loggedIn) {
 		const user = await authService.currentUser();
 		if (user && user.accessToken) {
@@ -24,11 +33,21 @@ authService.onAuthStatusChanged(async (status) => {
 			};
 			chatClient.connect(opts);
 		}
-	} else if (status === TwitchClientStatus.loggedOut) {
+	} 
+	/**
+	 * If the status of the authenticate is changed to logged out we want 
+	 * to automatically disconnect from Twitch chat
+	 */
+	else if (status === TwitchClientStatus.loggedOut) {
 		chatClient.disconnect();
 	}
 });
 
+/**
+ * Activates the extension in VS Code and registers commands available
+ * in the command palette
+ * @param context - Context the extesion is being run in
+ */
 export async function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, Twitch Themer is now active!');
 
@@ -43,6 +62,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(chatConnectCommand, chatDisconnectCommand, signInCommand, signOutCommand, statusBarItem);
 }
 
+/**
+ * Deactivates the extension in VS Code
+ */
 export function deactivate() {
 	authService.handleSignOut();
 }
