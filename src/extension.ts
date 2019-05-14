@@ -8,7 +8,7 @@ import { AuthenticationService } from './Authentication';
 import { Constants } from './Constants';
 import { createStatusBarItem } from './StatusBar';
 
-const chatClient = new ChatClient();
+let chatClient: ChatClient;
 const authService = new AuthenticationService();
 
 /**
@@ -23,10 +23,11 @@ authService.onAuthStatusChanged(async (status) => {
 	 */
 	if (status === TwitchClientStatus.loggedIn) {
 		const user = await authService.currentUser();
+		Constants.chatClientUserName = user.login;
 		if (user && user.accessToken) {
 			const opts = {
 				identity: {
-					username: Constants.chatClientUserName,
+					username: user.login,
 					password: user.accessToken,
 				},
 				channels: [user.login]
@@ -50,6 +51,10 @@ authService.onAuthStatusChanged(async (status) => {
  */
 export async function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, Twitch Themer is now active!');
+
+	// We instantiate a new ChatClient using the global state of this extension;
+	// the state holds extension specific values such as the banned users.
+	chatClient = new ChatClient(context.globalState);
 
 	await authService.initialize();
 

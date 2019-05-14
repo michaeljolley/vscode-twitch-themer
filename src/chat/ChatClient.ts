@@ -1,3 +1,4 @@
+import { Memento } from 'vscode';
 import { Client, Options, Userstate } from 'tmi.js';
 import { Themer } from '../commands/Themer';
 import { disconnect } from 'cluster';
@@ -19,10 +20,14 @@ export default class ChatClient {
     /** Event that fires when the connection status of the chat client changes */
     public onStatusChanged = this.chatClientStatusEventEmitter.event;
 
-    constructor() {
+    /**
+     * constructor
+     * @param state - The global state of the extension
+     */
+    constructor(state: Memento) {
         this._client = null;
         this._options = null;
-        this._themer = new Themer(this);
+        this._themer = new Themer(this, state);
     }
 
     /**
