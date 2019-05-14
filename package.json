@@ -76,6 +76,7 @@
 		"test": "npm run test-compile && node node_modules/vscode/bin/test"
 	},
 	"devDependencies": {
+		"@types/chai": "^4.1.7",
 		"@types/dotenv": "~4.0.3",
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^10.12.21",
@@ -83,6 +84,7 @@
 		"@types/sinon": "^7.0.7",
 		"@types/tmi.js": "~1.4.0",
 		"@types/uuid": "~3.4.3",
+		"chai": "^4.2.0",
 		"copy-webpack-plugin": "^5.0.2",
 		"node-loader": "^0.6.0",
 		"sinon": "^7.2.5",

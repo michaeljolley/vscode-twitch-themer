@@ -59,6 +59,7 @@ suite('Themer Tests', function () {
   });
 
   setup(function () {
+    fakeState.update('bannedUsers', []);
     fakeWorkspaceConfiguration.update('workbench.colorTheme', 'Visual Studio Dark');
     fakeChatClient = new ChatClient(fakeState);
     fakeThemer = new Themer(fakeChatClient, fakeState);
@@ -134,6 +135,84 @@ suite('Themer Tests', function () {
           twitchUser!.should.equal(Constants.chatClientUserName);
           sendMessage.should.exist;
           sendMessage.split(', ').length.should.be.greaterThan(0);
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+      });
+  });
+
+  test('Themer should ban a user', function(done) {
+
+    const bannedUser = 'hotdog';
+
+    fakeThemer.handleCommands(Constants.chatClientUserName, '!theme', `ban ${bannedUser}`)
+      .then(() => {
+
+        try {
+          fakeState.get('bannedUsers')!.should.not.be.empty;
+          fakeState.get('bannedUsers')!.should.contain(bannedUser);
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+
+      });
+
+  });
+
+  test('Themer should unban a user', function(done) {
+    const bannedUser = 'hotdog';
+
+    fakeState.update('bannedUsers', [bannedUser]);
+    fakeThemer = new Themer(fakeChatClient, fakeState);
+
+    fakeThemer.handleCommands(Constants.chatClientUserName, '!theme', `unban ${bannedUser}`)
+      .then(() => {
+
+        try {
+          fakeState.get('bannedUsers')!.should.not.contain(bannedUser);
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+
+      });
+
+  });
+
+  test('Themer should not ban if user is not the logged in user', function(done) {
+    const bannedUser = 'hotdog';
+    const twitchUser = 'goofey';
+
+    fakeThemer.handleCommands(twitchUser, '!theme', `ban ${bannedUser}`)
+      .then(() => {
+
+        try {
+          fakeState.get('bannedUsers')!.should.be.empty;
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+      });
+  });
+
+  test('Themer should not unban if user is not the logged in user', function(done) {
+    const bannedUser = 'hotdog';
+    const twitchUser = 'goofey';
+
+    fakeState.update('bannedUsers', [bannedUser]);
+
+    fakeThemer.handleCommands(twitchUser, '!theme', `unban ${bannedUser}`)
+      .then(() => {
+
+        try{
+          fakeState.get('bannedUsers')!.should.not.be.empty;
+          fakeState.get('bannedUsers')!.should.contain(bannedUser);
           done();
         }
         catch (error) {
