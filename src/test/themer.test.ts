@@ -7,6 +7,7 @@ import * as sinon from 'sinon';
 import ChatClient from '../chat/ChatClient';
 import { Themer } from '../commands/Themer';
 import { Constants } from '../Constants';
+import { stringify } from 'querystring';
 
 chai.should();
 
@@ -16,11 +17,15 @@ suite('Themer Tests', function () {
   let fakeWorkspaceConfiguration: vscode.WorkspaceConfiguration;
   let fakeChatClient: ChatClient;
   let fakeThemer: Themer;
-  suiteSetup(function(){
+  
+  suiteSetup(function () {
     const fakeConfig: {
       [key: string]: any
     } = {
       'workbench.colorTheme': 'Visual Studio Dark'
+    };
+    const stateValues: { [key: string]: any } = {
+      'bannedUsers': []
     };
     fakeWorkspaceConfiguration = {
       get(section: string) {
@@ -36,13 +41,7 @@ suite('Themer Tests', function () {
         fakeConfig[section] = value;
         return Promise.resolve();
       }
-    };
-    getConfigurationStub = sinon.stub(vscode.workspace, 'getConfiguration').returns(fakeWorkspaceConfiguration);
-  });
-  setup(function () {
-    const stateValues: { [key: string]: any } = {
-      'bannedUsers': []
-    };
+    };    
     fakeState = {
       get(key: string): any {
         return stateValues[key];
@@ -52,14 +51,21 @@ suite('Themer Tests', function () {
         return Promise.resolve();
       }
     };
+    getConfigurationStub = sinon.stub(vscode.workspace, 'getConfiguration').returns(fakeWorkspaceConfiguration);
+  });
+  
+  suiteTeardown(function () {
+    getConfigurationStub.restore();
+  });
+
+  setup(function () {
+    fakeWorkspaceConfiguration.update('workbench.colorTheme', 'Visual Studio Dark');
     fakeChatClient = new ChatClient(fakeState);
     fakeThemer = new Themer(fakeChatClient, fakeState);
     getConfigurationStub.resetHistory();
   });
-  suiteTeardown(function () {
-    getConfigurationStub.restore();
-  });
-  test('Themer should return current theme', function (done) {
+  
+  test('Themer should return current theme (Visual Studio Dark)', function (done) {
     let sendMessage = '';
 
     const sendMessageStub = sinon.stub(fakeChatClient, 'sendMessage').callsFake((message: string) => {
@@ -81,7 +87,7 @@ suite('Themer Tests', function () {
   });
 
   test('Themer should reset theme to theme used when extension is activated', function (done) {
-    const startupTheme = fakeWorkspaceConfiguration.get('workbench.colorTheme');    
+    const startupTheme = fakeWorkspaceConfiguration.get('workbench.colorTheme');
 
     fakeWorkspaceConfiguration.update('workbench.colorTheme', 'HotDog Stand');
 
@@ -92,6 +98,45 @@ suite('Themer Tests', function () {
           fakeWorkspaceConfiguration.get('workbench.colorTheme')!.should.equal(startupTheme);
           done();
         } catch (error) {
+          done(error);
+        }
+      });
+  });
+
+  test('Themer should change current theme to Default Dark+', function (done) {
+    fakeThemer.handleCommands(Constants.chatClientUserName, '!theme', 'Default Dark+')
+      .then(() => {
+        try {
+          getConfigurationStub.calledOnce.should.be.true;
+          fakeWorkspaceConfiguration.get('workbench.colorTheme')!.should.equal('Default Dark+');
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+      });
+  });
+
+  test('Themer should return a comma seperated list of themes', function (done) {
+    let twitchUser: string | undefined;
+    let sendMessage: string;
+
+    const whisperStub = sinon.stub(fakeChatClient, 'whisper').callsFake((user: string | undefined, message: string) => {
+      twitchUser = user;
+      sendMessage = message;
+    });
+
+    fakeThemer.handleCommands(Constants.chatClientUserName, '!theme', 'list')
+      .then(() => {
+        try {
+          whisperStub.calledOnce.should.be.true;
+          twitchUser!.should.exist;
+          twitchUser!.should.equal(Constants.chatClientUserName);
+          sendMessage.should.exist;
+          sendMessage.split(', ').length.should.be.greaterThan(0);
+          done();
+        }
+        catch (error) {
           done(error);
         }
       });
