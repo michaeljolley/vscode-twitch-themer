@@ -17,8 +17,9 @@ export class Themer {
     /**
      * constructor
      * @param _chatClient - Twitch chat client used in sending messages to users/chat
+     * @param _state - The global state of the extension
      */
-    constructor(private _chatClient: ChatClient) 
+    constructor(private _chatClient: ChatClient, private _state: vscode.Memento) 
     {
         /** 
          * Get the current theme so we can reset it later 
@@ -30,6 +31,11 @@ export class Themer {
          * Initialize the list of available themes for users
          */
         this.refreshThemes(Constants.chatClientUserName);
+
+        /**
+         * Rehydrate the banned users from the extensions global state
+         */
+        this._state.get('bannedUsers', []).forEach(username => this._listRecipients.push({ username, banned: true }));
     }
 
     /**
@@ -93,6 +99,17 @@ export class Themer {
     }
 
     /**
+     * Updates the state of the extension
+     */
+    private updateState() {
+        const bannedUsers = this._listRecipients
+            .filter(recipient => recipient.banned && recipient.banned === true)
+            .map(recipient => recipient.username);
+
+        this._state.update('bannedUsers', bannedUsers);
+    }
+
+    /**
      * Bans a user from using the themer plugin.
      * @param twitchUser The user requesting the ban
      * @param username The user to ban
@@ -105,7 +122,7 @@ export class Themer {
             if (recipient === undefined) {
                 this._listRecipients.push({username: username.toLowerCase(), banned: true});
                 console.log(`${username} has been banned from using the themer plugin.`)
-                // TODO: Add banned user to a json file.
+                this.updateState();
             }
         }
     }
@@ -124,8 +141,8 @@ export class Themer {
                 const index = this._listRecipients.indexOf(recipient);
                 recipient.banned = false;
                 this._listRecipients.splice(index, 1, recipient);
-                console.log(`${username} can now use the themer plugin.`)
-                // TODO: Remove banned user from a json file.
+                console.log(`${username} can now use the themer plugin.`);
+                this.updateState();
             }
         }
     }
