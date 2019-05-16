@@ -7,7 +7,7 @@ import * as sinon from 'sinon';
 import ChatClient from '../chat/ChatClient';
 import { Themer } from '../commands/Themer';
 import { Constants } from '../Constants';
-import { stringify } from 'querystring';
+import { Userstate } from 'tmi.js';
 
 chai.should();
 
@@ -73,7 +73,7 @@ suite('Themer Tests', function () {
       sendMessage = message;
     });
 
-    fakeThemer.handleCommands(Constants.chatClientUserName, '!theme', '')
+    fakeThemer.handleCommands({ "display-name": Constants.chatClientUserName }, '!theme', '')
       .then(() => {
         try {
           getConfigurationStub.calledOnce.should.be.true;
@@ -92,7 +92,7 @@ suite('Themer Tests', function () {
 
     fakeWorkspaceConfiguration.update('workbench.colorTheme', 'HotDog Stand');
 
-    fakeThemer.resetTheme()
+    fakeThemer.resetTheme({badges: {broadcaster: "1"}})
       .then(() => {
         try {
           getConfigurationStub.calledOnce.should.be.true;
@@ -105,7 +105,7 @@ suite('Themer Tests', function () {
   });
 
   test('Themer should change current theme to Default Dark+', function (done) {
-    fakeThemer.handleCommands(Constants.chatClientUserName, '!theme', 'Default Dark+')
+    fakeThemer.handleCommands({ "display-name": Constants.chatClientUserName }, '!theme', 'Default Dark+')
       .then(() => {
         try {
           getConfigurationStub.calledOnce.should.be.true;
@@ -127,7 +127,7 @@ suite('Themer Tests', function () {
       sendMessage = message;
     });
 
-    fakeThemer.handleCommands(Constants.chatClientUserName, '!theme', 'list')
+    fakeThemer.handleCommands({ "display-name": Constants.chatClientUserName }, '!theme', 'list')
       .then(() => {
         try {
           whisperStub.calledOnce.should.be.true;
@@ -147,7 +147,7 @@ suite('Themer Tests', function () {
 
     const bannedUser = 'hotdog';
 
-    fakeThemer.handleCommands(Constants.chatClientUserName, '!theme', `ban ${bannedUser}`)
+    fakeThemer.handleCommands({ "display-name": Constants.chatClientUserName }, '!theme', `ban ${bannedUser}`)
       .then(() => {
 
         try {
@@ -169,7 +169,7 @@ suite('Themer Tests', function () {
     fakeState.update('bannedUsers', [bannedUser]);
     fakeThemer = new Themer(fakeChatClient, fakeState);
 
-    fakeThemer.handleCommands(Constants.chatClientUserName, '!theme', `unban ${bannedUser}`)
+    fakeThemer.handleCommands({ "display-name": Constants.chatClientUserName }, '!theme', `unban ${bannedUser}`)
       .then(() => {
 
         try {
@@ -186,7 +186,7 @@ suite('Themer Tests', function () {
 
   test('Themer should not ban if user is not the logged in user', function(done) {
     const bannedUser = 'hotdog';
-    const twitchUser = 'goofey';
+    const twitchUser = { "display-name": 'goofey' };
 
     fakeThemer.handleCommands(twitchUser, '!theme', `ban ${bannedUser}`)
       .then(() => {
@@ -203,7 +203,7 @@ suite('Themer Tests', function () {
 
   test('Themer should not unban if user is not the logged in user', function(done) {
     const bannedUser = 'hotdog';
-    const twitchUser = 'goofey';
+    const twitchUser: Userstate = { 'display-name': 'goofey' };
 
     fakeState.update('bannedUsers', [bannedUser]);
 
