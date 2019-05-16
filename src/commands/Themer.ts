@@ -17,6 +17,7 @@ export class Themer {
     private _listRecipients: Array<IListRecipient> = [];
     private _followerOnly: boolean = false;
     private _authService: AuthenticationService;
+    private _followers: Array<IListRecipient> = [];
 
     /**
      * constructor
@@ -139,7 +140,7 @@ export class Themer {
             const recipient = this.getRecipient(username);
             if (recipient === undefined) {
                 this._listRecipients.push({username: username.toLowerCase(), banned: true});
-                console.log(`${username} has been banned from using the themer plugin.`)
+                console.log(`${username} has been banned from using the themer plugin.`);
                 this.updateState();
             }
         }
@@ -175,6 +176,11 @@ export class Themer {
         if (twitchUser !== undefined && 
         twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
             this._followerOnly = activate;
+            if (this._followerOnly)
+            {
+                const followers : Array<any> = await this._authService.getFollowers();
+                followers.forEach(x => this._followers.push({username: x["from_name"].toLocaleLowerCase()}));
+            }
             this._followerOnly ? console.log('Follower Only mode has been activated.') : console.log('Follower Only mode has been deactivated.');
         }
     }
@@ -272,17 +278,20 @@ export class Themer {
      */
     private async changeTheme(twitchUser: Userstate, themeName: string) {
 
-        const twitchUserName = twitchUser["display-name"];
+        const twitchUserName = twitchUser["display-name"] || "";
 
         following:
         if (this._followerOnly) {
-            if (twitchUserName === Constants.chatClientUserName) {
+            if (twitchUserName.toLocaleLowerCase() === Constants.chatClientUserName.toLocaleLowerCase()) {
                 // broadcaster cannot follow their own stream. Temporary work around to mark broadcaster as follower.
                 break following;
+            } else if (this._followers.find(x => x.username === twitchUserName.toLocaleLowerCase())) {
+                break following;
             } else if (await this._authService.isTwitchUserFollowing(twitchUser["user-id"])) {
+                this._followers.push({username: twitchUserName? twitchUserName.toLocaleLowerCase() : ""});
                 break following;
             } else {
-                console.log (`${twitchUser} is not following.`);
+                console.log (`${twitchUserName} is not following.`);
                 return;
             }
         } else {
