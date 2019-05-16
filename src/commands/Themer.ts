@@ -103,7 +103,7 @@ export class Themer {
                 await this.followerOnly(twitchUserName, false);
                 break;
             default:
-                this.changeTheme(twitchUser, param);
+                await this.changeTheme(twitchUser, param);
                 break;
         }
     }
@@ -309,15 +309,15 @@ export class Themer {
         }
 
         /** Find theme based on themeName and change theme if it is found */
-        const theme = this._availableThemes.filter(f => f.label.toLowerCase() === themeName.toLowerCase())[0];
+        const theme = this._availableThemes.filter(f => f.label.toLowerCase() === themeName.toLowerCase() ||  f.themeId && f.themeId.toLowerCase() === themeName.toLowerCase())[0];
 
         if (theme) {  
             const themeExtension = vscode.extensions.getExtension(theme.extensionId);
         
             if (themeExtension !== undefined) {
                 const conf = vscode.workspace.getConfiguration();
-                themeExtension.activate().then(f => { 
-                    conf.update('workbench.colorTheme', theme.themeId || theme.label, vscode.ConfigurationTarget.Global);
+                await themeExtension.activate().then(async f => { 
+                    await conf.update('workbench.colorTheme', theme.themeId || theme.label, vscode.ConfigurationTarget.Global);
                     if (twitchUserName) {
                         vscode.window.showInformationMessage(`Theme changed to ${theme.label} by ${twitchUserName}`);
                     }
