@@ -14,6 +14,7 @@ export class Themer {
 
     private _originalTheme: string | undefined;
     private _followerOnly: boolean = false;
+    private _subOnly: boolean = false;
     private _availableThemes: Array<ITheme> = [];
     private _listRecipients: Array<IListRecipient> = [];
     private _authService: AuthenticationService;
@@ -106,6 +107,12 @@ export class Themer {
             case '!follower':
                 await this.followerOnly(twitchUserName, false);
                 break;
+            case 'sub only':
+                await this.subOnly(twitchUserName, true);
+                break;
+            case 'sub only off':
+                await this.subOnly(twitchUserName, false);
+                break;
             default:
                 await this.changeTheme(twitchUser, param);
                 break;
@@ -189,6 +196,20 @@ export class Themer {
             }
             this.updateState();
             this._followerOnly ? console.log('Follower Only mode has been activated.') : console.log('Follower Only mode has been deactivated.');
+        }
+    }
+    
+    /**
+     * Activates follower only mode
+     * @param twitchUser - The user requesting the follower mode change
+     * @param activate - Set follower only mode
+     */
+    private async subOnly(twitchUser: string | undefined, activate: boolean)
+    {
+        if (twitchUser !== undefined && 
+        twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
+            this._subOnly = activate;
+            this._subOnly ? console.log('Sub Only mode has been activated.') : console.log('Sub Only mode has been deactivated.');
         }
     }
 
@@ -303,6 +324,21 @@ export class Themer {
             }
         } else {
             break following;
+        }
+
+        subscriber:
+        if (this._subOnly) {
+            if (twitchUserName.toLocaleLowerCase() === Constants.chatClientUserName.toLocaleLowerCase()) {
+                // broadcaster cannot subscribe to their own stream if they are not an affiate or partner.
+                break subscriber;
+            } else if (twitchUser && twitchUser["subscriber"]) {
+                break subscriber;
+            } else {
+                console.log (`${twitchUserName} is not a subscriber.`);
+                return;
+            }
+        } else {
+            break subscriber;
         }
         
         /** Ensure the user hasn't been banned before changing the theme */
