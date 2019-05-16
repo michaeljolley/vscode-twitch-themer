@@ -7,11 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- Broadcaster can use `!theme follower only` or `!theme follower only off` to activate or deactivate follower only mode
 
 ---
+
+## [0.1.0] - 2019-05-16
+
+### Added
+
+- Broadcaster can use `!theme follower` or `!theme !follower` to activate or deactivate follower only mode
+- Added tests for Themer class
+
 
 ## [0.0.6] - 2019-05-12
 
@@ -67,7 +72,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.6...HEAD
+[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.1.0...HEAD
+[0.1.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.6...0.1.0
 [0.0.6]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.5...0.0.6
 [0.0.5]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.4...0.0.5
 [0.0.4]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.3...0.0.4
