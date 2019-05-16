@@ -4,6 +4,7 @@ import { ITheme } from './ITheme';
 import { IListRecipient } from './IListRecipient';
 import { Constants } from '../Constants';
 import { Userstate } from 'tmi.js';
+import { AuthenticationService } from '../Authentication';
 
 /**
  * Manages all logic associated with retrieveing themes,
@@ -15,6 +16,7 @@ export class Themer {
     private _availableThemes: Array<ITheme> = [];
     private _listRecipients: Array<IListRecipient> = [];
     private _followerOnly: boolean = false;
+    private _authService: AuthenticationService;
 
     /**
      * constructor
@@ -38,6 +40,11 @@ export class Themer {
          * Rehydrate the banned users from the extensions global state
          */
         this._state.get('bannedUsers', []).forEach(username => this._listRecipients.push({ username, banned: true }));
+
+        /**
+         * Create a connection to the authenication service
+         */
+        this._authService = new AuthenticationService;
     }
 
     /**
@@ -267,17 +274,20 @@ export class Themer {
 
         const twitchUserName = twitchUser["display-name"];
 
-        // following:
-        // if (this._followerOnly) {
-        //     if (twitchUserFollowing) {
-        //         break following;
-        //     } else {
-        //         console.log (`${twitchUser} is not following.`);
-        //         return;
-        //     }
-        // } else {
-        //     break following;
-        // }
+        following:
+        if (this._followerOnly) {
+            if (twitchUserName === Constants.chatClientUserName) {
+                // broadcaster cannot follow their own stream. Temporary work around to mark broadcaster as follower.
+                break following;
+            } else if (await this._authService.isTwitchUserFollowing(twitchUser["user-id"])) {
+                break following;
+            } else {
+                console.log (`${twitchUser} is not following.`);
+                return;
+            }
+        } else {
+            break following;
+        }
         
         /** Ensure the user hasn't been banned before changing the theme */
         if (twitchUserName) {

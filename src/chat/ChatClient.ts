@@ -123,13 +123,6 @@ export default class ChatClient {
         if (!message) { return; }
 
         if (message.toLocaleLowerCase().startsWith('!theme')) {
-            // let userFollowing : boolean = false;
-            // if (userState["display-name"] === Constants.chatClientUserName) {
-            //     // broadcaster cannot follow their own stream. Temporary work around to mark broadcaster as follower.
-            //     userFollowing = true;
-            // } else {
-            //     userFollowing = await this._authenticationService.isTwitchUserFollowing(userState["user-id"]);
-            // }
             await this._themer.handleCommands(userState, '!theme', message.replace('!theme', '').trim());
         }
     }
