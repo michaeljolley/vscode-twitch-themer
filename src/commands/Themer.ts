@@ -3,6 +3,7 @@ import ChatClient from '../chat/ChatClient';
 import { ITheme } from './ITheme';
 import { IListRecipient } from './IListRecipient';
 import { Constants } from '../Constants';
+import { Userstate } from 'tmi.js';
 
 /**
  * Manages all logic associated with retrieveing themes,
@@ -46,12 +47,14 @@ export class Themer {
      * @param param - Optional additional parameters sent by user
      * @param following - Check if twitchUser is following streamer
      */
-    public async handleCommands(twitchUser: string | undefined, command: string, param: string, following: boolean) {
+    public async handleCommands(twitchUser: Userstate, command: string, param: string) {
         
         /** Only command we're going to respond to is !theme */
         if (command !== '!theme') {
             return;
         }
+
+        const twitchUserName = twitchUser["display-name"];
         
         param = param.toLowerCase().trim();
 
@@ -68,31 +71,31 @@ export class Themer {
                 await this.currentTheme();
                 break;
             case 'list':
-                await this.sendThemes(twitchUser);
+                await this.sendThemes(twitchUserName);
                 break;
             case 'reset':
-                await this.resetTheme(following);
+                await this.resetTheme(twitchUser);
                 break;
             case 'random':
-                await this.randomTheme(twitchUser, following);
+                await this.randomTheme(twitchUser);
                 break;
             case 'refresh':
-                await this.refreshThemes(twitchUser);
+                await this.refreshThemes(twitchUserName);
                 break;
             case 'ban':
-                await this.ban(twitchUser, username);
+                await this.ban(twitchUserName, username);
                 break;
             case 'unban':
-                await this.unban(twitchUser, username);
+                await this.unban(twitchUserName, username);
                 break;
             case 'follower only':
-                await this.followerOnly(twitchUser, true);
+                await this.followerOnly(twitchUserName, true);
                 break;
             case 'follower only off':
-                await this.followerOnly(twitchUser, false);
+                await this.followerOnly(twitchUserName, false);
                 break;
             default:
-                this.changeTheme(twitchUser, param, following);
+                this.changeTheme(twitchUser, param);
                 break;
         }
     }
@@ -202,11 +205,11 @@ export class Themer {
     
     /**
      * Resets the theme to the one that was active when the extension was loaded
-     * @param twitchUserFollowing - Check if user is following
+     * @param twitchUser - pass through the twitch user state
      */
-    public async resetTheme(twitchUserFollowing: boolean) {
+    public async resetTheme(twitchUser: Userstate) {
         if (this._originalTheme) {
-            await this.changeTheme(undefined, this._originalTheme, twitchUserFollowing);
+            await this.changeTheme(twitchUser, this._originalTheme);
         }
     }
 
@@ -246,41 +249,41 @@ export class Themer {
 
     /**
      * Changes the theme to a random option from all available themes
-     * @param twitchUser - User who requested the random theme be applied
-     * @param twitchUserFollowing - Check if user is following
+     * @param twitchUser - pass through twitch user state
      */
-    private async randomTheme(twitchUser: string | undefined, twitchUserFollowing: boolean) {
+    private async randomTheme(twitchUser: Userstate) {
         const max = this._availableThemes.length;
         const randomNumber = Math.floor(Math.random() * max);
         const chosenTheme = this._availableThemes[randomNumber].label;
-        await this.changeTheme(twitchUser, chosenTheme, twitchUserFollowing);
+        await this.changeTheme(twitchUser, chosenTheme);
     }
 
     /**
      * Changes the active theme to the one specified
-     * @param twitchUser - User who requested the theme be applied
+     * @param twitchUser - User state of who requested the theme be applied
      * @param themeName - Name of the theme to be applied
-     * @param twitchUserFollowing - Check if user is following
      */
-    private async changeTheme(twitchUser: string | undefined, themeName: string, twitchUserFollowing: boolean) {
+    private async changeTheme(twitchUser: Userstate, themeName: string) {
 
-        following:
-        if (this._followerOnly) {
-            if (twitchUserFollowing) {
-                break following;
-            } else {
-                console.log (`${twitchUser} is not following.`);
-                return;
-            }
-        } else {
-            break following;
-        }
+        const twitchUserName = twitchUser["display-name"];
+
+        // following:
+        // if (this._followerOnly) {
+        //     if (twitchUserFollowing) {
+        //         break following;
+        //     } else {
+        //         console.log (`${twitchUser} is not following.`);
+        //         return;
+        //     }
+        // } else {
+        //     break following;
+        // }
         
         /** Ensure the user hasn't been banned before changing the theme */
-        if (twitchUser) {
-            const recipient = this.getRecipient(twitchUser, true);
+        if (twitchUserName) {
+            const recipient = this.getRecipient(twitchUserName, true);
             if (recipient && recipient.banned && recipient.banned === true) {
-                console.log(`${twitchUser} has been banned.`);
+                console.log(`${twitchUserName} has been banned.`);
                 return;
             }
         }
@@ -295,8 +298,8 @@ export class Themer {
                 const conf = vscode.workspace.getConfiguration();
                 themeExtension.activate().then(f => { 
                     conf.update('workbench.colorTheme', theme.themeId || theme.label, vscode.ConfigurationTarget.Global);
-                    if (twitchUser) {
-                        vscode.window.showInformationMessage(`Theme changed to ${theme.label} by ${twitchUser}`);
+                    if (twitchUserName) {
+                        vscode.window.showInformationMessage(`Theme changed to ${theme.label} by ${twitchUserName}`);
                     }
                 });
             }

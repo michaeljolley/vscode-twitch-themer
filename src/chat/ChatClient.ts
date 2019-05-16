@@ -5,14 +5,12 @@ import { disconnect } from 'cluster';
 import { EventEmitter } from 'vscode';
 import { TwitchClientStatus } from '../Enum';
 import { Constants } from '../Constants';
-import { AuthenticationService } from '../Authentication';
 
 /**
  * Twitch chat client used in communicating via chat/whispers
  */
 export default class ChatClient {
 
-    private _authenticationService : AuthenticationService;
     private _client: Client | null;
     private _options: Options | null;
     private readonly _themer: Themer;
@@ -27,7 +25,6 @@ export default class ChatClient {
      * @param state - The global state of the extension
      */
     constructor(state: Memento) {
-        this._authenticationService = new AuthenticationService;
         this._client = null;
         this._options = null;
         this._themer = new Themer(this, state);
@@ -71,7 +68,8 @@ export default class ChatClient {
          * continue working without having to manually change their
          * theme back to their preferred theme.
          */
-        await this._themer.resetTheme(true);
+        // TODO: Figure out a way to resetTheme 
+        // await this._themer.resetTheme(undefined);
     }
 
     /** Is the client currently connected to Twitch chat */
@@ -125,14 +123,14 @@ export default class ChatClient {
         if (!message) { return; }
 
         if (message.toLocaleLowerCase().startsWith('!theme')) {
-            let userFollowing : boolean = false;
-            if (userState["display-name"] === Constants.chatClientUserName) {
-                // broadcaster cannot follow their own stream. Temporary work around to mark broadcaster as follower.
-                userFollowing = true;
-            } else {
-                userFollowing = await this._authenticationService.isTwitchUserFollowing(userState["user-id"]);
-            }
-            await this._themer.handleCommands(userState["display-name"], '!theme', message.replace('!theme', '').trim(), userFollowing);
+            // let userFollowing : boolean = false;
+            // if (userState["display-name"] === Constants.chatClientUserName) {
+            //     // broadcaster cannot follow their own stream. Temporary work around to mark broadcaster as follower.
+            //     userFollowing = true;
+            // } else {
+            //     userFollowing = await this._authenticationService.isTwitchUserFollowing(userState["user-id"]);
+            // }
+            await this._themer.handleCommands(userState, '!theme', message.replace('!theme', '').trim());
         }
     }
 }
