@@ -68,8 +68,8 @@ export default class ChatClient {
          * continue working without having to manually change their
          * theme back to their preferred theme.
          */
-        // TODO: Figure out a way to resetTheme 
-        // await this._themer.resetTheme(undefined);
+        this._themer.followerOnly(Constants.chatClientUserName, false);
+        await this._themer.resetTheme(undefined);
     }
 
     /** Is the client currently connected to Twitch chat */
