@@ -77,6 +77,17 @@ These commands will either ban or unban a user from changing the theme via Twitc
 ```
 `Note: List of banned users will reset on extension activation/start up.`
 
+#### Follower Only mode
+
+These commands will either activate or deactivate follower only mode.
+
+```
+!theme follower only
+
+!theme follower only off
+```
+`Note: Follower only mode will be turned off on extension activation/start up`
+
 
 ## How to connect to Twitch
 
