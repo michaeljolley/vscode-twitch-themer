@@ -38,6 +38,11 @@ export class Themer {
         this.refreshThemes(Constants.chatClientUserName);
 
         /**
+         * Initialize follower only flag
+         */
+        this._followerOnly = this._state.get('followerOnly', false);
+
+        /**
          * Rehydrate the banned users from the extensions global state
          */
         this._state.get('bannedUsers', []).forEach(username => this._listRecipients.push({ username, banned: true }));
@@ -53,7 +58,6 @@ export class Themer {
      * @param twitchUser - Username of person sending the command
      * @param command - Command sent by user
      * @param param - Optional additional parameters sent by user
-     * @param following - Check if twitchUser is following streamer
      */
     public async handleCommands(twitchUser: Userstate, command: string, param: string) {
         
@@ -96,10 +100,10 @@ export class Themer {
             case 'unban':
                 await this.unban(twitchUserName, username);
                 break;
-            case 'follower only':
+            case 'follower':
                 await this.followerOnly(twitchUserName, true);
                 break;
-            case 'follower only off':
+            case '!follower':
                 await this.followerOnly(twitchUserName, false);
                 break;
             default:
@@ -176,6 +180,7 @@ export class Themer {
         if (twitchUser !== undefined && 
         twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
             this._followerOnly = activate;
+            this._state.update('followerOnly', activate);
             if (this._followerOnly)
             {
                 this._followers = [];

@@ -82,9 +82,9 @@ These commands will either ban or unban a user from changing the theme via Twitc
 These commands will either activate or deactivate follower only mode.
 
 ```
-!theme follower only
+!theme follower
 
-!theme follower only off
+!theme !follower
 ```
 `Note: Follower only mode will be turned off on extension activation/start up`
 
