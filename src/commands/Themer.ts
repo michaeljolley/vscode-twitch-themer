@@ -13,12 +13,12 @@ import { AuthenticationService } from '../Authentication';
 export class Themer {
 
     private _originalTheme: string | undefined;
+    private _followerOnly: boolean = false;
     private _availableThemes: Array<ITheme> = [];
     private _listRecipients: Array<IListRecipient> = [];
-    private _followerOnly: boolean = false;
     private _authService: AuthenticationService;
     private _followers: Array<IListRecipient> = [];
-
+    
     /**
      * constructor
      * @param _chatClient - Twitch chat client used in sending messages to users/chat
@@ -171,13 +171,14 @@ export class Themer {
      * @param twitchUser - The user requesting the follower mode change
      * @param activate - Set follower only mode
      */
-    private async followerOnly(twitchUser: string | undefined, activate: boolean)
+    public async followerOnly(twitchUser: string | undefined, activate: boolean)
     {
         if (twitchUser !== undefined && 
         twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
             this._followerOnly = activate;
             if (this._followerOnly)
             {
+                this._followers = [];
                 const followers : Array<any> = await this._authService.getFollowers();
                 followers.forEach(x => this._followers.push({username: x["from_name"].toLocaleLowerCase()}));
             }
@@ -220,7 +221,7 @@ export class Themer {
      * Resets the theme to the one that was active when the extension was loaded
      * @param twitchUser - pass through the twitch user state
      */
-    public async resetTheme(twitchUser: Userstate) {
+    public async resetTheme(twitchUser: Userstate | undefined) {
         if (this._originalTheme) {
             await this.changeTheme(twitchUser, this._originalTheme);
         }
@@ -276,9 +277,9 @@ export class Themer {
      * @param twitchUser - User state of who requested the theme be applied
      * @param themeName - Name of the theme to be applied
      */
-    private async changeTheme(twitchUser: Userstate, themeName: string) {
+    private async changeTheme(twitchUser: Userstate | undefined, themeName: string) {
 
-        const twitchUserName = twitchUser["display-name"] || "";
+        let twitchUserName : string = (twitchUser) ? twitchUser["display-name"] || "" : "";
 
         following:
         if (this._followerOnly) {
@@ -287,7 +288,7 @@ export class Themer {
                 break following;
             } else if (this._followers.find(x => x.username === twitchUserName.toLocaleLowerCase())) {
                 break following;
-            } else if (await this._authService.isTwitchUserFollowing(twitchUser["user-id"])) {
+            } else if (twitchUser && await this._authService.isTwitchUserFollowing(twitchUser["user-id"])) {
                 this._followers.push({username: twitchUserName? twitchUserName.toLocaleLowerCase() : ""});
                 break following;
             } else {
