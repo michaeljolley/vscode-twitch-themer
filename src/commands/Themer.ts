@@ -3,6 +3,8 @@ import ChatClient from '../chat/ChatClient';
 import { ITheme } from './ITheme';
 import { IListRecipient } from './IListRecipient';
 import { Constants } from '../Constants';
+import { Userstate } from 'tmi.js';
+import { AuthenticationService } from '../Authentication';
 
 /**
  * Manages all logic associated with retrieveing themes,
@@ -11,9 +13,12 @@ import { Constants } from '../Constants';
 export class Themer {
 
     private _originalTheme: string | undefined;
+    private _followerOnly: boolean = false;
     private _availableThemes: Array<ITheme> = [];
     private _listRecipients: Array<IListRecipient> = [];
-
+    private _authService: AuthenticationService;
+    private _followers: Array<IListRecipient> = [];
+    
     /**
      * constructor
      * @param _chatClient - Twitch chat client used in sending messages to users/chat
@@ -33,9 +38,19 @@ export class Themer {
         this.refreshThemes(Constants.chatClientUserName);
 
         /**
+         * Initialize follower only flag
+         */
+        this._followerOnly = this._state.get('followerOnly', false);
+
+        /**
          * Rehydrate the banned users from the extensions global state
          */
         this._state.get('bannedUsers', []).forEach(username => this._listRecipients.push({ username, banned: true }));
+
+        /**
+         * Create a connection to the authenication service
+         */
+        this._authService = new AuthenticationService;
     }
 
     /**
@@ -44,12 +59,14 @@ export class Themer {
      * @param command - Command sent by user
      * @param param - Optional additional parameters sent by user
      */
-    public async handleCommands(twitchUser: string | undefined, command: string, param: string) {
+    public async handleCommands(twitchUser: Userstate, command: string, param: string) {
         
         /** Only command we're going to respond to is !theme */
         if (command !== '!theme') {
             return;
         }
+
+        const twitchUserName = twitchUser["display-name"];
         
         param = param.toLowerCase().trim();
 
@@ -66,25 +83,31 @@ export class Themer {
                 await this.currentTheme();
                 break;
             case 'list':
-                await this.sendThemes(twitchUser);
+                await this.sendThemes(twitchUserName);
                 break;
             case 'reset':
-                await this.resetTheme();
+                await this.resetTheme(twitchUser);
                 break;
             case 'random':
                 await this.randomTheme(twitchUser);
                 break;
             case 'refresh':
-                await this.refreshThemes(twitchUser);
+                await this.refreshThemes(twitchUserName);
                 break;
             case 'ban':
-                await this.ban(twitchUser, username);
+                await this.ban(twitchUserName, username);
                 break;
             case 'unban':
-                await this.unban(twitchUser, username);
+                await this.unban(twitchUserName, username);
+                break;
+            case 'follower':
+                await this.followerOnly(twitchUserName, true);
+                break;
+            case '!follower':
+                await this.followerOnly(twitchUserName, false);
                 break;
             default:
-                this.changeTheme(twitchUser, param);
+                await this.changeTheme(twitchUser, param);
                 break;
         }
     }
@@ -121,7 +144,7 @@ export class Themer {
             const recipient = this.getRecipient(username);
             if (recipient === undefined) {
                 this._listRecipients.push({username: username.toLowerCase(), banned: true});
-                console.log(`${username} has been banned from using the themer plugin.`)
+                console.log(`${username} has been banned from using the themer plugin.`);
                 this.updateState();
             }
         }
@@ -144,6 +167,27 @@ export class Themer {
                 console.log(`${username} can now use the themer plugin.`);
                 this.updateState();
             }
+        }
+    }
+    
+    /**
+     * Activates follower only mode
+     * @param twitchUser - The user requesting the follower mode change
+     * @param activate - Set follower only mode
+     */
+    public async followerOnly(twitchUser: string | undefined, activate: boolean)
+    {
+        if (twitchUser !== undefined && 
+        twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
+            this._followerOnly = activate;
+            this._state.update('followerOnly', activate);
+            if (this._followerOnly)
+            {
+                this._followers = [];
+                const followers : Array<any> = await this._authService.getFollowers();
+                followers.forEach(x => this._followers.push({username: x["from_name"].toLocaleLowerCase()}));
+            }
+            this._followerOnly ? console.log('Follower Only mode has been activated.') : console.log('Follower Only mode has been deactivated.');
         }
     }
 
@@ -180,10 +224,11 @@ export class Themer {
     
     /**
      * Resets the theme to the one that was active when the extension was loaded
+     * @param twitchUser - pass through the twitch user state
      */
-    public async resetTheme() {
+    public async resetTheme(twitchUser: Userstate | undefined) {
         if (this._originalTheme) {
-            await this.changeTheme(undefined, this._originalTheme);
+            await this.changeTheme(twitchUser, this._originalTheme);
         }
     }
 
@@ -223,9 +268,9 @@ export class Themer {
 
     /**
      * Changes the theme to a random option from all available themes
-     * @param twitchUser - User who requested the random theme be applied
+     * @param twitchUser - pass through twitch user state
      */
-    private async randomTheme(twitchUser: string | undefined) {
+    private async randomTheme(twitchUser: Userstate) {
         const max = this._availableThemes.length;
         const randomNumber = Math.floor(Math.random() * max);
         const chosenTheme = this._availableThemes[randomNumber].label;
@@ -234,32 +279,52 @@ export class Themer {
 
     /**
      * Changes the active theme to the one specified
-     * @param twitchUser - User who requested the theme be applied
+     * @param twitchUser - User state of who requested the theme be applied
      * @param themeName - Name of the theme to be applied
      */
-    private async changeTheme(twitchUser: string | undefined, themeName: string) {
+    private async changeTheme(twitchUser: Userstate | undefined, themeName: string) {
+
+        let twitchUserName : string = (twitchUser) ? twitchUser["display-name"] || "" : "";
+
+        following:
+        if (this._followerOnly) {
+            if (twitchUserName.toLocaleLowerCase() === Constants.chatClientUserName.toLocaleLowerCase()) {
+                // broadcaster cannot follow their own stream. Temporary work around to mark broadcaster as follower.
+                break following;
+            } else if (this._followers.find(x => x.username === twitchUserName.toLocaleLowerCase())) {
+                break following;
+            } else if (twitchUser && await this._authService.isTwitchUserFollowing(twitchUser["user-id"])) {
+                this._followers.push({username: twitchUserName? twitchUserName.toLocaleLowerCase() : ""});
+                break following;
+            } else {
+                console.log (`${twitchUserName} is not following.`);
+                return;
+            }
+        } else {
+            break following;
+        }
         
         /** Ensure the user hasn't been banned before changing the theme */
-        if (twitchUser) {
-            const recipient = this.getRecipient(twitchUser, true);
+        if (twitchUserName) {
+            const recipient = this.getRecipient(twitchUserName, true);
             if (recipient && recipient.banned && recipient.banned === true) {
-                console.log(`${twitchUser} has been banned.`);
+                console.log(`${twitchUserName} has been banned.`);
                 return;
             }
         }
 
         /** Find theme based on themeName and change theme if it is found */
-        const theme = this._availableThemes.filter(f => f.label.toLowerCase() === themeName.toLowerCase())[0];
+        const theme = this._availableThemes.filter(f => f.label.toLowerCase() === themeName.toLowerCase() ||  f.themeId && f.themeId.toLowerCase() === themeName.toLowerCase())[0];
 
         if (theme) {  
             const themeExtension = vscode.extensions.getExtension(theme.extensionId);
         
             if (themeExtension !== undefined) {
                 const conf = vscode.workspace.getConfiguration();
-                themeExtension.activate().then(f => { 
-                    conf.update('workbench.colorTheme', theme.themeId || theme.label, vscode.ConfigurationTarget.Global);
-                    if (twitchUser) {
-                        vscode.window.showInformationMessage(`Theme changed to ${theme.label} by ${twitchUser}`);
+                await themeExtension.activate().then(async f => { 
+                    await conf.update('workbench.colorTheme', theme.themeId || theme.label, vscode.ConfigurationTarget.Global);
+                    if (twitchUserName) {
+                        vscode.window.showInformationMessage(`Theme changed to ${theme.label} by ${twitchUserName}`);
                     }
                 });
             }

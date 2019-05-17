@@ -68,7 +68,8 @@ export default class ChatClient {
          * continue working without having to manually change their
          * theme back to their preferred theme.
          */
-        await this._themer.resetTheme();
+        this._themer.followerOnly(Constants.chatClientUserName, false);
+        await this._themer.resetTheme(undefined);
     }
 
     /** Is the client currently connected to Twitch chat */
@@ -122,7 +123,7 @@ export default class ChatClient {
         if (!message) { return; }
 
         if (message.toLocaleLowerCase().startsWith('!theme')) {
-            await this._themer.handleCommands(userState["display-name"], '!theme', message.replace('!theme', '').trim());
+            await this._themer.handleCommands(userState, '!theme', message.replace('!theme', '').trim());
         }
     }
 }

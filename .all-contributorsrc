@@ -46,7 +46,18 @@
       "contributions": [
         "ideas",
         "code",
-        "design"
+        "design",
+        "doc",
+        "test"
+      ]
+    },
+    {
+      "login": "mholloway24",
+      "name": "Mike Holloway",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/40776983?v=4",
+      "profile": "https://github.com/mholloway24",
+      "contributions": [
+        "ideas"
       ]
     }
   ],
