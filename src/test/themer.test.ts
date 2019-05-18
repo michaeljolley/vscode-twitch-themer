@@ -89,12 +89,12 @@ suite('Themer Tests', function () {
       });
   });
 
-  test('Themer should reset theme to theme used when extension is activated', function (done) {
+  test('Themer should reset theme to theme used when extension is ', function (done) {
     const startupTheme = fakeWorkspaceConfiguration.get('workbench.colorTheme');
 
     fakeWorkspaceConfiguration.update('workbench.colorTheme', 'HotDog Stand');
 
-    fakeThemer.resetTheme({badges: {broadcaster: "1"}})
+    fakeThemer.resetTheme({"display-name": Constants.chatClientUserName, badges: {broadcaster: "1"}})
       .then(() => {
         try {
           getConfigurationStub.calledOnce.should.be.true;
