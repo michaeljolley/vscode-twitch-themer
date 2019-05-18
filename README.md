@@ -93,9 +93,9 @@ These commands will either activate or deactivate follower only mode.
 These commands will either activate or deactivate subscriber only mode.
 
 ```
-!theme sub only
+!theme sub
 
-!theme sub only off
+!theme !sub
 ```
 `Note: Subscriber only mode will be turned off on extension activation/start up`
 
