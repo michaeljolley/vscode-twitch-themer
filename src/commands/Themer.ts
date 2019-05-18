@@ -189,7 +189,6 @@ export class Themer {
             }
             this._followerOnly ? console.log('Follower Only mode has been activated.') : console.log('Follower Only mode has been deactivated.');
         }
-        return;
     }
 
     /**
