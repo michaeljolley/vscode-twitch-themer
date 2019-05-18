@@ -70,12 +70,13 @@ suite('Themer Tests', function () {
   
   test('Themer should return current theme (Visual Studio Dark)', function (done) {
     let sendMessage = '';
+    const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
 
     const sendMessageStub = sinon.stub(fakeChatClient, 'sendMessage').callsFake((message: string) => {
       sendMessage = message;
     });
 
-    fakeThemer.handleCommands({ "display-name": Constants.chatClientUserName }, '!theme', '')
+    fakeThemer.handleCommands(twitchUser, '!theme', '')
       .then(() => {
         try {
           getConfigurationStub.calledOnce.should.be.true;
@@ -89,12 +90,13 @@ suite('Themer Tests', function () {
       });
   });
 
-  test('Themer should reset theme to theme used when extension is ', function (done) {
+  test('Themer should reset theme to original theme when requested', function (done) {
+    const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName, badges: {broadcaster: "1"} };
     const startupTheme = fakeWorkspaceConfiguration.get('workbench.colorTheme');
 
     fakeWorkspaceConfiguration.update('workbench.colorTheme', 'HotDog Stand');
-
-    fakeThemer.resetTheme({"display-name": Constants.chatClientUserName, badges: {broadcaster: "1"}})
+    
+    fakeThemer.resetTheme(twitchUser)
       .then(() => {
         try {
           getConfigurationStub.calledOnce.should.be.true;
@@ -107,7 +109,9 @@ suite('Themer Tests', function () {
   });
 
   test('Themer should change current theme to Default Dark+', function (done) {
-    fakeThemer.handleCommands({ "display-name": Constants.chatClientUserName }, '!theme', 'Default Dark+')
+    const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
+
+    fakeThemer.handleCommands(twitchUser, '!theme', 'Default Dark+')
       .then(() => {
         try {
           getConfigurationStub.calledOnce.should.be.true;
@@ -146,10 +150,10 @@ suite('Themer Tests', function () {
   });
 
   test('Themer should ban a user', function(done) {
-
     const bannedUser = 'hotdog';
+    const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
 
-    fakeThemer.handleCommands({ "display-name": Constants.chatClientUserName }, '!theme', `ban ${bannedUser}`)
+    fakeThemer.handleCommands(twitchUser, '!theme', `ban ${bannedUser}`)
       .then(() => {
 
         try {
@@ -167,11 +171,12 @@ suite('Themer Tests', function () {
 
   test('Themer should unban a user', function(done) {
     const bannedUser = 'hotdog';
+    const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
 
     fakeState.update('bannedUsers', [bannedUser]);
     fakeThemer = new Themer(fakeChatClient, fakeState);
 
-    fakeThemer.handleCommands({ "display-name": Constants.chatClientUserName }, '!theme', `unban ${bannedUser}`)
+    fakeThemer.handleCommands(twitchUser, '!theme', `unban ${bannedUser}`)
       .then(() => {
 
         try {
@@ -188,7 +193,7 @@ suite('Themer Tests', function () {
 
   test('Themer should not ban if user is not the logged in user', function(done) {
     const bannedUser = 'hotdog';
-    const twitchUser = { "display-name": 'goofey' };
+    const twitchUser: Userstate = { 'display-name': 'goofey' };
 
     fakeThemer.handleCommands(twitchUser, '!theme', `ban ${bannedUser}`)
       .then(() => {
@@ -224,66 +229,90 @@ suite('Themer Tests', function () {
   });
 
   test('Themer should go to follower only mode if user is the logged in user', function(done) {
-    const twitchUser = { "display-name": Constants.chatClientUserName };
-    fakeState.update('followerOnly', false);
-
-    fakeThemer.handleCommands(twitchUser, '!theme', `follower`)
-      .then(() => {
-        try {
-          fakeState.get('followerOnly')!.should.be.true;
-          done();
-        }
-        catch (error) {
-          done(error);
-        }
-      });
+    const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
+    
+    fakeState.update('followerOnly', false).then(() => {
+      try {
+        fakeThemer.handleCommands(twitchUser, '!theme', `follower`)
+        .then(() => {
+          try {
+            fakeState.get('followerOnly')!.should.be.true;
+            done();
+          }
+          catch (error) {
+            done(error);
+          }
+        });
+      }
+      catch (error) {
+        done(error);
+      }
+    });
   });
 
   test('Themer should not go to follower only mode if user is not the logged in user', function(done) {
-    const twitchUser = { "display-name": 'goofey' };
-    fakeState.update('followerOnly', false);
-
-    fakeThemer.handleCommands(twitchUser, '!theme', `follower`)
-      .then(() => {
-        try {
-          fakeState.get('followerOnly')!.should.be.false;
-          done();
-        }
-        catch (error) {
-          done(error);
-        }
-      });
+    const twitchUser: Userstate = { 'display-name': 'goofey' };
+  
+    fakeState.update('followerOnly', false).then(() => {
+      try {
+        fakeThemer.handleCommands(twitchUser, '!theme', `follower`)
+          .then(() => {
+            try {
+              fakeState.get('followerOnly')!.should.be.false;
+              done();
+            }
+            catch (error) {
+              done(error);
+            }
+        });
+      }
+      catch (error) {
+        done(error);
+      }
+    });
   });
   
   test('Themer should leave follower only mode if user is the logged in user', function(done) {
-    const twitchUser = { "display-name": Constants.chatClientUserName };
-    fakeState.update('followerOnly', true);
-
-    fakeThemer.handleCommands(twitchUser, '!theme', `!follower`)
-      .then(() => {
-        try {
-          fakeState.get('followerOnly')!.should.be.false;
-          done();
-        }
-        catch (error) {
-          done(error);
-        }
-      });
+    const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
+  
+    fakeState.update('followerOnly', true).then(() => {
+      try {
+        fakeThemer.handleCommands(twitchUser, '!theme', `!follower`)
+          .then(() => {
+            try {
+              fakeState.get('followerOnly')!.should.be.false;
+              done();
+            }
+            catch (error) {
+              done(error);
+            }
+          });
+      }
+      catch (error) {
+        done(error);
+      }
+    });
   });
 
   test('Themer should not leave follower only mode if user is not the logged in user', function(done) {
-    const twitchUser = { "display-name": 'goofey' };
-    fakeState.update('followerOnly', true);
-
-    fakeThemer.handleCommands(twitchUser, '!theme', `!follower`)
-      .then(() => {
-        try {
-          fakeState.get('followerOnly')!.should.be.true;
-          done();
-        }
-        catch (error) {
-          done(error);
-        }
-      });
+    const twitchUser: Userstate = { 'display-name': 'goofey' };
+  
+    fakeState.update('followerOnly', true).then(() => {
+      try {
+        fakeThemer.handleCommands(twitchUser, '!theme', `!follower`)
+          .then(() => {
+            try {
+              fakeState.get('followerOnly')!.should.be.true;
+              done();
+            }
+            catch (error) {
+              done(error);
+            }
+          });
+      }
+      catch (error) {
+        done(error);
+      }
+    });
   });
 });
