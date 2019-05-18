@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Broadcaster can use `!theme sub` or `!theme !sub` to activate or deactivate sub only mode
 
 ---
 
@@ -15,8 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added tests for Themer class
-- Broadcaster can use `!theme follower only` or `!theme follower only off` to activate or deactivate follower only mode
-- Broadcaster can use `!theme sub only` or `!theme sub only off` to activate or deactivate sub only mode
+- Broadcaster can use `!theme follower` or `!theme !follower` to activate or deactivate follower only mode
 
 
 ## [0.0.6] - 2019-05-12
