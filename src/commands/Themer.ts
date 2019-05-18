@@ -178,7 +178,7 @@ export class Themer {
     public async followerOnly(twitchUser: string | undefined, activate: boolean)
     {
         if (twitchUser !== undefined && 
-        twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
+            twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
             this._followerOnly = activate;
             this._state.update('followerOnly', activate);
             if (this._followerOnly)
@@ -189,6 +189,7 @@ export class Themer {
             }
             this._followerOnly ? console.log('Follower Only mode has been activated.') : console.log('Follower Only mode has been deactivated.');
         }
+        return;
     }
 
     /**
