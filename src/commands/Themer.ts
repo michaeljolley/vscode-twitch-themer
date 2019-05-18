@@ -107,10 +107,10 @@ export class Themer {
             case '!follower':
                 await this.followerOnly(twitchUserName, false);
                 break;
-            case 'sub only':
+            case 'sub':
                 await this.subOnly(twitchUserName, true);
                 break;
-            case 'sub only off':
+            case '!sub':
                 await this.subOnly(twitchUserName, false);
                 break;
             default:
