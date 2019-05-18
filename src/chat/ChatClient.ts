@@ -1,3 +1,4 @@
+import { Memento } from 'vscode';
 import { Client, Options, Userstate } from 'tmi.js';
 import { Themer } from '../commands/Themer';
 import { disconnect } from 'cluster';
@@ -19,10 +20,14 @@ export default class ChatClient {
     /** Event that fires when the connection status of the chat client changes */
     public onStatusChanged = this.chatClientStatusEventEmitter.event;
 
-    constructor() {
+    /**
+     * constructor
+     * @param state - The global state of the extension
+     */
+    constructor(state: Memento) {
         this._client = null;
         this._options = null;
-        this._themer = new Themer(this);
+        this._themer = new Themer(this, state);
     }
 
     /**
@@ -63,7 +68,8 @@ export default class ChatClient {
          * continue working without having to manually change their
          * theme back to their preferred theme.
          */
-        await this._themer.resetTheme();
+        this._themer.followerOnly(Constants.chatClientUserName, false);
+        await this._themer.resetTheme(undefined);
     }
 
     /** Is the client currently connected to Twitch chat */
@@ -117,7 +123,7 @@ export default class ChatClient {
         if (!message) { return; }
 
         if (message.toLocaleLowerCase().startsWith('!theme')) {
-            await this._themer.handleCommands(userState["display-name"], '!theme', message.replace('!theme', '').trim());
+            await this._themer.handleCommands(userState, '!theme', message.replace('!theme', '').trim());
         }
     }
 }
