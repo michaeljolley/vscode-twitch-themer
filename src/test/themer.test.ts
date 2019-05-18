@@ -61,6 +61,7 @@ suite('Themer Tests', function () {
 
   setup(function () {
     fakeState.update('bannedUsers', []);
+    fakeState.update('followerOnly', true);
     fakeWorkspaceConfiguration.update('workbench.colorTheme', 'Visual Studio Dark');
     fakeChatClient = new ChatClient(fakeState);
     fakeThemer = new Themer(fakeChatClient, fakeState);
