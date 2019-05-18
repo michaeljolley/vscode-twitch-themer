@@ -130,6 +130,7 @@ export class Themer {
             .map(recipient => recipient.username);
 
         this._state.update('bannedUsers', bannedUsers);
+        this._state.update('followerOnly', this._followerOnly);
     }
 
     /**
@@ -180,13 +181,13 @@ export class Themer {
         if (twitchUser !== undefined && 
             twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
             this._followerOnly = activate;
-            this._state.update('followerOnly', activate);
             if (this._followerOnly)
             {
                 this._followers = [];
                 const followers : Array<any> = await this._authService.getFollowers();
                 followers.forEach(x => this._followers.push({username: x["from_name"].toLocaleLowerCase()}));
             }
+            this.updateState();
             this._followerOnly ? console.log('Follower Only mode has been activated.') : console.log('Follower Only mode has been deactivated.');
         }
     }

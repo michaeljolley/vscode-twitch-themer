@@ -231,6 +231,9 @@ suite('Themer Tests', function () {
   test('Themer should go to follower only mode if user is the logged in user', function(done) {
     const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
 
+    fakeState.update('followerOnly', false);
+    fakeThemer = new Themer(fakeChatClient, fakeState);
+
     fakeThemer.handleCommands(twitchUser, '!theme', `follower`)
       .then(() => {
         try {
