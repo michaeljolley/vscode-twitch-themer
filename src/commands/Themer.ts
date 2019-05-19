@@ -24,7 +24,7 @@ export class Themer {
      * @param _chatClient - Twitch chat client used in sending messages to users/chat
      * @param _state - The global state of the extension
      */
-    constructor(private _chatClient: ChatClient, private _state: vscode.Memento) 
+    constructor(private _chatClient: ChatClient, private _state: vscode.Memento, authService = new AuthenticationService) 
     {
         /** 
          * Get the current theme so we can reset it later 
@@ -50,7 +50,7 @@ export class Themer {
         /**
          * Create a connection to the authenication service
          */
-        this._authService = new AuthenticationService;
+        this._authService = authService;
     }
 
     /**
