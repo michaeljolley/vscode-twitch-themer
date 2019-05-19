@@ -188,7 +188,10 @@ export class Themer {
                 followers.forEach(x => this._followers.push({username: x["from_name"].toLocaleLowerCase()}));
             }
             this.updateState();
-            this._followerOnly ? console.log('Follower Only mode has been activated.') : console.log('Follower Only mode has been deactivated.');
+            let message = this._followerOnly ? 'Follower Only mode has been activated.' :'Follower Only mode has been deactivated.';
+            console.log(message);
+            this._chatClient.sendMessage(message);
+
         }
     }
 
