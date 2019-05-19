@@ -62,7 +62,7 @@ export class Themer {
     public async handleCommands(twitchUser: Userstate, command: string, param: string) {
         
         /** Only command we're going to respond to is !theme */
-        if (command !== '!theme') {
+        if (command.toLowerCase() !== '!theme') {
             return;
         }
 
