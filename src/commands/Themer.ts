@@ -191,7 +191,6 @@ export class Themer {
             let message = this._followerOnly ? 'Follower Only mode has been activated.' :'Follower Only mode has been deactivated.';
             console.log(message);
             this._chatClient.sendMessage(message);
-
         }
     }
 
