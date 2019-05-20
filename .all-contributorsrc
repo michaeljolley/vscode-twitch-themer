@@ -60,6 +60,16 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "John-Kryspin",
+      "name": "John Kryspin",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/6597539?v=4",
+      "profile": "https://github.com/John-Kryspin",
+      "contributions": [
+        "ideas",
+        "talk"
+      ]
     }
   ],
   "contributorsPerLine": 7,
