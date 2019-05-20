@@ -24,7 +24,7 @@ We love pull requests from everyone.
 
 Fork, then clone the repo:
 
-    git clone git@github.com:your-username/aviary.git
+    git clone git@github.com:your-username/vscode-twitch-themer.git
 
 **All changes should be based from the `vNext` branch.**
 
