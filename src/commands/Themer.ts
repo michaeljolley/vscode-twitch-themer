@@ -329,6 +329,8 @@ export class Themer {
                     }
                 });
             }
+        }else{
+            this._chatClient.whisper(twitchUserName, themeName + ` is an invalid theme name, please use !theme list for valid options`);
         }
     }
 
