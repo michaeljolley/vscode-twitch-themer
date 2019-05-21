@@ -15,8 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added tests for Themer class
 - Broadcaster can use `!theme follower` or `!theme !follower` to activate or deactivate follower only mode
+- Added tests for Themer class
 
 
 ## [0.0.6] - 2019-05-12
