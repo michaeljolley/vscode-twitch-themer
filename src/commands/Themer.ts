@@ -44,6 +44,11 @@ export class Themer {
         this._followerOnly = this._state.get('followerOnly', false);
 
         /**
+         * Initialize sub only flag
+         */
+        this._subOnly = this._state.get('subOnly', false);
+
+        /**
          * Rehydrate the banned users from the extensions global state
          */
         this._state.get('bannedUsers', []).forEach(username => this._listRecipients.push({ username, banned: true }));
@@ -138,6 +143,7 @@ export class Themer {
 
         this._state.update('bannedUsers', bannedUsers);
         this._state.update('followerOnly', this._followerOnly);
+        this._state.update('subOnly', this._subOnly);
     }
 
     /**
@@ -209,6 +215,7 @@ export class Themer {
         if (twitchUser !== undefined && 
         twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
             this._subOnly = activate;
+            this.updateState();
             this._subOnly ? console.log('Sub Only mode has been activated.') : console.log('Sub Only mode has been deactivated.');
         }
     }
