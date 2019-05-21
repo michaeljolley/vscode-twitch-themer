@@ -27,7 +27,8 @@ suite('Themer Tests', function () {
     };
     const stateValues: { [key: string]: any } = {
       'bannedUsers': [],
-      'followerOnly': false
+      'followerOnly': false,
+      'subOnly': false
     };
     fakeWorkspaceConfiguration = {
       get(section: string) {
@@ -63,6 +64,7 @@ suite('Themer Tests', function () {
   setup(function () {
     fakeState.update('bannedUsers', []);
     fakeState.update('followerOnly', false);
+    fakeState.update('subOnly', false);
     fakeWorkspaceConfiguration.update('workbench.colorTheme', 'Visual Studio Dark');
     fakeChatClient = new ChatClient(fakeState);
     fakeThemer = new Themer(fakeChatClient, fakeState);
@@ -298,6 +300,70 @@ suite('Themer Tests', function () {
       .then(() => {
         try {
           fakeState.get('followerOnly')!.should.be.true;
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+    });
+  });
+
+  test('Themer should go to subscriber only mode if user is the logged in user', function(done) {
+    const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
+    fakeState.update('subOnly', false);
+
+    fakeThemer.handleCommands(twitchUser, '!theme', `sub`)
+      .then(() => {
+        try {
+          fakeState.get('subOnly')!.should.be.true;
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+    });
+  });
+
+  test('Themer should not go to subscriber only mode if user is not the logged in user', function(done) {
+    const twitchUser: Userstate = { 'display-name': 'goofey' };
+    fakeState.update('subOnly', false);
+
+    fakeThemer.handleCommands(twitchUser, '!theme', `sub`)
+      .then(() => {
+        try {
+          fakeState.get('subOnly')!.should.be.false;
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+    });
+  });
+  
+  test('Themer should leave subscriber only mode if user is the logged in user', function(done) {
+    const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
+    fakeState.update('subOnly', true);
+  
+    fakeThemer.handleCommands(twitchUser, '!theme', `!sub`)
+      .then(() => {
+        try {
+          fakeState.get('subOnly')!.should.be.false;
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+    });
+  });
+
+  test('Themer should not leave subscriber only mode if user is not the logged in user', function(done) {
+    const twitchUser: Userstate = { 'display-name': 'goofey' };
+    fakeState.update('subOnly', true);
+    
+    fakeThemer.handleCommands(twitchUser, '!theme', `!sub`)
+      .then(() => {
+        try {
+          fakeState.get('subOnly')!.should.be.true;
           done();
         }
         catch (error) {
