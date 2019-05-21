@@ -88,6 +88,17 @@ These commands will either activate or deactivate follower only mode.
 ```
 `Note: Follower only mode will be turned off on extension activation/start up`
 
+#### Subscriber Only mode
+
+These commands will either activate or deactivate subscriber only mode.
+
+```
+!theme sub
+
+!theme !sub
+```
+`Note: Subscriber only mode will be turned off on extension activation/start up`
+
 
 ## How to connect to Twitch
 

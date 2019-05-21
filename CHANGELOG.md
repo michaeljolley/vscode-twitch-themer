@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Broadcaster can use `!theme sub` or `!theme !sub` to activate or deactivate sub only mode
 
 ---
 
