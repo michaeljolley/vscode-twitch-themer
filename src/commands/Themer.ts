@@ -330,7 +330,7 @@ export class Themer {
                 });
             }
         }else{
-            this._chatClient.whisper(twitchUserName, themeName + ` is an invalid theme name, please use !theme list for valid options`);
+            this._chatClient.sendMessage(`${twitchUserName}, ${theme} is not a valid theme name or isn't installed.  You can use !theme list to get a list of available themes.`);
         }
     }
 
