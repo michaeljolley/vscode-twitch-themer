@@ -17,6 +17,7 @@ export default class ChatClient {
 
     private chatClientStatusEventEmitter = new EventEmitter<TwitchClientStatus>();
 
+
     /** Event that fires when the connection status of the chat client changes */
     public onStatusChanged = this.chatClientStatusEventEmitter.event;
 

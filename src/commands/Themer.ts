@@ -5,6 +5,7 @@ import { IListRecipient } from './IListRecipient';
 import { Constants } from '../Constants';
 import { Userstate } from 'tmi.js';
 import { AuthenticationService } from '../Authentication';
+import { watch } from 'fs';
 
 /**
  * Manages all logic associated with retrieveing themes,
@@ -41,7 +42,7 @@ export class Themer {
         /**
          * Initialize follower only flag
          */
-        this._followerOnly = this._state.get('followerOnly', false);
+        this._followerOnly = vscode.workspace.getConfiguration().get('twitchThemer.followerOnly', false);
 
         /**
          * Initialize sub only flag
@@ -57,6 +58,7 @@ export class Themer {
          * Create a connection to the authenication service
          */
         this._authService = authService;
+        
     }
 
     /**
@@ -142,7 +144,6 @@ export class Themer {
             .map(recipient => recipient.username);
 
         this._state.update('bannedUsers', bannedUsers);
-        this._state.update('followerOnly', this._followerOnly);
         this._state.update('subOnly', this._subOnly);
     }
 
@@ -193,15 +194,15 @@ export class Themer {
     {
         if (twitchUser !== undefined && 
             twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
-            this._followerOnly = activate;
-            if (this._followerOnly)
+            vscode.workspace.getConfiguration().update('twitchThemer.followerOnly', activate);
+            if (activate)
             {
                 this._followers = [];
                 const followers : Array<any> = await this._authService.getFollowers();
                 followers.forEach(x => this._followers.push({username: x["from_name"].toLocaleLowerCase()}));
             }
             this.updateState();
-            const message = this._followerOnly ? 'Follower Only mode has been activated.' :'Follower Only mode has been deactivated.';
+            const message = vscode.workspace.getConfiguration().get('twitchThemer.followerOnly', false) ? 'Follower Only mode has been activated.' :'Follower Only mode has been deactivated.';
             console.log(message);
             this._chatClient.sendMessage(message);        
         }
