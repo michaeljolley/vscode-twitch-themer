@@ -194,6 +194,7 @@ export class Themer {
         if (twitchUser !== undefined && 
             twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
             vscode.workspace.getConfiguration().update('twitchThemer.followerOnly', activate);
+            this._followerOnly = activate;
             if (activate)
             {
                 this._followers = [];
@@ -217,7 +218,8 @@ export class Themer {
         if (twitchUser !== undefined && 
         twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
             vscode.workspace.getConfiguration().update('twitchThemer.subscriberOnly', activate);
-            const message = this._subOnly ? 'Sub Only mode has been activated' : 'Sub Only mode has been deactivated.';
+            this._subOnly = activate;
+            const message = vscode.workspace.getConfiguration().get('twitchThemer.subscriberOnly', false) ? 'Sub Only mode has been activated' : 'Sub Only mode has been deactivated.';
             console.log(message);
             this._chatClient.sendMessage(message);        
         }
