@@ -30,11 +30,19 @@ export default class ChatClient {
         this._options = null;
         this._themer = new Themer(this, state);
     }
-
-    public changeFollowerOnlyMode(followerOnly: boolean){
+    /**
+     * Changes Follower only flag 
+     * @param followerOnly 
+     */
+    public toggleFollowerOnlyMode(followerOnly: boolean){
         this._themer.followerOnly(Constants.chatClientUserName, followerOnly);
     }
-    public changeSubscriberOnlyMode(subscriberOnly: boolean){
+
+    /**
+     * Changes Subscriber only flag 
+     * @param subscriberOnly 
+     */
+    public toggleSubscriberOnlyMode(subscriberOnly: boolean){
         this._themer.subOnly(Constants.chatClientUserName, subscriberOnly);
     }
 
