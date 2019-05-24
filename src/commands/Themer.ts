@@ -216,7 +216,7 @@ export class Themer {
     {
         if (twitchUser !== undefined && 
         twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
-            this._subOnly = activate;
+            vscode.workspace.getConfiguration().update('twitchThemer.subscriberOnly', activate);
             const message = this._subOnly ? 'Sub Only mode has been activated' : 'Sub Only mode has been deactivated.';
             console.log(message);
             this._chatClient.sendMessage(message);        
