@@ -31,6 +31,13 @@ export default class ChatClient {
         this._themer = new Themer(this, state);
     }
 
+    public changeFollowerOnlyMode(followerOnly: boolean){
+        this._themer.followerOnly(Constants.chatClientUserName, followerOnly);
+    }
+    public changeSubscriberOnlyMode(subscriberOnly: boolean){
+        this._themer.subOnly(Constants.chatClientUserName, subscriberOnly);
+    }
+
     /**
      * Connects to Twitch chat
      * @param options - tmi.js Options for connecting to Twitch chat 

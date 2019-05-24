@@ -65,12 +65,15 @@ export async function activate(context: vscode.ExtensionContext) {
 	const chatDisconnectCommand = vscode.commands.registerCommand(Commands.chatDisconnect, chatClient.disconnect.bind(chatClient));
 	
 
-	context.subscriptions.push(vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent)=>{
+	const handleSettingsChange = vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent)=>{
 		if(e.affectsConfiguration('twitchThemer.followerOnly')){
-			console.log("CHANGED!");
+			chatClient.changeFollowerOnlyMode(vscode.workspace.getConfiguration().get('twitchThemer.followerOnly', false));
 		}
-	}))
-	context.subscriptions.push(chatConnectCommand, chatDisconnectCommand, signInCommand, signOutCommand, statusBarItem);
+		if(e.affectsConfiguration('twitchThemer.subscriberOnly')){
+			chatClient.changeSubscriberOnlyMode(vscode.workspace.getConfiguration().get('twitchThemer.subscriberOnly', false));
+		}
+	});
+	context.subscriptions.push(chatConnectCommand, chatDisconnectCommand, signInCommand, signOutCommand, statusBarItem, handleSettingsChange);
 }
 
 /**

@@ -67,7 +67,7 @@
 					"default": false,
 					"description": "Follow Only mode"
 				},
-				"typescript.subscriberOnly": {
+				"twitchThemer.subscriberOnly": {
 					"type": "boolean",
 					"default": false,
 					"description": "Subscriber only mode"
