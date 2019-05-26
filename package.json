@@ -61,7 +61,18 @@
 		],
 		"configuration": {
 			"title": "Twitch Themer",
-			"properties": {}
+			"properties": {
+				"twitchThemer.followerOnly": {
+					"type": "boolean",
+					"default": false,
+					"description": "Follow Only mode"
+				},
+				"twitchThemer.subscriberOnly": {
+					"type": "boolean",
+					"default": false,
+					"description": "Subscriber only mode"
+				}
+			}
 		}
 	},
 	"scripts": {

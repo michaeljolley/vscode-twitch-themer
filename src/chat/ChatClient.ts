@@ -29,6 +29,21 @@ export default class ChatClient {
         this._options = null;
         this._themer = new Themer(this, state);
     }
+    /**
+     * Changes Follower only flag 
+     * @param followerOnly 
+     */
+    public toggleFollowerOnlyMode(followerOnly: boolean){
+        this._themer.followerOnly(Constants.chatClientUserName, followerOnly);
+    }
+
+    /**
+     * Changes Subscriber only flag 
+     * @param subscriberOnly 
+     */
+    public toggleSubscriberOnlyMode(subscriberOnly: boolean){
+        this._themer.subOnly(Constants.chatClientUserName, subscriberOnly);
+    }
 
     /**
      * Connects to Twitch chat
