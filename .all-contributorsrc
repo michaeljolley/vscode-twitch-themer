@@ -72,6 +72,15 @@
         "bug",
         "test"
       ]
+    },
+    {
+      "login": "majorthorn",
+      "name": "majorthorn",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/10319786?v=4",
+      "profile": "https://github.com/majorthorn",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
