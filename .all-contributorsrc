@@ -61,6 +61,27 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "John-Kryspin",
+      "name": "John Kryspin",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/6597539?v=4",
+      "profile": "https://github.com/John-Kryspin",
+      "contributions": [
+        "ideas",
+        "code",
+        "bug",
+        "test"
+      ]
+    },
+    {
+      "login": "majorthorn",
+      "name": "majorthorn",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/10319786?v=4",
+      "profile": "https://github.com/majorthorn",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
