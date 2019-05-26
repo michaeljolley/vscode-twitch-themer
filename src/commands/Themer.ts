@@ -41,12 +41,12 @@ export class Themer {
         /**
          * Initialize follower only flag
          */
-        this._followerOnly = this._state.get('followerOnly', false);
+        this._followerOnly = vscode.workspace.getConfiguration().get('twitchThemer.followerOnly', false);
 
         /**
          * Initialize sub only flag
          */
-        this._subOnly = this._state.get('subOnly', false);
+        this._subOnly = vscode.workspace.getConfiguration().get('twitchThemer.subscriberOnly', false);
 
         /**
          * Rehydrate the banned users from the extensions global state
@@ -142,8 +142,6 @@ export class Themer {
             .map(recipient => recipient.username);
 
         this._state.update('bannedUsers', bannedUsers);
-        this._state.update('followerOnly', this._followerOnly);
-        this._state.update('subOnly', this._subOnly);
     }
 
     /**
@@ -193,6 +191,7 @@ export class Themer {
     {
         if (twitchUser !== undefined && 
             twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
+            vscode.workspace.getConfiguration().update('twitchThemer.followerOnly', activate);
             this._followerOnly = activate;
             if (this._followerOnly)
             {
@@ -212,13 +211,15 @@ export class Themer {
      * @param twitchUser - The user requesting the follower mode change
      * @param activate - Set follower only mode
      */
-    private async subOnly(twitchUser: string | undefined, activate: boolean)
+    public async subOnly(twitchUser: string | undefined, activate: boolean)
     {
         if (twitchUser !== undefined && 
         twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
+            vscode.workspace.getConfiguration().update('twitchThemer.subscriberOnly', activate);
             this._subOnly = activate;
-            this.updateState();
-            this._subOnly ? console.log('Sub Only mode has been activated.') : console.log('Sub Only mode has been deactivated.');
+            const message = this._subOnly ? 'Sub Only mode has been activated' : 'Sub Only mode has been deactivated.';
+            console.log(message);
+            this._chatClient.sendMessage(message);        
         }
     }
 
