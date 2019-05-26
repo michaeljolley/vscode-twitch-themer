@@ -9,7 +9,7 @@
 
 A Visual Studio Code extension that listens to twitch chat and allows viewers to change the streamers VS Code theme by sending **!theme**
 
-![](./resources/screenshot-example.gif)  
+![](./resources/screenshot-example.gif)
 
 ## Twitch Chat Commands
 
@@ -23,7 +23,7 @@ This will send the currently active theme to Twitch chat.
 
 #### Receive a list of available theme names
 
-This will send a list of installed VS Code themes to the requestor via whisper. 
+This will send a list of installed VS Code themes to the requestor via whisper.
 
 ```
 !theme list
@@ -88,6 +88,17 @@ These commands will either activate or deactivate follower only mode.
 ```
 `Note: Follower only mode will be turned off on extension activation/start up`
 
+#### Subscriber Only mode
+
+These commands will either activate or deactivate subscriber only mode.
+
+```
+!theme sub
+
+!theme !sub
+```
+`Note: Subscriber only mode will be turned off on extension activation/start up`
+
 
 ## How to connect to Twitch
 
@@ -110,7 +121,9 @@ These commands will either activate or deactivate follower only mode.
 See [CHANGELOG.md](CHANGELOG.md)
 
 
-## Contributors
+## Contributing
+
+Want to contribute? Check out our [Code of Conduct](CODE_OF_CONDUCT.md) and [Contributing](CONTRIBUTING.md) docs. This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.  Contributions of any kind welcome!
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
@@ -119,5 +132,3 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table><tr><td align="center"><a href="https://michaeljolley.com/"><img src="https://avatars2.githubusercontent.com/u/1228996?v=4" width="100px;" alt="Michael Jolley"/><br /><sub><b>Michael Jolley</b></sub></a><br /><a href="https://github.com/MichaelJolley/vscode-twitch-themer/commits?author=MichaelJolley" title="Code">💻</a> <a href="https://github.com/MichaelJolley/vscode-twitch-themer/commits?author=MichaelJolley" title="Documentation">📖</a> <a href="#design-MichaelJolley" title="Design">🎨</a> <a href="#ideas-MichaelJolley" title="Ideas, Planning, & Feedback">🤔</a> <a href="#maintenance-MichaelJolley" title="Maintenance">🚧</a> <a href="https://github.com/MichaelJolley/vscode-twitch-themer/commits?author=MichaelJolley" title="Tests">⚠️</a></td><td align="center"><a href="https://github.com/PatPat1567"><img src="https://avatars0.githubusercontent.com/u/41209202?v=4" width="100px;" alt="PatPat1567"/><br /><sub><b>PatPat1567</b></sub></a><br /><a href="https://github.com/MichaelJolley/vscode-twitch-themer/commits?author=PatPat1567" title="Code">💻</a> <a href="#ideas-PatPat1567" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/MichaelJolley/vscode-twitch-themer/commits?author=PatPat1567" title="Documentation">📖</a></td><td align="center"><a href="https://c-j.tech"><img src="https://avatars0.githubusercontent.com/u/3969086?v=4" width="100px;" alt="Chris Jones"/><br /><sub><b>Chris Jones</b></sub></a><br /><a href="#ideas-cmjchrisjones" title="Ideas, Planning, & Feedback">🤔</a></td><td align="center"><a href="https://github.com/parithon"><img src="https://avatars3.githubusercontent.com/u/8602418?v=4" width="100px;" alt="Anthony Conrad"/><br /><sub><b>Anthony Conrad</b></sub></a><br /><a href="#ideas-parithon" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/MichaelJolley/vscode-twitch-themer/commits?author=parithon" title="Code">💻</a> <a href="#design-parithon" title="Design">🎨</a> <a href="https://github.com/MichaelJolley/vscode-twitch-themer/commits?author=parithon" title="Documentation">📖</a> <a href="https://github.com/MichaelJolley/vscode-twitch-themer/commits?author=parithon" title="Tests">⚠️</a></td><td align="center"><a href="https://github.com/mholloway24"><img src="https://avatars2.githubusercontent.com/u/40776983?v=4" width="100px;" alt="Mike Holloway"/><br /><sub><b>Mike Holloway</b></sub></a><br /><a href="#ideas-mholloway24" title="Ideas, Planning, & Feedback">🤔</a></td><td align="center"><a href="https://github.com/John-Kryspin"><img src="https://avatars2.githubusercontent.com/u/6597539?v=4" width="100px;" alt="John Kryspin"/><br /><sub><b>John Kryspin</b></sub></a><br /><a href="#ideas-John-Kryspin" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/MichaelJolley/vscode-twitch-themer/commits?author=John-Kryspin" title="Code">💻</a> <a href="https://github.com/MichaelJolley/vscode-twitch-themer/issues?q=author%3AJohn-Kryspin" title="Bug reports">🐛</a> <a href="https://github.com/MichaelJolley/vscode-twitch-themer/commits?author=John-Kryspin" title="Tests">⚠️</a></td><td align="center"><a href="https://github.com/majorthorn"><img src="https://avatars3.githubusercontent.com/u/10319786?v=4" width="100px;" alt="majorthorn"/><br /><sub><b>majorthorn</b></sub></a><br /><a href="https://github.com/MichaelJolley/vscode-twitch-themer/issues?q=author%3Amajorthorn" title="Bug reports">🐛</a></td></tr></table>
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

@@ -8,6 +8,7 @@ import ChatClient from '../chat/ChatClient';
 import { Themer } from '../commands/Themer';
 import { Constants } from '../Constants';
 import { Userstate } from 'tmi.js';
+import { AuthenticationService } from '../Authentication';
 
 chai.should();
 
@@ -26,7 +27,8 @@ suite('Themer Tests', function () {
     };
     const stateValues: { [key: string]: any } = {
       'bannedUsers': [],
-      'followerOnly': false
+      'followerOnly': false,
+      'subOnly': false
     };
     fakeWorkspaceConfiguration = {
       get(section: string) {
@@ -62,6 +64,7 @@ suite('Themer Tests', function () {
   setup(function () {
     fakeState.update('bannedUsers', []);
     fakeState.update('followerOnly', false);
+    fakeState.update('subOnly', false);
     fakeWorkspaceConfiguration.update('workbench.colorTheme', 'Visual Studio Dark');
     fakeChatClient = new ChatClient(fakeState);
     fakeThemer = new Themer(fakeChatClient, fakeState);
@@ -228,33 +231,41 @@ suite('Themer Tests', function () {
       });
   });
 
-  // test('Themer should go to follower only mode if user is the logged in user', function(done) {
-  //   const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
+  test('Themer should go to follower only mode if user is the logged in user', function(done) {
+    const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
+    const fakeAuthService: AuthenticationService = new AuthenticationService;
 
-  //   fakeState.update('followerOnly', false);
-  //   fakeThemer = new Themer(fakeChatClient, fakeState);
+    // We stub out the getFollowers function to return an empty array.
+    // The getFollowers() method requires access to 'keytar' which
+    // isn't available in the Linux build servers as 'keytar' depends
+    // on Gnome libraries which aren't installed because no GUI is
+    // installed on the Linux build servers.
+    sinon.stub(fakeAuthService, 'getFollowers').returns(Promise.resolve([]));
 
-  //   fakeThemer.handleCommands(twitchUser, '!theme', `follower`)
-  //     .then(() => {
-  //       try {
-  //         fakeState.get('followerOnly')!.should.be.true;
-  //         done();
-  //       }
-  //       catch (error) {
-  //         done(error);
-  //       }
-  //   });
-  // });
-
-  test('Themer should not go to follower only mode if user is not the logged in user', function(done) {
-    const twitchUser: Userstate = { 'display-name': 'goofey' };
-
-    fakeState.update('followerOnly', false);
+    vscode.workspace.getConfiguration().update('twitchThemer.followerOnly', false);
+    fakeThemer = new Themer(fakeChatClient, fakeState, fakeAuthService);
 
     fakeThemer.handleCommands(twitchUser, '!theme', `follower`)
       .then(() => {
         try {
-          fakeState.get('followerOnly')!.should.be.false;
+          vscode.workspace.getConfiguration().get('twitchThemer.followerOnly')!.should.be.true;
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+    });
+  });
+
+  test('Themer should not go to follower only mode if user is not the logged in user', function(done) {
+    const twitchUser: Userstate = { 'display-name': 'goofey' };
+
+    vscode.workspace.getConfiguration().update('twitchThemer.followerOnly', false);
+
+    fakeThemer.handleCommands(twitchUser, '!theme', `follower`)
+      .then(() => {
+        try {
+          vscode.workspace.getConfiguration().get('twitchThemer.followerOnly')!.should.be.false;
           done();
         }
         catch (error) {
@@ -266,12 +277,12 @@ suite('Themer Tests', function () {
   test('Themer should leave follower only mode if user is the logged in user', function(done) {
     const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
 
-    fakeState.update('followerOnly', true);
+    vscode.workspace.getConfiguration().update('twitchThemer.followerOnly', true);
   
     fakeThemer.handleCommands(twitchUser, '!theme', `!follower`)
       .then(() => {
         try {
-          fakeState.get('followerOnly')!.should.be.false;
+          vscode.workspace.getConfiguration().get('twitchThemer.followerOnly')!.should.be.false;
           done();
         }
         catch (error) {
@@ -283,12 +294,76 @@ suite('Themer Tests', function () {
   test('Themer should not leave follower only mode if user is not the logged in user', function(done) {
     const twitchUser: Userstate = { 'display-name': 'goofey' };
 
-    fakeState.update('followerOnly', true);
+    vscode.workspace.getConfiguration().update('twitchThemer.followerOnly', true);
     
     fakeThemer.handleCommands(twitchUser, '!theme', `!follower`)
       .then(() => {
         try {
-          fakeState.get('followerOnly')!.should.be.true;
+          vscode.workspace.getConfiguration().get('twitchThemer.followerOnly')!.should.be.true;
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+    });
+  });
+
+  test('Themer should go to subscriber only mode if user is the logged in user', function(done) {
+    const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
+    vscode.workspace.getConfiguration().update('twitchThemer.subscriberOnly', false);
+
+    fakeThemer.handleCommands(twitchUser, '!theme', `sub`)
+      .then(() => {
+        try {
+          vscode.workspace.getConfiguration().get('twitchThemer.subscriberOnly')!.should.be.true;
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+    });
+  });
+
+  test('Themer should not go to subscriber only mode if user is not the logged in user', function(done) {
+    const twitchUser: Userstate = { 'display-name': 'goofey' };
+    vscode.workspace.getConfiguration().update('twitchThemer.subscriberOnly', false);
+
+    fakeThemer.handleCommands(twitchUser, '!theme', `sub`)
+      .then(() => {
+        try {
+          vscode.workspace.getConfiguration().get('twitchThemer.subscriberOnly')!.should.be.false;
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+    });
+  });
+  
+  test('Themer should leave subscriber only mode if user is the logged in user', function(done) {
+    const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
+    vscode.workspace.getConfiguration().update('twitchThemer.subscriberOnly', true);
+  
+    fakeThemer.handleCommands(twitchUser, '!theme', `!sub`)
+      .then(() => {
+        try {
+          vscode.workspace.getConfiguration().get('twitchThemer.subscriberOnly')!.should.be.false;
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+    });
+  });
+
+  test('Themer should not leave subscriber only mode if user is not the logged in user', function(done) {
+    const twitchUser: Userstate = { 'display-name': 'goofey' };
+    vscode.workspace.getConfiguration().update('twitchThemer.subscriberOnly', true);
+    
+    fakeThemer.handleCommands(twitchUser, '!theme', `!sub`)
+      .then(() => {
+        try {
+          vscode.workspace.getConfiguration().get('twitchThemer.subscriberOnly')!.should.be.true;
           done();
         }
         catch (error) {

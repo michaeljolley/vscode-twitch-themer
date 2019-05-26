@@ -10,6 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0] - 2019-05-26
+
+### Added
+
+- Broadcaster can use `!theme sub` or `!theme !sub` to activate or deactivate sub only mode
+- Follower Only & Subscriber Only are now also VS Code settings so you don't have to use chat commands
+- If user sends a `!theme {theme name}` with an invalid theme name, the extension will whisper them to let
+them know it's not a valid theme name
+
+
 ## [0.1.0] - 2019-05-16
 
 ### Added
@@ -72,7 +82,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.1.0...HEAD
+[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.2.0...HEAD
+[0.1.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.6...0.1.0
 [0.0.6]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.5...0.0.6
 [0.0.5]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.4...0.0.5
