@@ -76,7 +76,7 @@
 		}
 	},
 	"scripts": {
-		"package": "npx vsce package",
+		"package": "npx vsce package -o release.vsix",
 		"publish": "npx vsce publish",
 		"vscode:prepublish": "webpack --mode production",
 		"webpack": "webpack --mode none",
