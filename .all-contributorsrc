@@ -83,6 +83,16 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "surlydev",
+      "name": "SurlyDev",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/880671?v=4",
+      "profile": "http://surlydev.net",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
