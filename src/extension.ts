@@ -18,8 +18,6 @@ authService.onAuthStatusChanged(async (status) => {
 	/**
 	 * If the user is not logged in we want to attempt to authenticate
 	 * them with Twitch.
-	 * 
-	 * If they are or become, logged in, we want to immediately connect to Twitch chat
 	 */
 	if (status === TwitchClientStatus.loggedIn) {
 		const user = await authService.currentUser();
@@ -32,11 +30,10 @@ authService.onAuthStatusChanged(async (status) => {
 				},
 				channels: [user.login]
 			};
-			chatClient.connect(opts);
 		}
-	} 
+	}
 	/**
-	 * If the status of the authenticate is changed to logged out we want 
+	 * If the status of the authenticate is changed to logged out we want
 	 * to automatically disconnect from Twitch chat
 	 */
 	else if (status === TwitchClientStatus.loggedOut) {
@@ -52,16 +49,18 @@ authService.onAuthStatusChanged(async (status) => {
 export async function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, Twitch Themer is now active!');
 
-	// We instantiate a new ChatClient using the global state of this extension;
-	// the state holds extension specific values such as the banned users.
-	chatClient = new ChatClient(context.globalState);
 
 	await authService.initialize();
+
+	// We instantiate a new ChatClient using the global state of this extension;
+	// the state holds extension specific values such as the banned users.
+	chatClient = new ChatClient(context.globalState, authService);
+
 
 	const statusBarItem = await createStatusBarItem(context, authService, chatClient);
 	const signInCommand = vscode.commands.registerCommand(Commands.twitchSignIn, authService.handleSignIn.bind(authService));
 	const signOutCommand = vscode.commands.registerCommand(Commands.twitchSignOut, authService.handleSignOut.bind(authService));
-	const chatConnectCommand = vscode.commands.registerCommand(Commands.chatConnect, authService.handleSignIn.bind(authService));
+	const chatConnectCommand = vscode.commands.registerCommand(Commands.chatConnect, chatClient.connect.bind(chatClient));
 	const chatDisconnectCommand = vscode.commands.registerCommand(Commands.chatDisconnect, chatClient.disconnect.bind(chatClient));
 
 	const handleSettingsChange = vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent)=>{
@@ -72,7 +71,7 @@ export async function activate(context: vscode.ExtensionContext) {
 			chatClient.toggleSubscriberOnlyMode(vscode.workspace.getConfiguration().get('twitchThemer.subscriberOnly', false));
 		}
 	});
-	
+
 	context.subscriptions.push(chatConnectCommand, chatDisconnectCommand, signInCommand, signOutCommand, statusBarItem, handleSettingsChange);
 }
 
