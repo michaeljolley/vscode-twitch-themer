@@ -65,12 +65,12 @@
 				"twitchThemer.followerOnly": {
 					"type": "boolean",
 					"default": false,
-					"description": "Follow Only mode"
+					"description": "Allow Followers only"
 				},
 				"twitchThemer.subscriberOnly": {
 					"type": "boolean",
 					"default": false,
-					"description": "Subscriber only mode"
+					"description": "Allow Subscribers only"
 				}
 			}
 		}
@@ -110,9 +110,9 @@
 	},
 	"dependencies": {
 		"dotenv": "~7.0.0",
-		"keytar": "^4.4.1",
+		"keytar": "^4.9.0",
+		"node-fetch": "~2.3.0",
 		"tmi.js": "~1.4.2",
-		"uuid": "~3.3.2",
-		"node-fetch": "~2.3.0"
+		"uuid": "~3.3.2"
 	}
 }
