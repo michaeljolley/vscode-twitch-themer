@@ -2,10 +2,10 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import * as vscode from 'vscode';
-import ChatClient from './chat/ChatClient';
-import { Commands, TwitchClientStatus } from './Enum';
 import { AuthenticationService } from './Authentication';
+import ChatClient from './chat/ChatClient';
 import { Constants } from './Constants';
+import { Commands, TwitchClientStatus } from './Enum';
 import { createStatusBarItem } from './StatusBar';
 
 let chatClient: ChatClient;
@@ -30,6 +30,7 @@ authService.onAuthStatusChanged(async (status) => {
 				},
 				channels: [user.login]
 			};
+			chatClient.connect(opts);
 		}
 	}
 	/**
@@ -49,19 +50,15 @@ authService.onAuthStatusChanged(async (status) => {
 export async function activate(context: vscode.ExtensionContext) {
 	console.log('Congratulations, Twitch Themer is now active!');
 
-
 	await authService.initialize();
 
 	// We instantiate a new ChatClient using the global state of this extension;
 	// the state holds extension specific values such as the banned users.
-	chatClient = new ChatClient(context.globalState, authService);
-
+	chatClient = new ChatClient(context.globalState);
 
 	const statusBarItem = await createStatusBarItem(context, authService, chatClient);
-	const signInCommand = vscode.commands.registerCommand(Commands.twitchSignIn, authService.handleSignIn.bind(authService));
-	const signOutCommand = vscode.commands.registerCommand(Commands.twitchSignOut, authService.handleSignOut.bind(authService));
-	const chatConnectCommand = vscode.commands.registerCommand(Commands.chatConnect, chatClient.connect.bind(chatClient));
-	const chatDisconnectCommand = vscode.commands.registerCommand(Commands.chatDisconnect, chatClient.disconnect.bind(chatClient));
+	const chatConnect = vscode.commands.registerCommand(Commands.chatConnect, authService.handleSignIn.bind(authService));
+	const chatDisconnect = vscode.commands.registerCommand(Commands.chatDisconnect, authService.handleSignOut.bind(authService));
 
 	const handleSettingsChange = vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent)=>{
 		if(e.affectsConfiguration('twitchThemer.followerOnly')){
@@ -72,7 +69,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	context.subscriptions.push(chatConnectCommand, chatDisconnectCommand, signInCommand, signOutCommand, statusBarItem, handleSettingsChange);
+	context.subscriptions.push(chatConnect, chatDisconnect, statusBarItem, handleSettingsChange);
 }
 
 /**

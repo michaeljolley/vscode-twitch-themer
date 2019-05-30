@@ -1,11 +1,11 @@
-import * as vscode from 'vscode';
+import { readFileSync } from 'fs';
 import * as http from 'http';
+import * as keytartype from 'keytar';
+import * as fetch from 'node-fetch';
 import * as path from 'path';
 import * as url from 'url';
-import { readFileSync } from 'fs';
-import * as keytartype from 'keytar';
 import { v4 } from 'uuid';
-import * as fetch from 'node-fetch';
+import * as vscode from 'vscode';
 import { TwitchClientStatus } from './Enum';
 
 const service = 'vscode-twitch-themer';
@@ -44,7 +44,7 @@ export class AuthenticationService {
     public onAuthStatusChanged = this.authStatusEventEmitter.event;
 
     /**
-     * Initializes the authentication service.  If the user is 
+     * Initializes the authentication service.  If the user is
      * already authenticated it will immediately fire the logged in status.
      */
     async initialize() {
@@ -55,7 +55,7 @@ export class AuthenticationService {
     }
 
     /**
-     * Attempts to read the users OAuth token to authenticate.  If an 
+     * Attempts to read the users OAuth token to authenticate.  If an
      * OAuth token doesn't exist then we'll open a browser to allow
      * the user to authenticate with Twitch and return an OAuth token
      * to the extension.

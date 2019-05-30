@@ -18,7 +18,6 @@ suite('Themer Tests', function () {
   let fakeWorkspaceConfiguration: vscode.WorkspaceConfiguration;
   let fakeChatClient: ChatClient;
   let fakeThemer: Themer;
-  let fakeAuthService: AuthenticationService;
 
   suiteSetup(function () {
     const fakeConfig: {
@@ -67,8 +66,7 @@ suite('Themer Tests', function () {
     fakeState.update('followerOnly', false);
     fakeState.update('subOnly', false);
     fakeWorkspaceConfiguration.update('workbench.colorTheme', 'Visual Studio Dark');
-    fakeAuthService = new AuthenticationService();
-    fakeChatClient = new ChatClient(fakeState, fakeAuthService);
+    fakeChatClient = new ChatClient(fakeState);
     fakeThemer = new Themer(fakeChatClient, fakeState);
     getConfigurationStub.resetHistory();
   });

@@ -1,12 +1,9 @@
-import * as vscode from 'vscode';
-import { Memento } from 'vscode';
-import { Client, Options, Userstate } from 'tmi.js';
-import { Themer } from '../commands/Themer';
 import { disconnect } from 'cluster';
-import { EventEmitter } from 'vscode';
-import { TwitchClientStatus } from '../Enum';
+import { Client, Options, Userstate } from 'tmi.js';
+import { EventEmitter, Memento } from 'vscode';
+import { Themer } from '../commands/Themer';
 import { Constants } from '../Constants';
-import { AuthenticationService } from '../Authentication';
+import { TwitchClientStatus } from '../Enum';
 
 /**
  * Twitch chat client used in communicating via chat/whispers
@@ -16,7 +13,6 @@ export default class ChatClient {
     private _client: Client | null;
     private _options: Options | null;
     private readonly _themer: Themer;
-    private readonly _authService: AuthenticationService;
 
     private chatClientStatusEventEmitter = new EventEmitter<TwitchClientStatus>();
 
@@ -27,11 +23,10 @@ export default class ChatClient {
      * constructor
      * @param state - The global state of the extension
      */
-    constructor(state: Memento, authService: AuthenticationService) {
+    constructor(state: Memento) {
         this._client = null;
         this._options = null;
         this._themer = new Themer(this, state);
-        this._authService = authService;
     }
     /**
      * Changes Follower only flag
@@ -55,13 +50,6 @@ export default class ChatClient {
      */
     public async connect(options: Options): Promise<[string, number]> {
         this._options = options;
-
-        const currentUser = await this._authService.currentUser();
-
-        if (currentUser === null) {
-            vscode.window.showInformationMessage(`Not logged in to Twitch.  Signing in now.`);
-            await this._authService.handleSignIn();
-        }
 
         /** We're disconnecting just in case we were already
          * connected using different options */
@@ -94,7 +82,6 @@ export default class ChatClient {
          * continue working without having to manually change their
          * theme back to their preferred theme.
          */
-        this._themer.followerOnly(Constants.chatClientUserName, false);
         await this._themer.resetTheme(undefined);
     }
 
@@ -148,7 +135,9 @@ export default class ChatClient {
         if (self) { return; }
         if (!message) { return; }
 
-        if (message.toLocaleLowerCase().startsWith('!theme')) {
+        message = message.toLocaleLowerCase().trim();
+
+        if (message.startsWith('!theme')) {
             await this._themer.handleCommands(userState, '!theme', message.replace('!theme', '').trim());
         }
     }

@@ -1,7 +1,7 @@
-import { ExtensionContext, StatusBarAlignment, window, StatusBarItem, Event } from "vscode";
-import { TwitchClientStatus } from "./Enum";
+import { ExtensionContext, StatusBarAlignment, StatusBarItem, window } from "vscode";
 import { AuthenticationService } from "./Authentication";
 import ChatClient from "./chat/ChatClient";
+import { TwitchClientStatus } from "./Enum";
 
 /**
  * Creates the status bar item to use in updating users of the status of the extension
@@ -41,7 +41,7 @@ export async function createStatusBarItem(context: ExtensionContext,
 function updateStatusBarItem(statusBarItem: StatusBarItem, authStatus: TwitchClientStatus,
     chatClientConnected: boolean,
     userName?: string | undefined) {
-        
+
     let text = 'Twitch Themer: ';
     statusBarItem.show();
 

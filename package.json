@@ -47,16 +47,6 @@
 				"command": "twitchThemer.chatDisconnect",
 				"title": "Chat Disconnect",
 				"category": "Twitch Themer"
-			},
-			{
-				"command": "twitchThemer.signIn",
-				"title": "Sign In",
-				"category": "Twitch Themer"
-			},
-			{
-				"command": "twitchThemer.signOut",
-				"title": "Sign Out",
-				"category": "Twitch Themer"
 			}
 		],
 		"configuration": {
