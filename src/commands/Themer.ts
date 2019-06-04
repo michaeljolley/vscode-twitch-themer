@@ -67,17 +67,15 @@ export class Themer {
      */
     public async handleCommands(twitchUser: Userstate, command: string, param: string) {
 
-        command = command.toLowerCase().trim();
+        command = command.toLocaleLowerCase().trim();
 
 	/** Only command we're going to respond to is !theme */
         if (command !== '!theme') {
             return;
         }
 
-	param = param.toLowerCase().trim();
+        param = param.toLocaleLowerCase().trim().replace(',','');
         const twitchUserName = twitchUser["display-name"];
-
-        param = param.toLocaleLowerCase().trim();
 
         let username: string  | undefined;
         /** Determine if the param is a (un)ban request */

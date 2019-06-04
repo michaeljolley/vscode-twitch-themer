@@ -127,6 +127,22 @@ suite('Themer Tests', function () {
       });
   });
 
+  test('Themer should remove trailing comma and change current theme to Default Dark+', function (done) {
+    const twitchUser: Userstate = { 'display-name': Constants.chatClientUserName };
+
+    fakeThemer.handleCommands(twitchUser, '!theme', 'Default Dark+,')
+      .then(() => {
+        try {
+          getConfigurationStub.calledOnce.should.be.true;
+          fakeWorkspaceConfiguration.get('workbench.colorTheme')!.should.equal('Default Dark+');
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+      });
+  });
+
   test('Themer should return a comma seperated list of themes', function (done) {
     let twitchUser: string | undefined;
     let sendMessage: string;
