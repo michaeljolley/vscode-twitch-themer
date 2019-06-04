@@ -30,16 +30,16 @@ export default class ChatClient {
         this._themer = new Themer(this, state);
     }
     /**
-     * Changes Follower only flag 
-     * @param followerOnly 
+     * Changes Follower only flag
+     * @param followerOnly
      */
     public toggleFollowerOnlyMode(followerOnly: boolean){
         this._themer.followerOnly(Constants.chatClientUserName, followerOnly);
     }
 
     /**
-     * Changes Subscriber only flag 
-     * @param subscriberOnly 
+     * Changes Subscriber only flag
+     * @param subscriberOnly
      */
     public toggleSubscriberOnlyMode(subscriberOnly: boolean){
         this._themer.subOnly(Constants.chatClientUserName, subscriberOnly);
@@ -47,12 +47,12 @@ export default class ChatClient {
 
     /**
      * Connects to Twitch chat
-     * @param options - tmi.js Options for connecting to Twitch chat 
+     * @param options - tmi.js Options for connecting to Twitch chat
      */
     public async connect(options: Options): Promise<[string, number]> {
         this._options = options;
 
-        /** We're disconnecting just in case we were already 
+        /** We're disconnecting just in case we were already
          * connected using different options */
         await disconnect();
 
@@ -78,12 +78,11 @@ export default class ChatClient {
         }
 
         /**
-         * Every time we disconnect from chat we want to reset the 
-         * theme to the streamers original theme so they can 
+         * Every time we disconnect from chat we want to reset the
+         * theme to the streamers original theme so they can
          * continue working without having to manually change their
          * theme back to their preferred theme.
          */
-        this._themer.followerOnly(Constants.chatClientUserName, false);
         await this._themer.resetTheme(undefined);
     }
 
@@ -104,7 +103,7 @@ export default class ChatClient {
 
     /**
      * Sends a whisper to the specified user
-     * @param twitchUser - Username of the recipient of the whisper 
+     * @param twitchUser - Username of the recipient of the whisper
      * @param message - Message to send to the twitchUser
      */
     public whisper(twitchUser: string | undefined, message: string) {
