@@ -74,7 +74,7 @@ export class Themer {
             return;
         }
 
-	param = param.toLowerCase().trim();
+        param = param.toLowerCase().trim().replace(',','');
         const twitchUserName = twitchUser["display-name"];
 
         param = param.toLocaleLowerCase().trim();
