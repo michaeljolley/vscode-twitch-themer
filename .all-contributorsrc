@@ -27,7 +27,8 @@
       "contributions": [
         "code",
         "ideas",
-        "doc"
+        "doc",
+        "bug"
       ]
     },
     {
@@ -36,7 +37,8 @@
       "avatar_url": "https://avatars0.githubusercontent.com/u/3969086?v=4",
       "profile": "https://c-j.tech",
       "contributions": [
-        "ideas"
+        "ideas",
+        "bug"
       ]
     },
     {
@@ -60,6 +62,37 @@
       "profile": "https://github.com/mholloway24",
       "contributions": [
         "ideas"
+      ]
+    },
+    {
+      "login": "John-Kryspin",
+      "name": "John Kryspin",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/6597539?v=4",
+      "profile": "https://github.com/John-Kryspin",
+      "contributions": [
+        "ideas",
+        "code",
+        "bug",
+        "test"
+      ]
+    },
+    {
+      "login": "majorthorn",
+      "name": "majorthorn",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/10319786?v=4",
+      "profile": "https://github.com/majorthorn",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "surlydev",
+      "name": "SurlyDev",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/880671?v=4",
+      "profile": "http://surlydev.net",
+      "contributions": [
+        "code",
+        "bug"
       ]
     }
   ],

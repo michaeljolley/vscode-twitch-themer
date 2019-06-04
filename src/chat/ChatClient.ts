@@ -1,10 +1,9 @@
-import { Memento } from 'vscode';
-import { Client, Options, Userstate } from 'tmi.js';
-import { Themer } from '../commands/Themer';
 import { disconnect } from 'cluster';
-import { EventEmitter } from 'vscode';
-import { TwitchClientStatus } from '../Enum';
+import { Client, Options, Userstate } from 'tmi.js';
+import { EventEmitter, Memento } from 'vscode';
+import { Themer } from '../commands/Themer';
 import { Constants } from '../Constants';
+import { TwitchClientStatus } from '../Enum';
 
 /**
  * Twitch chat client used in communicating via chat/whispers
@@ -29,15 +28,30 @@ export default class ChatClient {
         this._options = null;
         this._themer = new Themer(this, state);
     }
+    /**
+     * Changes Follower only flag
+     * @param followerOnly
+     */
+    public toggleFollowerOnlyMode(followerOnly: boolean){
+        this._themer.followerOnly(Constants.chatClientUserName, followerOnly);
+    }
+
+    /**
+     * Changes Subscriber only flag
+     * @param subscriberOnly
+     */
+    public toggleSubscriberOnlyMode(subscriberOnly: boolean){
+        this._themer.subOnly(Constants.chatClientUserName, subscriberOnly);
+    }
 
     /**
      * Connects to Twitch chat
-     * @param options - tmi.js Options for connecting to Twitch chat 
+     * @param options - tmi.js Options for connecting to Twitch chat
      */
     public async connect(options: Options): Promise<[string, number]> {
         this._options = options;
 
-        /** We're disconnecting just in case we were already 
+        /** We're disconnecting just in case we were already
          * connected using different options */
         await disconnect();
 
@@ -63,12 +77,11 @@ export default class ChatClient {
         }
 
         /**
-         * Every time we disconnect from chat we want to reset the 
-         * theme to the streamers original theme so they can 
+         * Every time we disconnect from chat we want to reset the
+         * theme to the streamers original theme so they can
          * continue working without having to manually change their
          * theme back to their preferred theme.
          */
-        this._themer.followerOnly(Constants.chatClientUserName, false);
         await this._themer.resetTheme(undefined);
     }
 
@@ -89,7 +102,7 @@ export default class ChatClient {
 
     /**
      * Sends a whisper to the specified user
-     * @param twitchUser - Username of the recipient of the whisper 
+     * @param twitchUser - Username of the recipient of the whisper
      * @param message - Message to send to the twitchUser
      */
     public whisper(twitchUser: string | undefined, message: string) {
@@ -122,7 +135,9 @@ export default class ChatClient {
         if (self) { return; }
         if (!message) { return; }
 
-        if (message.toLocaleLowerCase().startsWith('!theme')) {
+        message = message.toLocaleLowerCase().trim();
+
+        if (message.startsWith('!theme')) {
             await this._themer.handleCommands(userState, '!theme', message.replace('!theme', '').trim());
         }
     }

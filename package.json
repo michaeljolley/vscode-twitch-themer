@@ -9,7 +9,7 @@
 		"email": "mike@sparcapp.io"
 	},
 	"icon": "resources/logo.png",
-	"version": "0.1.0",
+	"version": "0.2.1",
 	"preview": true,
 	"engines": {
 		"vscode": "^1.32.0"
@@ -47,25 +47,26 @@
 				"command": "twitchThemer.chatDisconnect",
 				"title": "Chat Disconnect",
 				"category": "Twitch Themer"
-			},
-			{
-				"command": "twitchThemer.signIn",
-				"title": "Sign In",
-				"category": "Twitch Themer"
-			},
-			{
-				"command": "twitchThemer.signOut",
-				"title": "Sign Out",
-				"category": "Twitch Themer"
 			}
 		],
 		"configuration": {
 			"title": "Twitch Themer",
-			"properties": {}
+			"properties": {
+				"twitchThemer.followerOnly": {
+					"type": "boolean",
+					"default": false,
+					"description": "Allow Followers only"
+				},
+				"twitchThemer.subscriberOnly": {
+					"type": "boolean",
+					"default": false,
+					"description": "Allow Subscribers only"
+				}
+			}
 		}
 	},
 	"scripts": {
-		"package": "npx vsce package",
+		"package": "npx vsce package -o release.vsix",
 		"publish": "npx vsce publish",
 		"vscode:prepublish": "webpack --mode production",
 		"webpack": "webpack --mode none",
@@ -99,9 +100,9 @@
 	},
 	"dependencies": {
 		"dotenv": "~7.0.0",
-		"keytar": "^4.4.1",
+		"keytar": "^4.9.0",
+		"node-fetch": "~2.3.0",
 		"tmi.js": "~1.4.2",
-		"uuid": "~3.3.2",
-		"node-fetch": "~2.3.0"
+		"uuid": "~3.3.2"
 	}
 }

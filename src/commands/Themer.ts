@@ -1,10 +1,10 @@
-import * as vscode from 'vscode';
-import ChatClient from '../chat/ChatClient';
-import { ITheme } from './ITheme';
-import { IListRecipient } from './IListRecipient';
-import { Constants } from '../Constants';
 import { Userstate } from 'tmi.js';
+import * as vscode from 'vscode';
 import { AuthenticationService } from '../Authentication';
+import ChatClient from '../chat/ChatClient';
+import { Constants } from '../Constants';
+import { IListRecipient } from './IListRecipient';
+import { ITheme } from './ITheme';
 
 /**
  * Manages all logic associated with retrieveing themes,
@@ -14,20 +14,21 @@ export class Themer {
 
     private _originalTheme: string | undefined;
     private _followerOnly: boolean = false;
+    private _subOnly: boolean = false;
     private _availableThemes: Array<ITheme> = [];
     private _listRecipients: Array<IListRecipient> = [];
     private _authService: AuthenticationService;
     private _followers: Array<IListRecipient> = [];
-    
+
     /**
      * constructor
      * @param _chatClient - Twitch chat client used in sending messages to users/chat
      * @param _state - The global state of the extension
      */
-    constructor(private _chatClient: ChatClient, private _state: vscode.Memento, authService = new AuthenticationService) 
+    constructor(private _chatClient: ChatClient, private _state: vscode.Memento, authService = new AuthenticationService)
     {
-        /** 
-         * Get the current theme so we can reset it later 
+        /**
+         * Get the current theme so we can reset it later
          * via command or when disconnecting from chat
          */
         this._originalTheme = vscode.workspace.getConfiguration().get('workbench.colorTheme');
@@ -40,7 +41,12 @@ export class Themer {
         /**
          * Initialize follower only flag
          */
-        this._followerOnly = this._state.get('followerOnly', false);
+        this._followerOnly = vscode.workspace.getConfiguration().get('twitchThemer.followerOnly', false);
+
+        /**
+         * Initialize sub only flag
+         */
+        this._subOnly = vscode.workspace.getConfiguration().get('twitchThemer.subscriberOnly', false);
 
         /**
          * Rehydrate the banned users from the extensions global state
@@ -60,21 +66,24 @@ export class Themer {
      * @param param - Optional additional parameters sent by user
      */
     public async handleCommands(twitchUser: Userstate, command: string, param: string) {
-        
-        /** Only command we're going to respond to is !theme */
+
+        command = command.toLowerCase().trim();
+
+	/** Only command we're going to respond to is !theme */
         if (command !== '!theme') {
             return;
         }
 
+	param = param.toLowerCase().trim();
         const twitchUserName = twitchUser["display-name"];
-        
-        param = param.toLowerCase().trim();
+
+        param = param.toLocaleLowerCase().trim();
 
         let username: string  | undefined;
         /** Determine if the param is a (un)ban request */
         const ban = param.match(/((?:un)?ban) (\w*)/);
         if (ban) {
-            param = ban[1] || ''; // Change the param to 'ban' or 'unban' 
+            param = ban[1] || ''; // Change the param to 'ban' or 'unban'
             username = ban[2]; // The username to ban
         }
 
@@ -106,6 +115,12 @@ export class Themer {
             case '!follower':
                 await this.followerOnly(twitchUserName, false);
                 break;
+            case 'sub':
+                await this.subOnly(twitchUserName, true);
+                break;
+            case '!sub':
+                await this.subOnly(twitchUserName, false);
+                break;
             default:
                 await this.changeTheme(twitchUser, param);
                 break;
@@ -130,7 +145,6 @@ export class Themer {
             .map(recipient => recipient.username);
 
         this._state.update('bannedUsers', bannedUsers);
-        this._state.update('followerOnly', this._followerOnly);
     }
 
     /**
@@ -139,7 +153,7 @@ export class Themer {
      * @param username The user to ban
      */
     private async ban(twitchUser: string | undefined, username: string | undefined) {
-        if (twitchUser !== undefined && 
+        if (twitchUser !== undefined &&
             twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase() &&
             username !== undefined)  {
             const recipient = this.getRecipient(username);
@@ -157,8 +171,8 @@ export class Themer {
      * @param username The user to unban
      */
     private async unban(twitchUser: string | undefined, username: string | undefined) {
-        if (twitchUser !== undefined && 
-            twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase() && 
+        if (twitchUser !== undefined &&
+            twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase() &&
             username !== undefined) {
             const recipient = this.getRecipient(username, true);
             if (recipient !== undefined) {
@@ -170,7 +184,7 @@ export class Themer {
             }
         }
     }
-    
+
     /**
      * Activates follower only mode
      * @param twitchUser - The user requesting the follower mode change
@@ -178,8 +192,9 @@ export class Themer {
      */
     public async followerOnly(twitchUser: string | undefined, activate: boolean)
     {
-        if (twitchUser !== undefined && 
+        if (twitchUser !== undefined &&
             twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
+            vscode.workspace.getConfiguration().update('twitchThemer.followerOnly', activate, vscode.ConfigurationTarget.Global);
             this._followerOnly = activate;
             if (this._followerOnly)
             {
@@ -188,7 +203,26 @@ export class Themer {
                 followers.forEach(x => this._followers.push({username: x["from_name"].toLocaleLowerCase()}));
             }
             this.updateState();
-            this._followerOnly ? console.log('Follower Only mode has been activated.') : console.log('Follower Only mode has been deactivated.');
+            const message = this._followerOnly ? 'Follower Only mode has been activated.' :'Follower Only mode has been deactivated.';
+            console.log(message);
+            this._chatClient.sendMessage(message);
+        }
+    }
+
+    /**
+     * Activates follower only mode
+     * @param twitchUser - The user requesting the follower mode change
+     * @param activate - Set follower only mode
+     */
+    public async subOnly(twitchUser: string | undefined, activate: boolean)
+    {
+        if (twitchUser !== undefined &&
+        twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
+            vscode.workspace.getConfiguration().update('twitchThemer.subscriberOnly', activate, vscode.ConfigurationTarget.Global);
+            this._subOnly = activate;
+            const message = this._subOnly ? 'Subscriber Only mode has been activated' : 'Subscriber Only mode has been deactivated.';
+            console.log(message);
+            this._chatClient.sendMessage(message);
         }
     }
 
@@ -222,7 +256,7 @@ export class Themer {
             this._chatClient.whisper(twitchUser, `Available themes are: ${themeNames.join(', ')}`);
         }
     }
-    
+
     /**
      * Resets the theme to the one that was active when the extension was loaded
      * @param twitchUser - pass through the twitch user state
@@ -250,22 +284,22 @@ export class Themer {
                             .forEach((fe: any) => {
                             const iThemes = fe.packageJSON.contributes.themes.map((m: any) => {
                                                             return { extensionId: fe.id, label: m.label, themeId: m.id };});
-                                                            
+
                             this._availableThemes = (this._availableThemes.concat.apply(
                                                                         this._availableThemes,
                                                                         iThemes)
                                                                     .filter(() => true));
                             });
 
-                            /** 
-                            * The only reasons to refresh the list of themes is because 
-                            * the user has added or removed theme extensions. Since the 
-                            * list of available themes has changed we should allow users 
-                            * to re-request the list of themes so they can continue playing. 
+                            /**
+                            * The only reasons to refresh the list of themes is because
+                            * the user has added or removed theme extensions. Since the
+                            * list of available themes has changed we should allow users
+                            * to re-request the list of themes so they can continue playing.
                             */
                             this.clearListRecipients();
         }
-    } 
+    }
 
     /**
      * Changes the theme to a random option from all available themes
@@ -304,7 +338,22 @@ export class Themer {
         } else {
             break following;
         }
-        
+
+        subscriber:
+        if (this._subOnly) {
+            if (twitchUserName.toLocaleLowerCase() === Constants.chatClientUserName.toLocaleLowerCase()) {
+                // broadcaster cannot subscribe to their own stream if they are not an affiate or partner.
+                break subscriber;
+            } else if (twitchUser && twitchUser["subscriber"]) {
+                break subscriber;
+            } else {
+                console.log (`${twitchUserName} is not a subscriber.`);
+                return;
+            }
+        } else {
+            break subscriber;
+        }
+
         /** Ensure the user hasn't been banned before changing the theme */
         if (twitchUserName) {
             const recipient = this.getRecipient(twitchUserName, true);
@@ -315,20 +364,23 @@ export class Themer {
         }
 
         /** Find theme based on themeName and change theme if it is found */
-        const theme = this._availableThemes.filter(f => f.label.toLowerCase() === themeName.toLowerCase() ||  f.themeId && f.themeId.toLowerCase() === themeName.toLowerCase())[0];
+        const theme = this._availableThemes.filter(f => f.label.toLocaleLowerCase() === themeName.toLocaleLowerCase() ||
+                                                        f.themeId && f.themeId.toLocaleLowerCase() === themeName.toLocaleLowerCase())[0];
 
-        if (theme) {  
+        if (theme) {
             const themeExtension = vscode.extensions.getExtension(theme.extensionId);
-        
+
             if (themeExtension !== undefined) {
                 const conf = vscode.workspace.getConfiguration();
-                await themeExtension.activate().then(async f => { 
+                await themeExtension.activate().then(async f => {
                     await conf.update('workbench.colorTheme', theme.themeId || theme.label, vscode.ConfigurationTarget.Global);
                     if (twitchUserName) {
                         vscode.window.showInformationMessage(`Theme changed to ${theme.label} by ${twitchUserName}`);
                     }
                 });
             }
+        }else{
+            this._chatClient.sendMessage(`${twitchUserName}, ${themeName} is not a valid theme name or isn't installed.  You can use !theme list to get a list of available themes.`);
         }
     }
 
