@@ -1,7 +1,8 @@
-import { ExtensionContext, StatusBarAlignment, StatusBarItem, window } from "vscode";
+import * as vscode from 'vscode';
 import { AuthenticationService } from "./Authentication";
 import ChatClient from "./chat/ChatClient";
-import { TwitchClientStatus } from "./Enum";
+import { TwitchClientStatus, Commands, KeytarKeys } from "./Enum";
+import { keytar } from './Common';
 
 /**
  * Creates the status bar item to use in updating users of the status of the extension
@@ -9,25 +10,49 @@ import { TwitchClientStatus } from "./Enum";
  * @param authService - Service used in authenticating the user with Twitch
  * @param chatClient - Twitch chat client used in connecting to channel
  */
-export async function createStatusBarItem(context: ExtensionContext,
+export async function createStatusBarItem(context: vscode.ExtensionContext,
     authService: AuthenticationService,
     chatClient: ChatClient) {
 
-    const statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left);
-    const user = await authService.currentUser();
+    const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
 
-    updateStatusBarItem(statusBarItem, user ? TwitchClientStatus.loggedIn : TwitchClientStatus.loggedOut,
-        chatClient.isConnected(),
-        user ? user.login : '');
+    statusBarItem.tooltip = "Twitch Themer Extension";
+    statusBarItem.command = Commands.toggleChat;
 
-    context.subscriptions.push(statusBarItem, authService.onAuthStatusChanged(updateStatusBar),
-        chatClient.onStatusChanged(updateStatusBar));
+    context.subscriptions.push(statusBarItem,
+                               authService.onAuthStatusChanged(processAuthChange),
+                               chatClient.onConnectionChanged(processChatStatusChange));
 
     return statusBarItem;
 
-    async function updateStatusBar(status: TwitchClientStatus) {
-        const user = await authService.currentUser();
-        updateStatusBarItem(statusBarItem, status, chatClient.isConnected(), user ? user.login : null);
+    async function processAuthChange(status: boolean) {
+        if (!status) {
+            updateStatusBarItem(statusBarItem, TwitchClientStatus.loggedOut, null);
+        }
+        else {
+            let user: string | null = null;
+            if (keytar) {
+                user = await keytar.getPassword(KeytarKeys.service, KeytarKeys.userLogin);
+            }
+            updateStatusBarItem(statusBarItem, TwitchClientStatus.loggedIn, user);
+        }
+    }
+
+    async function processChatStatusChange(status: boolean) {
+        let user: string | null = null;
+        if (keytar) {
+            user = await keytar.getPassword(KeytarKeys.service, KeytarKeys.userLogin);
+        }
+
+        if (status) {
+            updateStatusBarItem(statusBarItem, TwitchClientStatus.chatConnected, user);
+        }
+        else if (user) { // disconnected but still logged in
+            updateStatusBarItem(statusBarItem, TwitchClientStatus.loggedIn, user);
+        }
+        else {
+            updateStatusBarItem(statusBarItem, TwitchClientStatus.loggedOut, null);
+        }
     }
 }
 
@@ -38,24 +63,26 @@ export async function createStatusBarItem(context: ExtensionContext,
  * @param chatClientConnected - Defines if the Twitch chat client is connected to the channel
  * @param userName - Username of the user attempting to connect to chat
  */
-function updateStatusBarItem(statusBarItem: StatusBarItem, authStatus: TwitchClientStatus,
-    chatClientConnected: boolean,
-    userName?: string | undefined) {
+function updateStatusBarItem(statusBarItem: vscode.StatusBarItem, authStatus: TwitchClientStatus,
+    userName: string | null) {
 
-    let text = 'Twitch Themer: ';
+    const icon = '$(paintcan)'; // The octicon to use for the status bar icon (https://octicons.github.com/)
+    let text = `${icon}`;
     statusBarItem.show();
 
     switch (authStatus) {
         case TwitchClientStatus.loggingIn:
-            text += 'Logging In...';
+            text += ' Logging In...';
+            vscode.window.showInformationMessage('Signing in to Twitch');
             break;
         case TwitchClientStatus.loggedIn:
+            text += ` ${userName} (Disconnected)`;
+            break;
         case TwitchClientStatus.chatConnected:
-        case TwitchClientStatus.chatDisconnected:
-            text += `${userName} ${chatClientConnected ? '' : '(disconnected)'}`;
+            text += ` ${userName}`;
             break;
         case TwitchClientStatus.loggedOut:
-            statusBarItem.hide();
+            text += ' Disconnected';
             break;
     }
 

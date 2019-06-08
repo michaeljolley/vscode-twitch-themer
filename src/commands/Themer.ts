@@ -1,10 +1,12 @@
-import { Userstate } from 'tmi.js';
 import * as vscode from 'vscode';
-import { AuthenticationService } from '../Authentication';
-import ChatClient from '../chat/ChatClient';
-import { Constants } from '../Constants';
+import { Userstate } from 'tmi.js';
 import { IListRecipient } from './IListRecipient';
 import { ITheme } from './ITheme';
+import { IWhisperMessage } from '../chat/IWhisperMessage';
+import { keytar } from '../Common';
+import { KeytarKeys, AccessState } from '../Enum';
+import { API } from '../api/API';
+import { IChatMessage } from '../chat/IChatMessage';
 
 /**
  * Manages all logic associated with retrieveing themes,
@@ -12,20 +14,28 @@ import { ITheme } from './ITheme';
  */
 export class Themer {
 
+    private _accessState: AccessState = AccessState.Viewers;
     private _originalTheme: string | undefined;
-    private _followerOnly: boolean = false;
-    private _subOnly: boolean = false;
     private _availableThemes: Array<ITheme> = [];
     private _listRecipients: Array<IListRecipient> = [];
-    private _authService: AuthenticationService;
     private _followers: Array<IListRecipient> = [];
+    private _currentUserLogin: string | undefined;
+
+    private sendWhisperEventEmitter = new vscode.EventEmitter<IWhisperMessage>();
+    private sendMessageEventEmitter = new vscode.EventEmitter<string>();
+
+    /** Event that fires when themer needs to send a whisper */
+    public onSendWhisper = this.sendWhisperEventEmitter.event;
+
+    /** Event that fires when themer needs to send a message */
+    public onSendMesssage = this.sendMessageEventEmitter.event;
 
     /**
      * constructor
-     * @param _chatClient - Twitch chat client used in sending messages to users/chat
      * @param _state - The global state of the extension
+     * @param _context - Current extensions context
      */
-    constructor(private _chatClient: ChatClient, private _state: vscode.Memento, authService = new AuthenticationService)
+    constructor(private _state: vscode.Memento, _context: vscode.ExtensionContext)
     {
         /**
          * Get the current theme so we can reset it later
@@ -34,63 +44,64 @@ export class Themer {
         this._originalTheme = vscode.workspace.getConfiguration().get('workbench.colorTheme');
 
         /**
-         * Initialize the list of available themes for users
+         * Gets the access state from the workspace
          */
-        this.refreshThemes(Constants.chatClientUserName);
-
-        /**
-         * Initialize follower only flag
-         */
-        this._followerOnly = vscode.workspace.getConfiguration().get('twitchThemer.followerOnly', false);
-
-        /**
-         * Initialize sub only flag
-         */
-        this._subOnly = vscode.workspace.getConfiguration().get('twitchThemer.subscriberOnly', false);
+        this._accessState = vscode.workspace.getConfiguration().get('twitchThemer.accessState', AccessState.Viewers);
 
         /**
          * Rehydrate the banned users from the extensions global state
          */
         this._state.get('bannedUsers', []).forEach(username => this._listRecipients.push({ username, banned: true }));
+    }
 
-        /**
-         * Create a connection to the authenication service
-         */
-        this._authService = authService;
+    public async handleAuthStatusChanged(signedIn: boolean) {
+        if (signedIn) {
+            if (keytar) {
+                const login = await keytar.getPassword(KeytarKeys.service, KeytarKeys.userLogin);
+                this._currentUserLogin = login ? login : undefined;
+                this.refreshThemes(this._currentUserLogin);
+            }
+        }
+        else {
+            this._currentUserLogin = undefined;
+            this.resetTheme(undefined);
+        }
+    }
+
+    /**
+     * Updates access state of extension
+     * @param accessState - New access state
+     */
+    public handleAccessStateChanged(accessState: AccessState){
+        this._accessState = accessState;
     }
 
     /**
      * Attempts to process commands received by users in Twitch chat
      * @param twitchUser - Username of person sending the command
-     * @param command - Command sent by user
-     * @param param - Optional additional parameters sent by user
+     * @param message - Optional additional parameters sent by user
      */
-    public async handleCommands(twitchUser: Userstate, command: string, param: string) {
+    public async handleCommands(chatMessage: IChatMessage) {
 
-        command = command.toLocaleLowerCase().trim();
+        const twitchUser: Userstate = chatMessage.userState;
+        let message: string = chatMessage.message;
 
-	/** Only command we're going to respond to is !theme */
-        if (command !== '!theme') {
-            return;
-        }
-
-        param = param.toLocaleLowerCase().trim().replace(',','');
         const twitchUserName = twitchUser["display-name"];
 
         let username: string  | undefined;
         /** Determine if the param is a (un)ban request */
-        const ban = param.match(/((?:un)?ban) (\w*)/);
+        const ban = message.match(/((?:!)?ban) (\w*)/);
         if (ban) {
-            param = ban[1] || ''; // Change the param to 'ban' or 'unban'
+            message = ban[1] || ''; // Change the param to 'ban' or 'unban'
             username = ban[2]; // The username to ban
         }
 
-        switch (param) {
+        switch (message) {
             case '':
-                await this.currentTheme();
-                break;
-            case 'list':
                 await this.sendThemes(twitchUserName);
+                break;
+            case 'current':
+                await this.currentTheme();
                 break;
             case 'reset':
                 await this.resetTheme(twitchUser);
@@ -104,23 +115,11 @@ export class Themer {
             case 'ban':
                 await this.ban(twitchUserName, username);
                 break;
-            case 'unban':
+            case '!ban':
                 await this.unban(twitchUserName, username);
                 break;
-            case 'follower':
-                await this.followerOnly(twitchUserName, true);
-                break;
-            case '!follower':
-                await this.followerOnly(twitchUserName, false);
-                break;
-            case 'sub':
-                await this.subOnly(twitchUserName, true);
-                break;
-            case '!sub':
-                await this.subOnly(twitchUserName, false);
-                break;
             default:
-                await this.changeTheme(twitchUser, param);
+                await this.changeTheme(twitchUser, message);
                 break;
         }
     }
@@ -131,7 +130,8 @@ export class Themer {
      * @param banned (optional) Include only recipients that are banned
      */
     private getRecipient(twitchUser: string, banned?: boolean): IListRecipient | undefined {
-        return this._listRecipients.filter(f => f.username.toLowerCase() === twitchUser.toLowerCase() && f.banned === banned)[0];
+        return this._listRecipients.filter(f => f.username.toLocaleLowerCase() === twitchUser.toLocaleLowerCase()
+                                             && f.banned === banned)[0];
     }
 
     /**
@@ -152,11 +152,10 @@ export class Themer {
      */
     private async ban(twitchUser: string | undefined, username: string | undefined) {
         if (twitchUser !== undefined &&
-            twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase() &&
             username !== undefined)  {
             const recipient = this.getRecipient(username);
             if (recipient === undefined) {
-                this._listRecipients.push({username: username.toLowerCase(), banned: true});
+                this._listRecipients.push({username: username.toLocaleLowerCase(), banned: true});
                 console.log(`${username} has been banned from using the themer plugin.`);
                 this.updateState();
             }
@@ -170,7 +169,8 @@ export class Themer {
      */
     private async unban(twitchUser: string | undefined, username: string | undefined) {
         if (twitchUser !== undefined &&
-            twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase() &&
+            this._currentUserLogin &&
+            twitchUser.toLocaleLowerCase() === this._currentUserLogin.toLocaleLowerCase() &&
             username !== undefined) {
             const recipient = this.getRecipient(username, true);
             if (recipient !== undefined) {
@@ -180,47 +180,6 @@ export class Themer {
                 console.log(`${username} can now use the themer plugin.`);
                 this.updateState();
             }
-        }
-    }
-
-    /**
-     * Activates follower only mode
-     * @param twitchUser - The user requesting the follower mode change
-     * @param activate - Set follower only mode
-     */
-    public async followerOnly(twitchUser: string | undefined, activate: boolean)
-    {
-        if (twitchUser !== undefined &&
-            twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
-            vscode.workspace.getConfiguration().update('twitchThemer.followerOnly', activate, vscode.ConfigurationTarget.Global);
-            this._followerOnly = activate;
-            if (this._followerOnly)
-            {
-                this._followers = [];
-                const followers : Array<any> = await this._authService.getFollowers();
-                followers.forEach(x => this._followers.push({username: x["from_name"].toLocaleLowerCase()}));
-            }
-            this.updateState();
-            const message = this._followerOnly ? 'Follower Only mode has been activated.' :'Follower Only mode has been deactivated.';
-            console.log(message);
-            this._chatClient.sendMessage(message);
-        }
-    }
-
-    /**
-     * Activates follower only mode
-     * @param twitchUser - The user requesting the follower mode change
-     * @param activate - Set follower only mode
-     */
-    public async subOnly(twitchUser: string | undefined, activate: boolean)
-    {
-        if (twitchUser !== undefined &&
-        twitchUser.toLowerCase() === Constants.chatClientUserName.toLowerCase()) {
-            vscode.workspace.getConfiguration().update('twitchThemer.subscriberOnly', activate, vscode.ConfigurationTarget.Global);
-            this._subOnly = activate;
-            const message = this._subOnly ? 'Subscriber Only mode has been activated' : 'Subscriber Only mode has been deactivated.';
-            console.log(message);
-            this._chatClient.sendMessage(message);
         }
     }
 
@@ -251,7 +210,7 @@ export class Themer {
 
             /** Get list of available themes and whisper them to user */
             const themeNames = this._availableThemes.map(m => m.label);
-            this._chatClient.whisper(twitchUser, `Available themes are: ${themeNames.join(', ')}`);
+            this.sendWhisperEventEmitter.fire({user: twitchUser, message: `Available themes are: ${themeNames.join(', ')}`});
         }
     }
 
@@ -274,8 +233,9 @@ export class Themer {
         /** We only refresh the list of themes
          * if the requester was the logged in user
          */
-        if (twitchUser &&
-            twitchUser.toLowerCase().trim() === Constants.chatClientUserName.toLowerCase()) {
+        if (twitchUser !== undefined &&
+            this._currentUserLogin &&
+            twitchUser.toLocaleLowerCase() === this._currentUserLogin.toLocaleLowerCase()) {
             vscode.extensions.all.filter(f => f.packageJSON.contributes &&
                                               f.packageJSON.contributes.themes &&
                                               f.packageJSON.contributes.themes.length > 0)
@@ -320,14 +280,15 @@ export class Themer {
         let twitchUserName : string = (twitchUser) ? twitchUser["display-name"] || "" : "";
 
         following:
-        if (this._followerOnly) {
-            if (twitchUserName.toLocaleLowerCase() === Constants.chatClientUserName.toLocaleLowerCase()) {
+        if (this._accessState === AccessState.Followers) {
+            if (this._currentUserLogin &&
+                twitchUserName.toLocaleLowerCase() === this._currentUserLogin.toLocaleLowerCase()) {
                 // broadcaster cannot follow their own stream. Temporary work around to mark broadcaster as follower.
                 break following;
             } else if (this._followers.find(x => x.username === twitchUserName.toLocaleLowerCase())) {
                 break following;
-            } else if (twitchUser && await this._authService.isTwitchUserFollowing(twitchUser["user-id"])) {
-                this._followers.push({username: twitchUserName? twitchUserName.toLocaleLowerCase() : ""});
+            } else if (twitchUser && await API.isTwitchUserFollowing(twitchUser["user-id"])) {
+                this._followers.push({username: twitchUserName ? twitchUserName.toLocaleLowerCase() : ""});
                 break following;
             } else {
                 console.log (`${twitchUserName} is not following.`);
@@ -338,8 +299,9 @@ export class Themer {
         }
 
         subscriber:
-        if (this._subOnly) {
-            if (twitchUserName.toLocaleLowerCase() === Constants.chatClientUserName.toLocaleLowerCase()) {
+        if (this._accessState === AccessState.Subscribers) {
+            if (this._currentUserLogin &&
+                twitchUserName.toLocaleLowerCase() === this._currentUserLogin.toLocaleLowerCase()) {
                 // broadcaster cannot subscribe to their own stream if they are not an affiate or partner.
                 break subscriber;
             } else if (twitchUser && twitchUser["subscriber"]) {
@@ -377,8 +339,9 @@ export class Themer {
                     }
                 });
             }
-        }else{
-            this._chatClient.sendMessage(`${twitchUserName}, ${themeName} is not a valid theme name or isn't installed.  You can use !theme list to get a list of available themes.`);
+        }
+        else {
+            this.sendMessageEventEmitter.fire(`${twitchUserName}, ${themeName} is not a valid theme name or isn't installed.  You can use !theme list to get a list of available themes.`);
         }
     }
 
@@ -387,7 +350,7 @@ export class Themer {
      */
     private async currentTheme() {
         const currentTheme = vscode.workspace.getConfiguration().get('workbench.colorTheme');
-        this._chatClient.sendMessage(`The current theme is ${currentTheme}`);
+        this.sendMessageEventEmitter.fire(`The current theme is ${currentTheme}`);
     }
 
     /**

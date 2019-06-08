@@ -4,43 +4,87 @@ dotenv.config();
 import * as vscode from 'vscode';
 import { AuthenticationService } from './Authentication';
 import ChatClient from './chat/ChatClient';
-import { Constants } from './Constants';
-import { Commands, TwitchClientStatus } from './Enum';
+import { Commands, TwitchClientStatus, AccessState } from './Enum';
 import { createStatusBarItem } from './StatusBar';
+import { Themer } from './commands/Themer';
+import { IChatMessage } from './chat/IChatMessage';
+import { IWhisperMessage } from './chat/IWhisperMessage';
 
-let chatClient: ChatClient;
-const authService = new AuthenticationService();
+let activeExtension: Extension;
 
-/**
- * Handles changes in the authentication status of the user
- */
-authService.onAuthStatusChanged(async (status) => {
-	/**
-	 * If the user is not logged in we want to attempt to authenticate
-	 * them with Twitch.
-	 */
-	if (status === TwitchClientStatus.loggedIn) {
-		const user = await authService.currentUser();
-		Constants.chatClientUserName = user.login;
-		if (user && user.accessToken) {
-			const opts = {
-				identity: {
-					username: user.login,
-					password: user.accessToken,
-				},
-				channels: [user.login]
-			};
-			chatClient.connect(opts);
+
+let _authenticationService: AuthenticationService;
+let _chatClient: ChatClient;
+let _themer: Themer;
+let _context: vscode.ExtensionContext;
+
+
+export class Extension {
+
+	/** State of the extension */
+	public static twitchClientStatus: TwitchClientStatus;
+
+	constructor(context: vscode.ExtensionContext) {
+		_context = context;
+		_authenticationService = new AuthenticationService();
+		_chatClient = new ChatClient(_context.globalState);
+		_themer = new Themer(_context.globalState, _context);
+	}
+
+	public async initialize() {
+		await _authenticationService.initialize();
+
+    _context.subscriptions.push(
+
+			_themer.onSendMesssage(this.onSendMessage),
+			_themer.onSendWhisper(this.onSendWhisper),
+
+			_chatClient.onChatMessageReceived(this.onChatMessageReceived),
+
+			_authenticationService.onAuthStatusChanged(this.onAuthStatusChanged),
+			_chatClient.onConnectionChanged(this.onChatConnectionChanged)
+		);
+
+		const statusBarItem = await createStatusBarItem(_context, _authenticationService, _chatClient);
+		const toggleChat = vscode.commands.registerCommand(Commands.toggleChat, _chatClient.toggleChat.bind(_chatClient));
+		const twitchSignIn = vscode.commands.registerCommand(Commands.twitchSignIn, _authenticationService.handleSignIn.bind(_authenticationService));
+		const twitchSignOut = vscode.commands.registerCommand(Commands.twitchSignOut, _authenticationService.handleSignOut.bind(_authenticationService));
+
+		const handleSettingsChange = vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent)=>{
+			if(e.affectsConfiguration('twitchThemer.accessState')){
+				_themer.handleAccessStateChanged(vscode.workspace.getConfiguration().get('twitchThemer.accessState', AccessState.Viewers));
+			}
+		});
+
+		_context.subscriptions.push(toggleChat, twitchSignIn, twitchSignOut, statusBarItem, handleSettingsChange);
+	}
+
+	private onSendMessage(message: string) {
+		_chatClient.sendMessage(message);
+	}
+
+	private onSendWhisper(whisper: IWhisperMessage) {
+		_chatClient.whisper(whisper);
+	}
+
+	private onChatMessageReceived(chatMessage: IChatMessage) {
+		_themer.handleCommands(chatMessage);
+	}
+
+	private onAuthStatusChanged(signedIn: boolean) {
+		if (!signedIn) {
+			_chatClient.disconnect();
 		}
+		_themer.handleAuthStatusChanged(signedIn);
 	}
-	/**
-	 * If the status of the authenticate is changed to logged out we want
-	 * to automatically disconnect from Twitch chat
-	 */
-	else if (status === TwitchClientStatus.loggedOut) {
-		chatClient.disconnect();
+
+	private onChatConnectionChanged(connected: boolean) {
 	}
-});
+
+	public deactivate() {
+		_authenticationService.handleSignOut();
+	}
+}
 
 /**
  * Activates the extension in VS Code and registers commands available
@@ -48,33 +92,17 @@ authService.onAuthStatusChanged(async (status) => {
  * @param context - Context the extesion is being run in
  */
 export async function activate(context: vscode.ExtensionContext) {
+
+	const extension: Extension = new Extension(context);
+
+	await extension.initialize();
+
 	console.log('Congratulations, Twitch Themer is now active!');
-
-	await authService.initialize();
-
-	// We instantiate a new ChatClient using the global state of this extension;
-	// the state holds extension specific values such as the banned users.
-	chatClient = new ChatClient(context.globalState);
-
-	const statusBarItem = await createStatusBarItem(context, authService, chatClient);
-	const chatConnect = vscode.commands.registerCommand(Commands.chatConnect, authService.handleSignIn.bind(authService));
-	const chatDisconnect = vscode.commands.registerCommand(Commands.chatDisconnect, authService.handleSignOut.bind(authService));
-
-	const handleSettingsChange = vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent)=>{
-		if(e.affectsConfiguration('twitchThemer.followerOnly')){
-			chatClient.toggleFollowerOnlyMode(vscode.workspace.getConfiguration().get('twitchThemer.followerOnly', false));
-		}
-		if(e.affectsConfiguration('twitchThemer.subscriberOnly')){
-			chatClient.toggleSubscriberOnlyMode(vscode.workspace.getConfiguration().get('twitchThemer.subscriberOnly', false));
-		}
-	});
-
-	context.subscriptions.push(chatConnect, chatDisconnect, statusBarItem, handleSettingsChange);
 }
 
 /**
  * Deactivates the extension in VS Code
  */
 export function deactivate() {
-	authService.handleSignOut();
+	activeExtension.deactivate();
 }

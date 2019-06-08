@@ -31,36 +31,35 @@
 	"activationEvents": [
 		"*",
 		"onCommand:twitchThemer.signIn",
-		"onCommand:twitchThemer.signOut",
-		"onCommand:twitchThemer.chatConnect",
-		"onCommand:twitchThemer.chatDisconnect"
+		"onCommand:twitchThemer.signOut"
 	],
 	"main": "./dist/extension",
 	"contributes": {
 		"commands": [
 			{
-				"command": "twitchThemer.chatConnect",
-				"title": "Chat Connect",
+				"command": "twitchThemer.signIn",
+				"title": "Sign In",
 				"category": "Twitch Themer"
 			},
 			{
-				"command": "twitchThemer.chatDisconnect",
-				"title": "Chat Disconnect",
+				"command": "twitchThemer.signOut",
+				"title": "Sign Out",
 				"category": "Twitch Themer"
 			}
 		],
 		"configuration": {
 			"title": "Twitch Themer",
 			"properties": {
-				"twitchThemer.followerOnly": {
-					"type": "boolean",
-					"default": false,
-					"description": "Allow Followers only"
-				},
-				"twitchThemer.subscriberOnly": {
-					"type": "boolean",
-					"default": false,
-					"description": "Allow Subscribers only"
+				"twitchThemer.accessState": {
+					"title": "View Access",
+					"type": "string",
+					"enum": [
+						"Viewers",
+						"Followers",
+						"Subscribers"
+					],
+					"default": "Viewers",
+					"description": "Users who are allowed to use the extension via Twitch chat."
 				}
 			}
 		}
