@@ -20,10 +20,10 @@ suite('Themer Tests', function () {
   let fakeThemer: Themer;
   const baseTheme: string = 'Visual Studio Dark';
   const testTheme: string = 'HotDogStand';
-  const testBroadcastUser: string = 'themichaeljolley';
-  const broadcaster: Userstate = { 'username': testBroadcastUser, 'display-name': testBroadcastUser, 'badges': {'broadcaster': '1'}  };
+  const testBroadcastUser: string = 'theMichaelJolley';
+  const broadcaster: Userstate = { 'username': testBroadcastUser.toLocaleLowerCase(), 'display-name': testBroadcastUser, 'badges': {'broadcaster': '1'}  };
   const moderator: Userstate = { 'username': 'parithon', 'display-name': 'parithon', 'badges': {'moderator': '1'}  };
-  const user: Userstate = { 'username': 'SurlyDev', 'display-name': 'SurlyDev' };
+  const user: Userstate = { 'username': 'surlydev', 'display-name': 'SurlyDev' };
 
   suiteSetup(function () {
     const fakeConfig: {
@@ -191,8 +191,8 @@ suite('Themer Tests', function () {
     fakeThemer.handleCommands(chatMessage)
       .then(() => {
         try {
-          fakeState.get<[]>('bannedUsers')!.should.not.be.empty;
-          fakeState.get<[]>('bannedUsers')!.should.contain(user.username);
+          fakeState.get<any[]>('bannedUsers')!.should.not.be.empty;
+          fakeState.get<any[]>('bannedUsers')!.should.contain(user.username);
           done();
         }
         catch (error) {
@@ -211,7 +211,7 @@ suite('Themer Tests', function () {
     fakeThemer.handleCommands(chatMessage)
       .then(() => {
         try {
-          fakeState.get<[]>('bannedUsers')!.should.not.contain(user.username);
+          fakeState.get<any[]>('bannedUsers')!.should.not.contain(user.username);
           done();
         }
         catch (error) {
