@@ -1,6 +1,3 @@
-import * as dotenv from 'dotenv';
-dotenv.config();
-
 import * as vscode from 'vscode';
 import { AuthenticationService } from './Authentication';
 import ChatClient from './chat/ChatClient';
@@ -11,8 +8,6 @@ import { IChatMessage } from './chat/IChatMessage';
 import { IWhisperMessage } from './chat/IWhisperMessage';
 
 let activeExtension: Extension;
-
-
 let _authenticationService: AuthenticationService;
 let _chatClient: ChatClient;
 let _themer: Themer;
@@ -28,7 +23,7 @@ export class Extension {
 		_context = context;
 		_authenticationService = new AuthenticationService();
 		_chatClient = new ChatClient(_context.globalState);
-		_themer = new Themer(_context.globalState, _context);
+		_themer = new Themer(_context.globalState);
 	}
 
 	public async initialize() {

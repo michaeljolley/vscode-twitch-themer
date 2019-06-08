@@ -77,7 +77,6 @@
 	},
 	"devDependencies": {
 		"@types/chai": "^4.1.7",
-		"@types/dotenv": "~4.0.3",
 		"@types/mocha": "^2.2.42",
 		"@types/node": "^10.12.21",
 		"@types/node-fetch": "^2.1.7",
@@ -98,7 +97,6 @@
 		"webpack-cli": "^3.2.3"
 	},
 	"dependencies": {
-		"dotenv": "~7.0.0",
 		"keytar": "^4.9.0",
 		"node-fetch": "~2.3.0",
 		"tmi.js": "~1.4.2",

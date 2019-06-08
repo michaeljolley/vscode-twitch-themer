@@ -62,3 +62,17 @@ export enum TwitchClientStatus {
     /** User is not authenticated and not connected to Twitch chat */
     loggedOut
 }
+
+/**
+ * Represents if user is the broadcaster, moderator or viewer
+ */
+export enum UserLevel {
+  /** Viewer only */
+  viewer = 0,
+
+  /** Moderator */
+  moderator = 1,
+
+  /** Broadcaster */
+  broadcaster = 2
+}

@@ -4,7 +4,7 @@ import { IListRecipient } from './IListRecipient';
 import { ITheme } from './ITheme';
 import { IWhisperMessage } from '../chat/IWhisperMessage';
 import { keytar } from '../Common';
-import { KeytarKeys, AccessState } from '../Enum';
+import { KeytarKeys, AccessState, UserLevel } from '../Enum';
 import { API } from '../api/API';
 import { IChatMessage } from '../chat/IChatMessage';
 
@@ -33,9 +33,8 @@ export class Themer {
     /**
      * constructor
      * @param _state - The global state of the extension
-     * @param _context - Current extensions context
      */
-    constructor(private _state: vscode.Memento, _context: vscode.ExtensionContext)
+    constructor(private _state: vscode.Memento)
     {
         /**
          * Get the current theme so we can reset it later
@@ -59,12 +58,14 @@ export class Themer {
             if (keytar) {
                 const login = await keytar.getPassword(KeytarKeys.service, KeytarKeys.userLogin);
                 this._currentUserLogin = login ? login : undefined;
-                this.refreshThemes(this._currentUserLogin);
+                const tempUserState: Userstate = {'username': this._currentUserLogin, 'display-name': this._currentUserLogin, 'badges': { 'broadcaster': '1' } };
+                this.refreshThemes(tempUserState);
             }
         }
         else {
+            const tempUserState: Userstate = {'username': this._currentUserLogin, 'display-name': this._currentUserLogin, 'badges': { 'broadcaster': '1' } };
             this._currentUserLogin = undefined;
-            this.resetTheme(undefined);
+            this.resetTheme(tempUserState);
         }
     }
 
@@ -74,6 +75,20 @@ export class Themer {
      */
     public handleAccessStateChanged(accessState: AccessState){
         this._accessState = accessState;
+    }
+
+    private getUserLevel(userState: Userstate): UserLevel {
+
+        if (userState.badges) {
+            if (userState.badges.broadcaster) {
+                return UserLevel.broadcaster;
+            }
+            else if (userState.badges.moderator) {
+                return UserLevel.moderator;
+            }
+        }
+
+        return UserLevel.viewer;
     }
 
     /**
@@ -86,8 +101,6 @@ export class Themer {
         const twitchUser: Userstate = chatMessage.userState;
         let message: string = chatMessage.message;
 
-        const twitchUserName = twitchUser["display-name"];
-
         let username: string  | undefined;
         /** Determine if the param is a (un)ban request */
         const ban = message.match(/((?:!)?ban) (\w*)/);
@@ -98,7 +111,7 @@ export class Themer {
 
         switch (message) {
             case '':
-                await this.sendThemes(twitchUserName);
+                await this.sendThemes(twitchUser);
                 break;
             case 'current':
                 await this.currentTheme();
@@ -110,13 +123,17 @@ export class Themer {
                 await this.randomTheme(twitchUser);
                 break;
             case 'refresh':
-                await this.refreshThemes(twitchUserName);
+                await this.refreshThemes(twitchUser);
                 break;
             case 'ban':
-                await this.ban(twitchUserName, username);
+                if (username !== undefined) {
+                    await this.ban(twitchUser, username);
+                }
                 break;
             case '!ban':
-                await this.unban(twitchUserName, username);
+                if (username !== undefined) {
+                    await this.unban(twitchUser, username);
+                }
                 break;
             default:
                 await this.changeTheme(twitchUser, message);
@@ -150,15 +167,19 @@ export class Themer {
      * @param twitchUser The user requesting the ban
      * @param username The user to ban
      */
-    private async ban(twitchUser: string | undefined, username: string | undefined) {
-        if (twitchUser !== undefined &&
-            username !== undefined)  {
+    private async ban(twitchUser: Userstate, username: string) {
+        if (this.getUserLevel(twitchUser) > UserLevel.viewer)  {
             const recipient = this.getRecipient(username);
             if (recipient === undefined) {
                 this._listRecipients.push({username: username.toLocaleLowerCase(), banned: true});
-                console.log(`${username} has been banned from using the themer plugin.`);
-                this.updateState();
             }
+            else {
+                const index = this._listRecipients.indexOf(recipient);
+                recipient.banned = true;
+                this._listRecipients.splice(index, 1, recipient);
+            }
+            this.updateState();
+            console.log(`${username} has been banned from using the themer plugin.`);
         }
     }
 
@@ -167,11 +188,8 @@ export class Themer {
      * @param twitchUser The user requesting the unban
      * @param username The user to unban
      */
-    private async unban(twitchUser: string | undefined, username: string | undefined) {
-        if (twitchUser !== undefined &&
-            this._currentUserLogin &&
-            twitchUser.toLocaleLowerCase() === this._currentUserLogin.toLocaleLowerCase() &&
-            username !== undefined) {
+    private async unban(twitchUser: Userstate, username: string) {
+        if (this.getUserLevel(twitchUser) > UserLevel.viewer) {
             const recipient = this.getRecipient(username, true);
             if (recipient !== undefined) {
                 const index = this._listRecipients.indexOf(recipient);
@@ -187,38 +205,39 @@ export class Themer {
      * Send a whisper to the requesting user with a list of available themes
      * @param twitchUser - User that will receive whisper of available themes
      */
-    private async sendThemes(twitchUser: string | undefined) {
-        if (twitchUser !== undefined) {
-            /** Ensure that we haven't sent them the list recently. */
-            const lastSent = this.getRecipient(twitchUser);
+    private async sendThemes(twitchUser: Userstate) {
+        const twitchUserName: string = twitchUser.username.toLocaleLowerCase();
 
-            if (lastSent && lastSent.banned && lastSent.banned === true) {
-                console.log(`${twitchUser} has been banned.`);
-                return;
-            }
+        /** Ensure that we haven't sent them the list recently. */
+        const lastSent = this.getRecipient(twitchUserName);
 
-            if (lastSent && lastSent.lastSent) {
-                if (lastSent.lastSent.getDate() > ((new Date()).getDate() + -1)) {
-                    return;
-                } else {
-                    lastSent.lastSent = new Date();
-                }
-            }
-            else {
-                this._listRecipients.push({username: twitchUser.toLowerCase(), lastSent: new Date()});
-            }
-
-            /** Get list of available themes and whisper them to user */
-            const themeNames = this._availableThemes.map(m => m.label);
-            this.sendWhisperEventEmitter.fire({user: twitchUser, message: `Available themes are: ${themeNames.join(', ')}`});
+        if (lastSent && lastSent.banned && lastSent.banned === true) {
+            console.log(`${twitchUserName} has been banned.`);
+            return;
         }
+
+        if (lastSent && lastSent.lastSent) {
+            if (lastSent.lastSent.getDate() > ((new Date()).getDate() + -1)) {
+                return;
+            } else {
+                lastSent.lastSent = new Date();
+            }
+        }
+        else {
+            this._listRecipients.push({username: twitchUserName, lastSent: new Date()});
+        }
+
+        /** Get list of available themes and whisper them to user */
+        const themeNames = this._availableThemes.map(m => m.label);
+        this.sendWhisperEventEmitter.fire({user: twitchUserName, message: `Available themes are: ${themeNames.join(', ')}`});
+
     }
 
     /**
      * Resets the theme to the one that was active when the extension was loaded
      * @param twitchUser - pass through the twitch user state
      */
-    public async resetTheme(twitchUser: Userstate | undefined) {
+    public async resetTheme(twitchUser: Userstate) {
         if (this._originalTheme) {
             await this.changeTheme(twitchUser, this._originalTheme);
         }
@@ -226,16 +245,14 @@ export class Themer {
 
     /**
      * Refreshes the list of available themes
-     * @param twitchUser - Username of user requesting to refresh the theme list
+     * @param twitchUser - Userstate of user requesting to refresh the theme list
      */
-    private async refreshThemes(twitchUser: string | undefined) {
+    private async refreshThemes(twitchUser: Userstate) {
 
         /** We only refresh the list of themes
-         * if the requester was the logged in user
+         * if the requester was a moderator/broadcaster
          */
-        if (twitchUser !== undefined &&
-            this._currentUserLogin &&
-            twitchUser.toLocaleLowerCase() === this._currentUserLogin.toLocaleLowerCase()) {
+        if (this.getUserLevel(twitchUser) > UserLevel.viewer) {
             vscode.extensions.all.filter(f => f.packageJSON.contributes &&
                                               f.packageJSON.contributes.themes &&
                                               f.packageJSON.contributes.themes.length > 0)
@@ -275,15 +292,14 @@ export class Themer {
      * @param twitchUser - User state of who requested the theme be applied
      * @param themeName - Name of the theme to be applied
      */
-    private async changeTheme(twitchUser: Userstate | undefined, themeName: string) {
+    private async changeTheme(twitchUser: Userstate, themeName: string) {
 
-        let twitchUserName : string = (twitchUser) ? twitchUser["display-name"] || "" : "";
+        const twitchUserName: string = twitchUser.username;
+        const twitchDisplayName: string = twitchUser["display-name"] ? twitchUser["display-name"] : twitchUserName;
 
         following:
         if (this._accessState === AccessState.Followers) {
-            if (this._currentUserLogin &&
-                twitchUserName.toLocaleLowerCase() === this._currentUserLogin.toLocaleLowerCase()) {
-                // broadcaster cannot follow their own stream. Temporary work around to mark broadcaster as follower.
+            if (this.getUserLevel(twitchUser) === UserLevel.broadcaster) {
                 break following;
             } else if (this._followers.find(x => x.username === twitchUserName.toLocaleLowerCase())) {
                 break following;
@@ -291,7 +307,7 @@ export class Themer {
                 this._followers.push({username: twitchUserName ? twitchUserName.toLocaleLowerCase() : ""});
                 break following;
             } else {
-                console.log (`${twitchUserName} is not following.`);
+                console.log (`${twitchDisplayName} is not following.`);
                 return;
             }
         } else {
@@ -300,14 +316,12 @@ export class Themer {
 
         subscriber:
         if (this._accessState === AccessState.Subscribers) {
-            if (this._currentUserLogin &&
-                twitchUserName.toLocaleLowerCase() === this._currentUserLogin.toLocaleLowerCase()) {
-                // broadcaster cannot subscribe to their own stream if they are not an affiate or partner.
+            if (this.getUserLevel(twitchUser) === UserLevel.broadcaster) {
                 break subscriber;
             } else if (twitchUser && twitchUser["subscriber"]) {
                 break subscriber;
             } else {
-                console.log (`${twitchUserName} is not a subscriber.`);
+                console.log (`${twitchDisplayName} is not a subscriber.`);
                 return;
             }
         } else {
@@ -318,7 +332,7 @@ export class Themer {
         if (twitchUserName) {
             const recipient = this.getRecipient(twitchUserName, true);
             if (recipient && recipient.banned && recipient.banned === true) {
-                console.log(`${twitchUserName} has been banned.`);
+                console.log(`${twitchDisplayName} has been banned.`);
                 return;
             }
         }
@@ -335,13 +349,13 @@ export class Themer {
                 await themeExtension.activate().then(async f => {
                     await conf.update('workbench.colorTheme', theme.themeId || theme.label, vscode.ConfigurationTarget.Global);
                     if (twitchUserName) {
-                        vscode.window.showInformationMessage(`Theme changed to ${theme.label} by ${twitchUserName}`);
+                        vscode.window.showInformationMessage(`Theme changed to ${theme.label} by ${twitchDisplayName}`);
                     }
                 });
             }
         }
         else {
-            this.sendMessageEventEmitter.fire(`${twitchUserName}, ${themeName} is not a valid theme name or isn't installed.  You can use !theme list to get a list of available themes.`);
+            this.sendMessageEventEmitter.fire(`${twitchDisplayName}, ${themeName} is not a valid theme name or isn't installed.  You can use !theme to get a list of available themes.`);
         }
     }
 
