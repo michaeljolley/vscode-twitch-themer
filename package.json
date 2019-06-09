@@ -31,7 +31,8 @@
 	"activationEvents": [
 		"*",
 		"onCommand:twitchThemer.signIn",
-		"onCommand:twitchThemer.signOut"
+		"onCommand:twitchThemer.signOut",
+		"onCommand:twitchThemer.toggleChat"
 	],
 	"main": "./dist/extension",
 	"contributes": {
@@ -44,6 +45,11 @@
 			{
 				"command": "twitchThemer.signOut",
 				"title": "Sign Out",
+				"category": "Twitch Themer"
+			},
+			{
+				"command": "twitchThemer.toggleChat",
+				"title": "Toggle Chat",
 				"category": "Twitch Themer"
 			}
 		],

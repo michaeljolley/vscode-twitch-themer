@@ -27,16 +27,6 @@ export class Extension {
   public async initialize() {
     await _authenticationService.initialize();
 
-    _context.subscriptions.push(
-      _themer.onSendMesssage(this.onSendMessage),
-      _themer.onSendWhisper(this.onSendWhisper),
-
-      _chatClient.onChatMessageReceived(this.onChatMessageReceived),
-
-      _authenticationService.onAuthStatusChanged(this.onAuthStatusChanged),
-      _chatClient.onConnectionChanged(this.onChatConnectionChanged)
-    );
-
     const statusBarItem = await createStatusBarItem(
       _context,
       _authenticationService,
@@ -67,7 +57,19 @@ export class Extension {
       }
     );
 
+    const themerOnSendMessage = _themer.onSendMesssage(this.onSendMessage);
+    const themerOnSendWhisper = _themer.onSendWhisper(this.onSendWhisper);
+    const chatOnChatMessageReceived = _chatClient.onChatMessageReceived(this.onChatMessageReceived);
+    const authOnAuthStatusChanged = _authenticationService.onAuthStatusChanged(this.onAuthStatusChanged);
+    const chatOnConnectionChanged = _chatClient.onConnectionChanged(this.onChatConnectionChanged);
+
     _context.subscriptions.push(
+      themerOnSendMessage,
+      themerOnSendWhisper,
+      chatOnChatMessageReceived,
+      authOnAuthStatusChanged,
+      chatOnConnectionChanged,
+
       toggleChat,
       twitchSignIn,
       twitchSignOut,
@@ -108,8 +110,8 @@ export class Extension {
  * @param context - Context the extesion is being run in
  */
 export async function activate(context: vscode.ExtensionContext) {
-  const extension: Extension = new Extension(context);
 
+  const extension: Extension = new Extension(context);
   await extension.initialize();
 
   console.log('Congratulations, Twitch Themer is now active!');

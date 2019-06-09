@@ -116,7 +116,7 @@ export class Themer {
    */
   public async handleCommands(chatMessage: IChatMessage) {
     const twitchUser: Userstate = chatMessage.userState;
-    let message: string = chatMessage.message;
+    let message: string = chatMessage.message.replace(',', '');
 
     let username: string | undefined;
     /** Determine if the param is a (un)ban request */

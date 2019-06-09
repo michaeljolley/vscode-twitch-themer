@@ -21,8 +21,8 @@ suite('Themer Tests', function() {
   let fakeWorkspaceConfiguration: vscode.WorkspaceConfiguration;
   let fakeChatClient: ChatClient;
   let fakeThemer: Themer;
-  const baseTheme: string = 'Light (Visual Studio)';
-  const testTheme: string = 'Dark (Visual Studio)';
+  const baseTheme: string = 'Visual Studio Light';
+  const testTheme: string = 'Visual Studio Dark';
   const badTheme: string = 'HotDog Stand';
   const testBroadcastUser: string = 'theMichaelJolley';
   const broadcaster: Userstate = {

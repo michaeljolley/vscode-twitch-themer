@@ -163,7 +163,6 @@ export default class ChatClient {
         userState,
         message: message
           .replace('!theme', '')
-          .replace(',', '')
           .trim()
       });
     }
