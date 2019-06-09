@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## Added
+---
+
+## [1.0.0] - 2019-06-09
+
+### Added
 
 - `!theme current` command will now send the current theme to chat
 - New command palette option to select access to commands.  Options are:
@@ -15,14 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Followers`: allow only non-banned follower & subscribers to send commands
   - `Subscribers`: allow only non-banned subscribers to send commands
 
-## Changed
+### Changed
 
 - `!theme` will now send the list of available themes via whisper.  This replaces
 `!theme list`
 - Extension will no longer consider commas in commands. So if a user accidentally sends
 `!theme {theme name},` it will be interpretted as if no comma was included in the command
 
-## Removed
+### Removed
 
 - The following commands have been removed:
   - `!theme follower`
@@ -31,11 +35,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `!theme !subscriber`
   - `!theme list`
 
-## Fixed
+### Fixed
 
 - Extension will no longer automatically join chat on start-up
-
----
 
 ## [0.2.0] - 2019-05-26
 
@@ -109,8 +111,9 @@ them know it's not a valid theme name
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.2.0...HEAD
-[0.1.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.1.0...0.2.0
+[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.2.0...1.0.0
+[0.2.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.6...0.1.0
 [0.0.6]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.5...0.0.6
 [0.0.5]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.4...0.0.5
