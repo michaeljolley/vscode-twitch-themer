@@ -7,8 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## Added
+
+- `!theme current` command will now send the current theme to chat
+- New command palette option to select access to commands.  Options are:
+  - `Viewers`: allows all non-banned viewers to send commands
+  - `Followers`: allow only non-banned follower & subscribers to send commands
+  - `Subscribers`: allow only non-banned subscribers to send commands
+
+## Changed
+
+- `!theme` will now send the list of available themes via whisper.  This replaces
+`!theme list`
+- Extension will no longer consider commas in commands. So if a user accidentally sends
+`!theme {theme name},` it will be interpretted as if no comma was included in the command
+
+## Removed
+
+- The following commands have been removed:
+  - `!theme follower`
+  - `!theme !follower`
+  - `!theme subscriber`
+  - `!theme !subscriber`
+  - `!theme list`
+
 ## Fixed
-- Fix bug to allow for theme name to ignore commas.
+
+- Extension will no longer automatically join chat on start-up
 
 ---
 
