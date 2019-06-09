@@ -94,6 +94,15 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "clarkio",
+      "name": "Brian Clark",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/6265396?v=4",
+      "profile": "https://www.clarkio.com",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
