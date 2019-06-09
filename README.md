@@ -1,6 +1,6 @@
 # Twitch Themer
 
-
+[![Marketplace](https://vsmarketplacebadge.apphb.com/version/MichaelJolley.vscode-twitch-themer.svg?color=blue&style=?style=for-the-badge&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/MichaelJolley.vscode-twitch-themer.svg?color=blue&style=flat-square)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![MIT](https://img.shields.io/badge/license-MIT-orange.svg?color=blue&style=flat-square)](https://opensource.org/licenses/MIT)
 
 | Release | vNext | Contributors
 | -- | -- | --
