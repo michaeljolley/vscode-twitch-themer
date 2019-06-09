@@ -112,8 +112,7 @@ export class Themer {
 
   /**
    * Attempts to process commands received by users in Twitch chat
-   * @param twitchUser - Username of person sending the command
-   * @param message - Optional additional parameters sent by user
+   * @param chatMessage - User & message received from Twitch
    */
   public async handleCommands(chatMessage: IChatMessage) {
     const twitchUser: Userstate = chatMessage.userState;

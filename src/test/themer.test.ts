@@ -21,8 +21,9 @@ suite('Themer Tests', function() {
   let fakeWorkspaceConfiguration: vscode.WorkspaceConfiguration;
   let fakeChatClient: ChatClient;
   let fakeThemer: Themer;
-  const baseTheme: string = 'Visual Studio Dark';
-  const testTheme: string = 'HotDogStand';
+  const baseTheme: string = 'Light (Visual Studio)';
+  const testTheme: string = 'Dark (Visual Studio)';
+  const badTheme: string = 'HotDog Stand';
   const testBroadcastUser: string = 'theMichaelJolley';
   const broadcaster: Userstate = {
     username: testBroadcastUser.toLocaleLowerCase(),
@@ -155,21 +156,21 @@ suite('Themer Tests', function() {
     });
   });
 
-  // test(`Themer should remove trailing comma and change current theme to ${testTheme}`, function (done) {
-  //   const chatMessage: IChatMessage = { message: `${testTheme},`, userState: user };
+  test(`Themer should remove trailing comma and change current theme to ${testTheme}`, function (done) {
+    const chatMessage: IChatMessage = { message: `${testTheme},`, userState: user };
 
-  //   fakeThemer.handleCommands(chatMessage)
-  //     .then(() => {
-  //       try {
-  //         getConfigurationStub.calledOnce.should.be.true;
-  //         fakeWorkspaceConfiguration.get<string>('workbench.colorTheme')!.should.equal(testTheme);
-  //         done();
-  //       }
-  //       catch (error) {
-  //         done(error);
-  //       }
-  //     });
-  // });
+    fakeThemer.handleCommands(chatMessage)
+      .then(() => {
+        try {
+          getConfigurationStub.calledOnce.should.be.true;
+          fakeWorkspaceConfiguration.get<string>('workbench.colorTheme')!.should.equal(testTheme);
+          done();
+        }
+        catch (error) {
+          done(error);
+        }
+      });
+  });
 
   test('Themer should return a comma seperated list of themes', function(done) {
     let recipient: string;
