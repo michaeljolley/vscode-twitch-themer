@@ -103,7 +103,7 @@ export default class ChatClient {
   private onJoinHandler(channel: string, username: string, self: boolean) {
     if (self && this._client) {
       this.sendMessage(
-        'Twitch Themer is ready to go. Listening for !theme list or !theme {theme name}'
+        'Twitch Themer is ready to go. Listening for commands beginning with !theme'
       );
     }
   }

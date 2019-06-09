@@ -90,6 +90,32 @@ export class Themer {
     }
   }
 
+
+  public async handleChatConnectionChanged(signedIn: boolean) {
+    if (signedIn) {
+      if (keytar) {
+        const login = await keytar.getPassword(
+          KeytarKeys.service,
+          KeytarKeys.userLogin
+        );
+        this._currentUserLogin = login ? login : undefined;
+        const tempUserState: Userstate = {
+          username: this._currentUserLogin,
+          'display-name': this._currentUserLogin,
+          badges: { broadcaster: '1' }
+        };
+        this.refreshThemes(tempUserState);
+      }
+    } else {
+      const tempUserState: Userstate = {
+        username: this._currentUserLogin,
+        'display-name': this._currentUserLogin,
+        badges: { broadcaster: '1' }
+      };
+      this.resetTheme(tempUserState);
+    }
+  }
+
   /**
    * Updates access state of extension
    * @param accessState - New access state

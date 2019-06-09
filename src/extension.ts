@@ -25,7 +25,6 @@ export class Extension {
   }
 
   public async initialize() {
-    await _authenticationService.initialize();
 
     const statusBarItem = await createStatusBarItem(
       _context,
@@ -76,6 +75,8 @@ export class Extension {
       statusBarItem,
       handleSettingsChange
     );
+
+    await _authenticationService.initialize();
   }
 
   private onSendMessage(message: string) {
@@ -97,7 +98,9 @@ export class Extension {
     _themer.handleAuthStatusChanged(signedIn);
   }
 
-  private onChatConnectionChanged(connected: boolean) {}
+  private async onChatConnectionChanged(connected: boolean) {
+    await _themer.handleChatConnectionChanged(connected);
+  }
 
   public deactivate() {
     _authenticationService.handleSignOut();
