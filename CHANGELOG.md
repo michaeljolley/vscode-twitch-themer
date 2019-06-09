@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.1] - 2019-06-09
+
+### Updated
+
+- Added larger version of logo
+- Updated README.md to include link to VS Marketplace
+- Updated package.json to stylize VS Marketplace listing
+
 ## [1.0.0] - 2019-06-09
 
 ### Added
@@ -111,7 +119,8 @@ them know it's not a valid theme name
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.0.0...HEAD
+[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.0.1...HEAD
+[1.0.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.2.0...1.0.0
 [0.2.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.0.6...0.1.0
