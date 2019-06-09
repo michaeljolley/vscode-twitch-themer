@@ -394,11 +394,9 @@ export class Themer {
             theme.themeId || theme.label,
             vscode.ConfigurationTarget.Global
           );
-          if (twitchUserName) {
-            vscode.window.showInformationMessage(
-              `Theme changed to ${theme.label} by ${twitchDisplayName}`
-            );
-          }
+          vscode.window.showInformationMessage(
+            `Theme changed to ${theme.label} by ${twitchDisplayName}`
+          );
         });
       }
     } else {
