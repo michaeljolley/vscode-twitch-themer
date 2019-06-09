@@ -13,22 +13,23 @@ A Visual Studio Code extension that listens to twitch chat and allows viewers to
 
 ## Twitch Chat Commands
 
-#### Send response to chat of current theme
-
-This will send the currently active theme to Twitch chat.
-
-```
-!theme
-```
-
 #### Receive a list of available theme names
 
 This will send a list of installed VS Code themes to the requestor via whisper.
 
 ```
-!theme list
+!theme
 ```
+
 `Note: Only 1 whisper per user will be sent per day.`
+
+#### Send response to chat of current theme
+
+This will send the currently active theme to Twitch chat.
+
+```
+!theme current
+```
 
 #### Set VS Code theme
 
@@ -37,6 +38,7 @@ This command will set the theme of the streamers' VS Code workspace to the theme
 ```
 !theme {theme name}
 ```
+
 `Note: The theme must be previously installed and available within VS Code.`
 
 #### Set Random VS Code theme
@@ -46,6 +48,7 @@ This command will set the theme of the streamers' VS Code workspace to a theme t
 ```
 !theme random
 ```
+
 `Note: The theme must be previously installed and available within VS Code.`
 
 #### Reset VS Code theme
@@ -55,6 +58,7 @@ This command will set the theme of the streamers' VS Code workspace back to the 
 ```
 !theme reset
 ```
+
 `Note: Everytime the extension disconnects from chat, the theme will be reset.`
 
 #### Refresh VS Code themes
@@ -64,49 +68,52 @@ This command will refresh the list of available themes in the streamers VS Code 
 ```
 !theme refresh
 ```
+
 `Note: List of themes and request timers will only be reset if the command is sent from the broadcaster.`
 
-#### Ban/Unban User from changing themes
+#### Ban/Unban user from changing themes
 
 These commands will either ban or unban a user from changing the theme via Twitch chat.
 
 ```
 !theme ban {username}
 
-!theme unban {username}
+!theme !ban {username}
 ```
+
 `Note: List of banned users will reset on extension activation/start up.`
 
-#### Follower Only mode
+----
 
-These commands will either activate or deactivate follower only mode.
+## Settings
 
-```
-!theme follower
+<img width="400px" src="https://user-images.githubusercontent.com/1228996/59153253-bf03f080-8a1a-11e9-9dc3-9fe92b3cb413.png" />
 
-!theme !follower
-```
-`Note: Follower only mode will be turned off on extension activation/start up`
+#### Access State
 
-#### Subscriber Only mode
+On the settings UI, you can specify whether the extension should only react to all viewers, only followers or only subscribers.
 
-These commands will either activate or deactivate subscriber only mode.
+----
 
-```
-!theme sub
+## Connecting / Disconnecting Twitch Chat
 
-!theme !sub
-```
-`Note: Subscriber only mode will be turned off on extension activation/start up`
+<img width="250px" src="https://user-images.githubusercontent.com/1228996/59153329-338b5f00-8a1c-11e9-8086-07619ea691d3.png" />
 
+If you are signed in to Twitch you'll see your username next to the Twitch Themer paint bucket icon.
 
-## How to connect to Twitch
+Click on the icon to toggle between connecting/disconnecting from Twitch chat.
 
-- You can login to the twitch chat client using `Twitch Themer: Sign In` command. Execute the commands from vscode command pallete. This will open the Twitch Authentication page. Login to your twitch account. The token is stored in secure keystorage.
+----
 
-- You can logout from the chat once you are done with your twitch session.
-- Connect to the chat client using `Twitch Themer: Chat Connect` command.
-- Disconnect from the chat client using `Twitch Themer: Chat Disconnect` commands
+## Command Palette
+
+#### Twitch Themer: Sign In
+
+Opens the Twitch Authentication page. Login to your Twitch account to access chat.
+
+#### Twitch Themer: Sign Out
+
+Removes your Twitch authentication and, if connected, leaves Twitch chat.
 
 ---
 
@@ -115,11 +122,13 @@ These commands will either activate or deactivate subscriber only mode.
 * Thanks to [Sivamuthu Kumar](https://github.com/ksivamuthu) for the authentication code that we blatantly plagiarized from his [VSCode Peacock Twitch Extension](https://github.com/ksivamuthu/vscode-peacock-twitch-client).
 * Thanks to [Brian Clark](https://github.com/clarkio) for his videos on creating VS Code extensions and his [VSCode Twitch Highlighter](https://github.com/clarkio/vscode-twitch-highlighter) extension that really is what brought about the idea for this extension.
 
+----
 
 ## Release Notes
 
 See [CHANGELOG.md](CHANGELOG.md)
 
+----
 
 ## Contributing
 

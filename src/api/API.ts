@@ -22,20 +22,6 @@ export class API {
     return false;
   }
 
-  public static async getFollowers() {
-    if (keytar) {
-      const accessToken = await keytar.getPassword(KeytarKeys.service, KeytarKeys.account);
-      const currentUserId = await keytar.getPassword(KeytarKeys.service, KeytarKeys.userId);
-      if (accessToken && currentUserId) {
-        const url = `https://api.twitch.tv/helix/users/follows?to_id=${currentUserId}`;
-        const res = await fetch.default(url, { headers: { 'Authorization': `Bearer ${accessToken}` } });
-        const json = await res.json();
-        return json.data;
-      }
-    }
-    return [];
-  }
-
   public static async getUserDetails(token: string | null) {
     const url = 'https://api.twitch.tv/helix/users';
     const res = await fetch.default(url, { headers: { 'Authorization': `Bearer ${token}` } });

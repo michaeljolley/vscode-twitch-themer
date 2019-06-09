@@ -1,4 +1,4 @@
-import { Userstate } from "tmi.js";
+import { Userstate } from 'tmi.js';
 
 /**
  * Object that represents a Twitch chat message

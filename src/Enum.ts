@@ -2,7 +2,6 @@
  * Access level for viewers
  */
 export enum AccessState {
-
   /** All viewers */
   Viewers,
 
@@ -11,28 +10,26 @@ export enum AccessState {
 
   /** Subscribers only */
   Subscribers
-
 }
 
 /**
  * Commands provided by the extension to VS Code
  */
 export enum Commands {
-    /** Attempt to sign in to Twitch to get an OAuth token */
-    twitchSignIn = 'twitchThemer.signIn',
+  /** Attempt to sign in to Twitch to get an OAuth token */
+  twitchSignIn = 'twitchThemer.signIn',
 
-    /** Forget the users OAuth token and disconnects from Twitch chat */
-    twitchSignOut = 'twitchThemer.signOut',
+  /** Forget the users OAuth token and disconnects from Twitch chat */
+  twitchSignOut = 'twitchThemer.signOut',
 
-    /** Toggles connection on/off to Twitch chat */
-    toggleChat = 'twitchThemer.toggleChat',
+  /** Toggles connection on/off to Twitch chat */
+  toggleChat = 'twitchThemer.toggleChat'
 }
 
 /**
  * Keys for values stored in keytar
  */
 export enum KeytarKeys {
-
   /** Service name */
   service = 'vscode-twitch-themer',
 
@@ -50,17 +47,17 @@ export enum KeytarKeys {
  * Statuses that represent the state of the extension, authentication & chat
  */
 export enum TwitchClientStatus {
-    /** Extension is attempting to authenticate with Twitch */
-    loggingIn,
+  /** Extension is attempting to authenticate with Twitch */
+  loggingIn,
 
-    /** User is authenticated with Twitch, but not connected to Twitch chat */
-    loggedIn,
+  /** User is authenticated with Twitch, but not connected to Twitch chat */
+  loggedIn,
 
-    /** User is authenticated and connected to Twitch chat */
-    chatConnected,
+  /** User is authenticated and connected to Twitch chat */
+  chatConnected,
 
-    /** User is not authenticated and not connected to Twitch chat */
-    loggedOut
+  /** User is not authenticated and not connected to Twitch chat */
+  loggedOut
 }
 
 /**

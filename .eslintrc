@@ -1,0 +1,15 @@
+{
+  "extends": ["prettier"],
+  "rules": {
+    "no-use-before-define": "off",
+    "linebreak-style": "off"
+  },
+  "globals": {
+    "localStorage": false,
+    "window": false,
+    "Audio": false,
+    "io": false,
+    "$": false,
+    "document": false
+  }
+}
