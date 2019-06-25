@@ -119,6 +119,31 @@ suite('Themer Tests', function() {
     });
   });
 
+  test(`Themer should return info about the GitHub repo`, function(done) {
+    let sentMessage: string = '';
+    const sendMessageStub = sinon
+      .stub(fakeChatClient, 'sendMessage')
+      .callsFake((message: string) => {
+        sentMessage = message;
+      });
+    fakeThemer.onSendMesssage(sendMessageStub);
+
+    const message = 'repo';
+    const chatMessage: IChatMessage = { message, userState: user };
+
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        sendMessageStub.calledOnce.should.be.true;
+        sentMessage.should.equal('You can find the source code for this VS \
+        Code extension at https://github.com/MichaelJolley/vscode-twitch-themer. \
+        Feel free to Fork & contribute.');
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
   test('Themer should reset theme to original theme when requested', function(done) {
     fakeWorkspaceConfiguration.update('workbench.colorTheme', testTheme);
 

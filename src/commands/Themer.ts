@@ -90,7 +90,6 @@ export class Themer {
     }
   }
 
-
   public async handleChatConnectionChanged(signedIn: boolean) {
     if (signedIn) {
       if (keytar) {
@@ -168,6 +167,9 @@ export class Themer {
       case 'refresh':
         await this.refreshThemes(twitchUser);
         break;
+      case 'repo':
+          await this.repo();
+          break;
       case 'ban':
         if (username !== undefined) {
           await this.ban(twitchUser, username);
@@ -427,7 +429,8 @@ export class Themer {
       }
     } else {
       this.sendMessageEventEmitter.fire(
-        `${twitchDisplayName}, ${themeName} is not a valid theme name or isn't installed.  You can use !theme to get a list of available themes.`
+        `${twitchDisplayName}, ${themeName} is not a valid theme name or \
+        isn't installed.  You can use !theme to get a list of available themes.`
       );
     }
   }
@@ -440,6 +443,16 @@ export class Themer {
       .getConfiguration()
       .get('workbench.colorTheme');
     this.sendMessageEventEmitter.fire(`The current theme is ${currentTheme}`);
+  }
+
+  /**
+   * Announces to chat info about the extensions GitHub repository
+   */
+  private async repo() {
+    const repoMessage = 'You can find the source code for this VS \
+        Code extension at https://github.com/MichaelJolley/vscode-twitch-themer. \
+        Feel free to Fork & contribute.';
+    this.sendMessageEventEmitter.fire(repoMessage);
   }
 
   /**
