@@ -164,12 +164,15 @@ export class Themer {
       case 'random':
         await this.randomTheme(twitchUser);
         break;
+      case 'help':
+        await this.help();
+        break;
       case 'refresh':
         await this.refreshThemes(twitchUser);
         break;
       case 'repo':
-          await this.repo();
-          break;
+        await this.repo();
+        break;
       case 'ban':
         if (username !== undefined) {
           await this.ban(twitchUser, username);
@@ -453,6 +456,17 @@ export class Themer {
         Code extension at https://github.com/MichaelJolley/vscode-twitch-themer. \
         Feel free to Fork & contribute.';
     this.sendMessageEventEmitter.fire(repoMessage);
+  }
+
+  /**
+   * Announces to chat a message with a brief explanation of how to use the commands
+   */
+  private async help() {
+    const helpMessage: string = `You can change the theme of the stream's VS\
+              Code by sending '!theme random'. You can also choose a theme\
+              specifically. Send '!theme' to be whispered a list of available\
+              themes.`;
+    this.sendMessageEventEmitter.fire(helpMessage);
   }
 
   /**
