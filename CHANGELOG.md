@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added the `!theme help` command to explain to chat how to use the extensions commands
+
 ---
 
 ## [1.0.1] - 2019-06-09
