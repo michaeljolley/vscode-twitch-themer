@@ -31,6 +31,22 @@ This will send the currently active theme to Twitch chat.
 !theme current
 ```
 
+#### Send info about this GitHub repo to chat
+
+This will send a message to Twitch chat letting everyone know where to access the source for this extension.
+
+```
+!theme repo
+```
+
+#### Explain how to use the extensions commands
+
+This will send a message to Twitch chat explaining the available commands.
+
+```
+!theme help
+```
+
 #### Set VS Code theme
 
 This command will set the theme of the streamers' VS Code workspace to the theme specified.

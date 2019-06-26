@@ -90,7 +90,6 @@ export class Themer {
     }
   }
 
-
   public async handleChatConnectionChanged(signedIn: boolean) {
     if (signedIn) {
       if (keytar) {
@@ -165,8 +164,14 @@ export class Themer {
       case 'random':
         await this.randomTheme(twitchUser);
         break;
+      case 'help':
+        await this.help();
+        break;
       case 'refresh':
         await this.refreshThemes(twitchUser);
+        break;
+      case 'repo':
+        await this.repo();
         break;
       case 'ban':
         if (username !== undefined) {
@@ -427,7 +432,8 @@ export class Themer {
       }
     } else {
       this.sendMessageEventEmitter.fire(
-        `${twitchDisplayName}, ${themeName} is not a valid theme name or isn't installed.  You can use !theme to get a list of available themes.`
+        `${twitchDisplayName}, ${themeName} is not a valid theme name or \
+        isn't installed.  You can use !theme to get a list of available themes.`
       );
     }
   }
@@ -440,6 +446,27 @@ export class Themer {
       .getConfiguration()
       .get('workbench.colorTheme');
     this.sendMessageEventEmitter.fire(`The current theme is ${currentTheme}`);
+  }
+
+  /**
+   * Announces to chat info about the extensions GitHub repository
+   */
+  private async repo() {
+    const repoMessage = 'You can find the source code for this VS \
+        Code extension at https://github.com/MichaelJolley/vscode-twitch-themer. \
+        Feel free to Fork & contribute.';
+    this.sendMessageEventEmitter.fire(repoMessage);
+  }
+
+  /**
+   * Announces to chat a message with a brief explanation of how to use the commands
+   */
+  private async help() {
+    const helpMessage: string = `You can change the theme of the stream's VS\
+              Code by sending '!theme random'. You can also choose a theme\
+              specifically. Send '!theme' to be whispered a list of available\
+              themes.`;
+    this.sendMessageEventEmitter.fire(helpMessage);
   }
 
   /**

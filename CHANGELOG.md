@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- New `!theme repo` will now send a message to chat with information about the extensions GitHub repo.
+- Added the `!theme help` command to explain to chat how to use the extensions commands
+
 ---
 
 ## [1.1.0] - 2019-06-26

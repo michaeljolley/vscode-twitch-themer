@@ -95,6 +95,34 @@ suite('Themer Tests', function() {
     getConfigurationStub.resetHistory();
   });
 
+  test(`Themer should explain how to use extension to chat`, function(done) {
+    let sentMessage: string = '';
+    const sendMessageStub = sinon
+      .stub(fakeChatClient, 'sendMessage')
+      .callsFake((message: string) => {
+        sentMessage = message;
+      });
+    fakeThemer.onSendMesssage(sendMessageStub);
+
+    const message = 'help';
+    const chatMessage: IChatMessage = { message, userState: user };
+
+    const helpMessage: string = `You can change the theme of the stream's VS\
+              Code by sending '!theme random'. You can also choose a theme\
+              specifically. Send '!theme' to be whispered a list of available\
+              themes.`;
+
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        sendMessageStub.calledOnce.should.be.true;
+        sentMessage.should.equal(helpMessage);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
   test(`Themer should return current theme (${baseTheme})`, function(done) {
     let sentMessage: string = '';
     const sendMessageStub = sinon
@@ -112,6 +140,31 @@ suite('Themer Tests', function() {
         getConfigurationStub.calledOnce.should.be.true;
         sendMessageStub.calledOnce.should.be.true;
         sentMessage.should.equal(`The current theme is ${baseTheme}`);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test(`Themer should return info about the GitHub repo`, function(done) {
+    let sentMessage: string = '';
+    const sendMessageStub = sinon
+      .stub(fakeChatClient, 'sendMessage')
+      .callsFake((message: string) => {
+        sentMessage = message;
+      });
+    fakeThemer.onSendMesssage(sendMessageStub);
+
+    const message = 'repo';
+    const chatMessage: IChatMessage = { message, userState: user };
+
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        sendMessageStub.calledOnce.should.be.true;
+        sentMessage.should.equal('You can find the source code for this VS \
+        Code extension at https://github.com/MichaelJolley/vscode-twitch-themer. \
+        Feel free to Fork & contribute.');
         done();
       } catch (error) {
         done(error);
