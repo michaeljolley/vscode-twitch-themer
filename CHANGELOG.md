@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2019-06-26
+
+### Added
+
+- `!theme repo` command that sends information about the extensions GitHub repo to Twitch chat
+- `!theme help` command that sends a brief explanation of how to use the extension to Twitch chat
+
 ## [1.0.1] - 2019-06-09
 
 ### Updated
@@ -56,14 +63,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - If user sends a `!theme {theme name}` with an invalid theme name, the extension will whisper them to let
 them know it's not a valid theme name
 
-
 ## [0.1.0] - 2019-05-16
 
 ### Added
 
 - Broadcaster can use `!theme follower` or `!theme !follower` to activate or deactivate follower only mode
 - Added tests for Themer class
-
 
 ## [0.0.6] - 2019-05-12
 
@@ -75,14 +80,12 @@ them know it's not a valid theme name
 
 - `!Theme` now recognized as a command like `!theme`
 
-
 ## [0.0.5] - 2019-05-10
 
 ### Added
 
 - Added a new `!theme refresh` command that refreshes the list of available themes.  **Can only be used by the broadcaster**
 - Added comments throughout codebase to provide better experience for future contributors
-
 
 ## [0.0.4] - 2019-05-09
 
@@ -105,13 +108,11 @@ them know it's not a valid theme name
 
 - Fixed the sending of messages to chat on join/disconnect to Twitch channel.
 
-
 ## [0.0.2] - 2019-05-01
 
 ### Added
 
 - Added configuration and badges for CI/CD process
-
 
 ## [0.0.1] - 2019-04-26
 
@@ -119,7 +120,8 @@ them know it's not a valid theme name
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.0.1...HEAD
+[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.1.0...HEAD
+[1.1.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.0.1...1.1.0
 [1.0.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.2.0...1.0.0
 [0.2.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.1.0...0.2.0
