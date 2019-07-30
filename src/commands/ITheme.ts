@@ -11,4 +11,8 @@ export interface ITheme {
    * should be used to set the active theme.
    */
   themeId: string | null;
+  /**
+   * Whether the theme is considered "dark mode"
+   */
+  isDark: boolean;
 }

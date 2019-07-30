@@ -183,7 +183,7 @@ suite('Themer Tests', function() {
         sendMessageStub.calledOnce.should.be.true;
         sentMessage.should.equal('You can find the source code for this VS \
         Code extension at https://github.com/MichaelJolley/vscode-twitch-themer. \
-        Feel free to Fork & contribute.');
+        Feel free to fork & contribute.');
         done();
       } catch (error) {
         done(error);
@@ -259,6 +259,59 @@ suite('Themer Tests', function() {
         recipient!.should.equal(user.username);
         whisperedMessage.should.exist;
         whisperedMessage.split(', ').length.should.be.greaterThan(0);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test(`Themer should change the theme to a random theme when using !theme random`, function(done) {
+    const chatMessage: IChatMessage = { message: 'random', userState: user };
+
+    fakeWorkspaceConfiguration.update('workbench.colorTheme', baseTheme);
+
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.not.equal(baseTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test(`Themer should change the theme to a random dark theme when using !theme random dark`, function(done) {
+    const chatMessage: IChatMessage = { message: 'random dark', userState: user };
+
+    /* baseTheme is light.  Set now so we can be sure we get a dark theme after running the command */
+    fakeWorkspaceConfiguration.update('workbench.colorTheme', baseTheme);
+
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.not.equal(baseTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test(`Themer should change the theme to a random light theme when using !theme random light`, function(done) {
+    const chatMessage: IChatMessage = { message: 'random light', userState: user };
+
+    /* testTheme is dark.  Set now so we can be sure we get a light theme after running the command */
+    fakeWorkspaceConfiguration.update('workbench.colorTheme', testTheme);
+
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.not.equal(testTheme);
         done();
       } catch (error) {
         done(error);

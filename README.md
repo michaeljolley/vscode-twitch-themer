@@ -59,13 +59,12 @@ This command will set the theme of the streamers' VS Code workspace to the theme
 
 #### Set Random VS Code theme
 
-This command will set the theme of the streamers' VS Code workspace to a theme that is chosen at random.
+This command will set the theme of the streamers' VS Code workspace to a theme that is chosen at random.  If `dark` or `light` is specified it will only select
+a random theme from the appropriate option.
 
 ```
-!theme random
+!theme random {dark || light}
 ```
-
-`Note: The theme must be previously installed and available within VS Code.`
 
 #### Reset VS Code theme
 

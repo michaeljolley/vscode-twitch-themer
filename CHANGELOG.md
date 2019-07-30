@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `!theme random light` command that chooses a random theme from the light theme extensions.
+- `!theme random dark` command that chooses a random theme from the dark theme extensions.
+
 ---
 
 ## [1.1.0] - 2019-06-26
