@@ -374,11 +374,11 @@ export class Themer {
     const themes = this._availableThemes.filter(f => {
       switch(filter) {
         case 1:
-          return f.isDark && f.label !== currentTheme;
+          return f.isDark && f.label !== currentTheme && f.themeId !== currentTheme;
         case 2:
-          return !f.isDark && f.label !== currentTheme;
+          return !f.isDark && f.label !== currentTheme && f.themeId !== currentTheme;
         default:
-          return true && f.label !== currentTheme;
+          return true && f.label !== currentTheme && f.themeId !== currentTheme;
       }
     });
 
