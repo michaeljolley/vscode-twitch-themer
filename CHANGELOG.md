@@ -7,12 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.2.0] - 2019-07-30
+
 ### Added
 
 - `!theme random light` command that chooses a random theme from the light theme extensions.
 - `!theme random dark` command that chooses a random theme from the dark theme extensions.
-
----
 
 ## [1.1.0] - 2019-06-26
 
@@ -125,7 +127,8 @@ them know it's not a valid theme name
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.1.0...HEAD
+[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.2.0...HEAD
+[1.2.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.0.1...1.1.0
 [1.0.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/0.2.0...1.0.0
