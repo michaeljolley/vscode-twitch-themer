@@ -92,7 +92,8 @@
       "profile": "http://surlydev.net",
       "contributions": [
         "code",
-        "bug"
+        "bug",
+        "ideas"
       ]
     },
     {
@@ -111,6 +112,25 @@
       "profile": "https://github.com/HeCodes2Much",
       "contributions": [
         "userTesting"
+      ]
+    },
+    {
+      "login": "Flyken271",
+      "name": "Flyken",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/39961800?v=4",
+      "profile": "https://github.com/Flyken271",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "calebmckay",
+      "name": "Caleb McKay",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/11079725?v=4",
+      "profile": "https://github.com/calebmckay",
+      "contributions": [
+        "test",
+        "code"
       ]
     }
   ],
