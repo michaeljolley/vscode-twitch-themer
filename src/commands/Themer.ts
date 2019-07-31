@@ -151,7 +151,12 @@ export class Themer {
       username = ban[2]; // The username to ban
     }
 
-    switch (message) {
+    const params: string[] = message.split(' ');
+    let command: string = '';
+    if (params.length > 0) {
+      command = params[0];
+    }
+    switch (command) {
       case '':
         await this.sendThemes(twitchUser);
         break;
@@ -162,7 +167,7 @@ export class Themer {
         await this.resetTheme(twitchUser);
         break;
       case 'random':
-        await this.randomTheme(twitchUser);
+        await this.randomTheme(twitchUser, message);
         break;
       case 'help':
         await this.help();
@@ -323,7 +328,7 @@ export class Themer {
       )
       .forEach((fe: any) => {
         const iThemes = fe.packageJSON.contributes.themes.map((m: any) => {
-          return { extensionId: fe.id, label: m.label, themeId: m.id };
+          return { extensionId: fe.id, label: m.label, themeId: m.id, isDark: m.uiTheme !== 'vs' };
         });
 
         this._availableThemes = this._availableThemes.concat
@@ -343,12 +348,46 @@ export class Themer {
   /**
    * Changes the theme to a random option from all available themes
    * @param twitchUser - pass through twitch user state
+   * @param message - message sent via chat
    */
-  private async randomTheme(twitchUser: Userstate) {
-    const max = this._availableThemes.length;
-    const randomNumber = Math.floor(Math.random() * max);
-    const chosenTheme = this._availableThemes[randomNumber].label;
-    await this.changeTheme(twitchUser, chosenTheme);
+  private async randomTheme(twitchUser: Userstate, message: string) {
+
+    const currentTheme = vscode.workspace
+      .getConfiguration()
+      .get('workbench.colorTheme');
+
+    const params = message.split(' ');
+    let filter: number = 0;
+    if (params.length > 1) {
+      switch (params[1].toLocaleLowerCase()) {
+        case 'dark':
+          filter = 1;
+          break;
+        case 'light':
+          filter = 2;
+          break;
+        default:
+          break;
+      }
+    }
+
+    const themes = this._availableThemes.filter(f => {
+      switch(filter) {
+        case 1:
+          return f.isDark && f.label !== currentTheme && f.themeId !== currentTheme;
+        case 2:
+          return !f.isDark && f.label !== currentTheme && f.themeId !== currentTheme;
+        default:
+          return true && f.label !== currentTheme && f.themeId !== currentTheme;
+      }
+    });
+
+    if (themes.length > 0) {
+      const max = themes.length;
+      const randomNumber = Math.floor(Math.random() * max);
+      const chosenTheme = themes[randomNumber].label;
+      await this.changeTheme(twitchUser, chosenTheme);
+    }
   }
 
   /**
@@ -454,7 +493,7 @@ export class Themer {
   private async repo() {
     const repoMessage = 'You can find the source code for this VS \
         Code extension at https://github.com/MichaelJolley/vscode-twitch-themer. \
-        Feel free to Fork & contribute.';
+        Feel free to fork & contribute.';
     this.sendMessageEventEmitter.fire(repoMessage);
   }
 

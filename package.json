@@ -9,16 +9,16 @@
 		"email": "mike@sparcapp.io"
 	},
 	"icon": "resources/logo.png",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"preview": false,
 	"engines": {
 		"vscode": "^1.32.0"
 	},
-  "galleryBanner": {
-    "color": "#373436",
-    "theme": "dark"
-  },
-  "extensionKind": "ui",
+	"galleryBanner": {
+		"color": "#373436",
+		"theme": "dark"
+	},
+	"extensionKind": "ui",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/michaeljolley/vscode-twitch-themer"

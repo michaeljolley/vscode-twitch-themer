@@ -9,6 +9,7 @@ import { Userstate } from 'tmi.js';
 import { IChatMessage } from '../chat/IChatMessage';
 import { API } from '../api/API';
 import { IWhisperMessage } from '../chat/IWhisperMessage';
+import { AccessState } from '../Enum';
 
 chai.should();
 
@@ -17,10 +18,15 @@ suite('Themer Tests', function() {
     [(string | undefined)?, (vscode.Uri | null | undefined)?],
     vscode.WorkspaceConfiguration
   >;
+  let isTwitchUserFollowingStub: sinon.SinonStub<
+    [(string | undefined)],
+    Promise<boolean>
+  >;
   let fakeState: vscode.Memento;
   let fakeWorkspaceConfiguration: vscode.WorkspaceConfiguration;
   let fakeChatClient: ChatClient;
   let fakeThemer: Themer;
+  let isTwitchUserFollowingReturn : boolean = false;
   const baseTheme: string = 'Visual Studio Light';
   const testTheme: string = 'Visual Studio Dark';
   const badTheme: string = 'HotDog Stand';
@@ -35,7 +41,15 @@ suite('Themer Tests', function() {
     'display-name': 'parithon',
     badges: { moderator: '1' }
   };
-  const user: Userstate = { username: 'surlydev', 'display-name': 'SurlyDev' };
+  const subscriber: Userstate = {
+    username: 'spellbee2',
+    'display-name': 'spellbee2',
+    subscriber: true
+  };
+  const user: Userstate = {
+    username: 'surlydev',
+    'display-name': 'SurlyDev'
+  };
 
   suiteSetup(function() {
     const fakeConfig: {
@@ -45,8 +59,6 @@ suite('Themer Tests', function() {
     };
     const stateValues: { [key: string]: any } = {
       bannedUsers: [],
-      followerOnly: false,
-      subOnly: false
     };
     fakeWorkspaceConfiguration = {
       get(section: string) {
@@ -79,20 +91,27 @@ suite('Themer Tests', function() {
     getConfigurationStub = sinon
       .stub(vscode.workspace, 'getConfiguration')
       .returns(fakeWorkspaceConfiguration);
+    isTwitchUserFollowingStub = sinon
+      .stub(API, 'isTwitchUserFollowing')
+      .callsFake(async (twitchUserId: string | undefined) => {
+        return isTwitchUserFollowingReturn;
+      });
   });
 
   suiteTeardown(function() {
     getConfigurationStub.restore();
+    isTwitchUserFollowingStub.restore();
   });
 
   setup(function() {
     fakeState.update('bannedUsers', []);
-    fakeState.update('followerOnly', false);
-    fakeState.update('subOnly', false);
     fakeWorkspaceConfiguration.update('workbench.colorTheme', baseTheme);
     fakeChatClient = new ChatClient(fakeState);
     fakeThemer = new Themer(fakeState);
+    fakeThemer.handleAccessStateChanged(AccessState.Viewers);
     getConfigurationStub.resetHistory();
+    isTwitchUserFollowingStub.resetHistory();
+    isTwitchUserFollowingReturn = false;
   });
 
   test(`Themer should explain how to use extension to chat`, function(done) {
@@ -164,7 +183,7 @@ suite('Themer Tests', function() {
         sendMessageStub.calledOnce.should.be.true;
         sentMessage.should.equal('You can find the source code for this VS \
         Code extension at https://github.com/MichaelJolley/vscode-twitch-themer. \
-        Feel free to Fork & contribute.');
+        Feel free to fork & contribute.');
         done();
       } catch (error) {
         done(error);
@@ -174,12 +193,6 @@ suite('Themer Tests', function() {
 
   test('Themer should reset theme to original theme when requested', function(done) {
     fakeWorkspaceConfiguration.update('workbench.colorTheme', testTheme);
-
-    const API_isTwitchUserFollowingStub = sinon
-      .stub(API, 'isTwitchUserFollowing')
-      .callsFake(async (twitchUserId: string | undefined) => {
-        return true;
-      });
 
     fakeThemer.resetTheme(broadcaster).then(() => {
       try {
@@ -253,6 +266,59 @@ suite('Themer Tests', function() {
     });
   });
 
+  test(`Themer should change the theme to a random theme when using !theme random`, function(done) {
+    const chatMessage: IChatMessage = { message: 'random', userState: user };
+
+    fakeWorkspaceConfiguration.update('workbench.colorTheme', baseTheme);
+
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.not.equal(baseTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test(`Themer should change the theme to a random dark theme when using !theme random dark`, function(done) {
+    const chatMessage: IChatMessage = { message: 'random dark', userState: user };
+
+    /* baseTheme is light.  Set now so we can be sure we get a dark theme after running the command */
+    fakeWorkspaceConfiguration.update('workbench.colorTheme', baseTheme);
+
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.not.equal(baseTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test(`Themer should change the theme to a random light theme when using !theme random light`, function(done) {
+    const chatMessage: IChatMessage = { message: 'random light', userState: user };
+
+    /* testTheme is dark.  Set now so we can be sure we get a light theme after running the command */
+    fakeWorkspaceConfiguration.update('workbench.colorTheme', testTheme);
+
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.not.equal(testTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
   test('Themer should ban a user', function(done) {
     const message = `ban ${user.username}`;
     const chatMessage: IChatMessage = { message, userState: moderator };
@@ -312,6 +378,90 @@ suite('Themer Tests', function() {
         fakeState
           .get<string>('bannedUsers')!
           .should.contain(moderator.username);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test('Themer should prevent theme changes by viewers if the AccessState is set to Followers', function(done) {
+    const chatMessage: IChatMessage = { message: testTheme, userState: user };
+    isTwitchUserFollowingReturn = false;
+
+    fakeThemer.handleAccessStateChanged(AccessState.Followers);
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.equal(baseTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test('Themer should allow theme changes by followers if the AccessState is set to Followers', function(done) {
+    const chatMessage: IChatMessage = { message: testTheme, userState: user };
+    isTwitchUserFollowingReturn = true;
+
+    fakeThemer.handleAccessStateChanged(AccessState.Followers);
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.equal(testTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test('Themer should prevent theme changes by viewers if the AccessState is set to Subscribers', function(done) {
+    const chatMessage: IChatMessage = { message: testTheme, userState: user };
+    isTwitchUserFollowingReturn = false;
+
+    fakeThemer.handleAccessStateChanged(AccessState.Subscribers);
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.equal(baseTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test('Themer should prevent theme changes by followers if the AccessState is set to Subscribers', function(done) {
+    const chatMessage: IChatMessage = { message: testTheme, userState: user };
+    isTwitchUserFollowingReturn = true;
+    fakeThemer.handleAccessStateChanged(AccessState.Subscribers);
+
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.equal(baseTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test('Themer should allow theme changes by subscribers if the AccessState is set to Subscribers', function(done) {
+    const chatMessage: IChatMessage = { message: testTheme, userState: subscriber };
+
+    fakeThemer.handleAccessStateChanged(AccessState.Subscribers);
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.equal(testTheme);
         done();
       } catch (error) {
         done(error);
