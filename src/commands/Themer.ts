@@ -63,6 +63,17 @@ export class Themer {
       .forEach(username =>
         this._listRecipients.push({ username, banned: true })
       );
+
+      /**
+       * Executes whenever a new extension is installed.
+       * Unfortunately this event does not fire with the
+       * new extension, so we must assume that maybe it was
+       * a theme, and we need to refresh the available themes.
+       */
+      vscode.extensions.onDidChange(() => {
+        // Reload the available themes.
+        this.loadThemes();
+      });
   }
 
   public async handleAuthStatusChanged(signedIn: boolean) {
@@ -179,14 +190,14 @@ export class Themer {
       case 'repo':
         await this.repo();
         break;
+      case "install":
+        await this.installTheme(twitchUser, message);
+        break;  
       case 'ban':
         if (username !== undefined) {
           await this.ban(twitchUser, username);
         }
         break;
-      case "install":
-        await this.installTheme(twitchUser, message);
-        break;  
       case '!ban':
         if (username !== undefined) {
           await this.unban(twitchUser, username);
@@ -365,11 +376,6 @@ export class Themer {
    * @param message - message sent via chat
    */
   private async installTheme(twitchUser: Userstate, message: string): Promise<void> {
-    // Try to install the theme
-    await vscode.commands.executeCommand(
-      "workbench.extensions.installExtension",
-      message
-    );
     const twitchUserName: string = twitchUser.username;
     const twitchDisplayName: string = twitchUser['display-name']
       ? twitchUser['display-name']
@@ -428,7 +434,7 @@ export class Themer {
       break moderator;
     }
 
-    const theme = message.split(' ')[0];
+    const theme = message.split(' ')[1];
 
     // Verify that the extension exists
     if (!await API.isValidExtensionName(theme)) {
@@ -441,15 +447,7 @@ export class Themer {
         "workbench.extensions.installExtension",
         theme
       );
-
-      const themeExt = vscode.extensions.getExtension(theme);
-      if(!themeExt) {
-        return;
-      }
-
-      const themeName = themeExt.packageJSON.contributes.themes[0].label;
-
-      this.changeTheme(twitchUser, themeName);
+      
     }
     catch (err) {
       // Handle the error

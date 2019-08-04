@@ -1,5 +1,5 @@
 
-import * as fetch from 'node-fetch';
+import fetch from 'node-fetch';
 import { keytar } from '../Common';
 import { KeytarKeys } from '../Enum';
 
@@ -12,7 +12,7 @@ export class API {
         const currentUserId = await keytar.getPassword(KeytarKeys.service, KeytarKeys.userId);
         if (accessToken && currentUserId) {
           const url = `https://api.twitch.tv/helix/users/follows?from_id=${twitchUserId}&to_id=${currentUserId}`;
-          const res = await fetch.default(url, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+          const res = await fetch(url, { headers: { 'Authorization': `Bearer ${accessToken}` } });
           const json = await res.json();
           return (json.data.length > 0) ? true: false;
         }
@@ -24,17 +24,17 @@ export class API {
 
   public static async getUserDetails(token: string | null) {
     const url = 'https://api.twitch.tv/helix/users';
-    const res = await fetch.default(url, { headers: { 'Authorization': `Bearer ${token}` } });
+    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
     const json = (await res.json());
     return json.data && json.data[0];
   }
 
   public static async isValidExtensionName(extensionName: string): Promise<boolean> {
-    const url = 'https://marketplace.visualstudiocode.com/items?itemName={extensionName}';
-    const res = await fetch.default(url);
+    const url = `https://marketplace.visualstudio.com/items?itemName=${extensionName}`;
+    const res = await fetch(url, { method: 'GET', headers: { "Accept": "*/*", "User-Agent": "VSCode-Twitch-Themer" } });
     if (res.status === 404) {
       return false;
     }
-    return true;
+    return res.ok;
   }
 }
