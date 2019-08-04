@@ -14,6 +14,7 @@ import { IChatMessage } from '../chat/IChatMessage';
  */
 export class Themer {
   private _accessState: AccessState = AccessState.Viewers;
+  private _installState: AccessState = AccessState.Followers;
   private _originalTheme: string | undefined;
   private _availableThemes: Array<ITheme> = [];
   private _listRecipients: Array<IListRecipient> = [];
@@ -183,6 +184,9 @@ export class Themer {
           await this.ban(twitchUser, username);
         }
         break;
+      case "install":
+        await this.installTheme(twitchUser, message);
+        break;  
       case '!ban':
         if (username !== undefined) {
           await this.unban(twitchUser, username);
@@ -345,6 +349,115 @@ export class Themer {
     this.clearListRecipients();
   }
 
+  private isBanned(twitchUserName: string): boolean {
+    if (twitchUserName) {
+      const recipient = this.getRecipient(twitchUserName, true);
+      if (recipient && recipient.banned && recipient.banned === true) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Installs the requested THEME and switches to the theme once installed
+   * @param twitchUser - pass through twitch user state
+   * @param message - message sent via chat
+   */
+  private async installTheme(twitchUser: Userstate, message: string): Promise<void> {
+    // Try to install the theme
+    await vscode.commands.executeCommand(
+      "workbench.extensions.installExtension",
+      message
+    );
+    const twitchUserName: string = twitchUser.username;
+    const twitchDisplayName: string = twitchUser['display-name']
+      ? twitchUser['display-name']
+      : twitchUserName;
+    
+    /** Ensure the user hasn't been banned before installing the theme */
+    if (this.isBanned(twitchUserName)) {
+      return;
+    }
+
+    following: if (this._installState === AccessState.Followers) {
+      if (this.getUserLevel(twitchUser) === UserLevel.broadcaster) {
+        break following;
+      } else if (
+        this._followers.find(
+          x => x.username === twitchUserName.toLocaleLowerCase()
+        )
+      ) {
+        break following;
+      } else if (
+        twitchUser &&
+        (await API.isTwitchUserFollowing(twitchUser['user-id']))
+      ) {
+        this._followers.push({
+          username: twitchUserName ? twitchUserName.toLocaleLowerCase() : ''
+        });
+        break following;
+      } else {
+        return;
+      }
+    } else {
+      break following;
+    }
+
+    subscriber: if (this._installState === AccessState.Subscribers) {
+      if (this.getUserLevel(twitchUser) === UserLevel.broadcaster) {
+        break subscriber;
+      } else if (twitchUser && twitchUser['subscriber']) {
+        break subscriber;
+      } else {
+        return;
+      }
+    } else {
+      break subscriber;
+    }
+
+    moderator: if (this._installState === AccessState.Subscribers) {
+      if (this.getUserLevel(twitchUser) === UserLevel.broadcaster) {
+        break moderator;
+      } else if (twitchUser && twitchUser['subscriber']) {
+        break moderator;
+      } else {
+        return;
+      }
+    } else {
+      break moderator;
+    }
+
+    const theme = message.split(' ')[0];
+
+    // Verify that the extension exists
+    if (!await API.isValidExtensionName(theme)) {
+      // Handle non-existing extension
+      return;
+    }
+
+    try {
+      await vscode.commands.executeCommand(
+        "workbench.extensions.installExtension",
+        theme
+      );
+
+      const themeExt = vscode.extensions.getExtension(theme);
+      if(!themeExt) {
+        return;
+      }
+
+      const themeName = themeExt.packageJSON.contributes.themes[0].label;
+
+      this.changeTheme(twitchUser, themeName);
+    }
+    catch (err) {
+      // Handle the error
+      console.error(err);
+      return;
+    }
+  }
+
   /**
    * Changes the theme to a random option from all available themes
    * @param twitchUser - pass through twitch user state
@@ -438,11 +551,8 @@ export class Themer {
     }
 
     /** Ensure the user hasn't been banned before changing the theme */
-    if (twitchUserName) {
-      const recipient = this.getRecipient(twitchUserName, true);
-      if (recipient && recipient.banned && recipient.banned === true) {
-        return;
-      }
+    if (this.isBanned(twitchUserName)) {
+      return;
     }
 
     /** Find theme based on themeName and change theme if it is found */

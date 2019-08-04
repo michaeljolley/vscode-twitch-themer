@@ -9,7 +9,10 @@ export enum AccessState {
   Followers,
 
   /** Subscribers only */
-  Subscribers
+  Subscribers,
+
+  /** Moderators only */
+  Moderators,
 }
 
 /**

@@ -28,4 +28,13 @@ export class API {
     const json = (await res.json());
     return json.data && json.data[0];
   }
+
+  public static async isValidExtensionName(extensionName: string): Promise<boolean> {
+    const url = 'https://marketplace.visualstudiocode.com/items?itemName={extensionName}';
+    const res = await fetch.default(url);
+    if (res.status === 404) {
+      return false;
+    }
+    return true;
+  }
 }
