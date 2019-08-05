@@ -67,7 +67,7 @@ export class Themer {
       /**
        * Executes whenever a new extension is installed.
        * Unfortunately this event does not fire with the
-       * new extension, so we must assume that maybe it was
+       * new extension as a param, so we must assume that maybe it was
        * a theme, and we need to refresh the available themes.
        */
       vscode.extensions.onDidChange(() => {
@@ -439,15 +439,33 @@ export class Themer {
     // Verify that the extension exists
     if (!await API.isValidExtensionName(theme)) {
       // Handle non-existing extension
+      const message = `@${twitchDisplayName}, I could not find the theme you are trying to install. Please double check the extension id and try again.`;
+      this.sendMessageEventEmitter.fire(message);
       return;
     }
 
     try {
+      let install = false;
+      do {
+        const choice = await vscode.window.showInformationMessage(`${twitchDisplayName} wants to install a theme (${theme}).`, 'Accept', 'Deny', 'Preview');
+        switch (choice) {
+          case 'Accept':
+            install = true;
+            break;
+          case 'Preview':
+            // Open marketplace
+            vscode.env.openExternal(vscode.Uri.parse(`https://marketplace.visualstudio.com/items?itemName=${theme}`));
+            break;
+          case 'Deny':
+            return;
+        }
+      } while (!install);
+      
+      // Install the theme
       await vscode.commands.executeCommand(
         "workbench.extensions.installExtension",
         theme
       );
-      
     }
     catch (err) {
       // Handle the error
