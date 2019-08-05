@@ -76,3 +76,17 @@ export enum UserLevel {
   /** Broadcaster */
   broadcaster = 2
 }
+
+/**
+ * Represents the reasons why a theme isn't available
+ */
+export enum ThemeNotAvailableReasons {
+  /** Could not find the extension on the Visual Studio Marketplace using the given extension id */
+  notFound = 'not found',
+  /** Occures if the API failed to match any repository for the extension on Visual Studio Markplace */
+  noRepositoryFound = 'no repository found',
+  /** Occures when the API fails to download the package.json from the Github repo for the extension */
+  packageJsonNotDownload = 'package.json could not be downloaded',
+  /** Occures whent he API cannot find any theme contributions within the package.json from the Github repository */
+  noThemesContributed = 'no themes contributed within package.json',
+}

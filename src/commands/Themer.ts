@@ -4,7 +4,7 @@ import { IListRecipient } from './IListRecipient';
 import { ITheme } from './ITheme';
 import { IWhisperMessage } from '../chat/IWhisperMessage';
 import { keytar } from '../Common';
-import { KeytarKeys, AccessState, UserLevel } from '../Enum';
+import { KeytarKeys, AccessState, UserLevel, ThemeNotAvailableReasons } from '../Enum';
 import { API } from '../api/API';
 import { IChatMessage } from '../chat/IChatMessage';
 
@@ -15,6 +15,7 @@ import { IChatMessage } from '../chat/IChatMessage';
 export class Themer {
   private _accessState: AccessState = AccessState.Viewers;
   private _installState: AccessState = AccessState.Followers;
+  private _autoInstall: boolean = false;
   private _originalTheme: string | undefined;
   private _availableThemes: Array<ITheme> = [];
   private _listRecipients: Array<IListRecipient> = [];
@@ -437,35 +438,58 @@ export class Themer {
     const theme = message.split(' ')[1];
 
     // Verify that the extension exists
-    if (!await API.isValidExtensionName(theme)) {
+    const isValidExtResult = await API.isValidExtensionName(theme);
+    if (!isValidExtResult.available) {
       // Handle non-existing extension
-      const message = `@${twitchDisplayName}, I could not find the theme you are trying to install. Please double check the extension id and try again.`;
-      this.sendMessageEventEmitter.fire(message);
+      if (isValidExtResult.reason) {
+        switch (isValidExtResult.reason) {
+          case ThemeNotAvailableReasons.notFound:
+            console.error(`The requested theme could not be found in the marketplace.`);
+            break;
+          case ThemeNotAvailableReasons.noRepositoryFound:
+            console.error(`The requested theme does not include a public repository.`);
+            break;
+          case ThemeNotAvailableReasons.packageJsonNotDownload:
+            console.error(`The requested theme's package.json could not be downloaded.`);
+            break;
+          case ThemeNotAvailableReasons.noThemesContributed:
+            console.error(`The requested theme extension does not contribute any themes.`);
+            break;
+          default:
+            console.error(`The requested theme could not be downloaded. Unknown reason.`);
+            break;
+        }
+      }
       return;
     }
 
     try {
-      let install = false;
-      do {
-        const choice = await vscode.window.showInformationMessage(`${twitchDisplayName} wants to install a theme (${theme}).`, 'Accept', 'Deny', 'Preview');
+      // Authorize the install of the extension if we do not allow for auto-installed extensions.
+      if (!this._autoInstall) {
+        const msg = `${twitchDisplayName} wants to install theme(s) ${isValidExtResult.label ? isValidExtResult.label.join(', ') : theme}.`;
+        let choice = await vscode.window.showInformationMessage(msg, 'Accept', 'Deny', 'Preview');
         switch (choice) {
-          case 'Accept':
-            install = true;
-            break;
           case 'Preview':
             // Open marketplace
             vscode.env.openExternal(vscode.Uri.parse(`https://marketplace.visualstudio.com/items?itemName=${theme}`));
+            choice = await vscode.window.showInformationMessage(msg, 'Accept', 'Deny');
+            if (choice === 'Deny') {
+              return;
+            } 
             break;
           case 'Deny':
             return;
         }
-      } while (!install);
+      }
       
       // Install the theme
       await vscode.commands.executeCommand(
         "workbench.extensions.installExtension",
         theme
       );
+
+      const msg = `@${twitchDisplayName}, the theme(s) '${isValidExtResult.label!.join(', ')}' were installed successfully.`;
+      this.sendMessageEventEmitter.fire(msg);
     }
     catch (err) {
       // Handle the error

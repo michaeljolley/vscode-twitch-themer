@@ -1,7 +1,8 @@
 
 import fetch from 'node-fetch';
 import { keytar } from '../Common';
-import { KeytarKeys } from '../Enum';
+import { KeytarKeys, ThemeNotAvailableReasons } from '../Enum';
+import * as vscode from 'vscode';
 
 export class API {
 
@@ -29,12 +30,32 @@ export class API {
     return json.data && json.data[0];
   }
 
-  public static async isValidExtensionName(extensionName: string): Promise<boolean> {
+  public static async isValidExtensionName(extensionName: string): Promise<{available: boolean; reason?: ThemeNotAvailableReasons; label?: string[] }> {
     const url = `https://marketplace.visualstudio.com/items?itemName=${extensionName}`;
-    const res = await fetch(url, { method: 'GET', headers: { "Accept": "*/*", "User-Agent": "VSCode-Twitch-Themer" } });
+    let res = await fetch(url, { method: 'GET', headers: { "Accept": "*/*", "User-Agent": "VSCode-Twitch-Themer" } });
     if (res.status === 404) {
-      return false;
+      return {available: false, reason: ThemeNotAvailableReasons.notFound};
     }
-    return res.ok;
+    let body = await res.text();
+    const repoUrlMatches = body.match(/"GitHubLink":"https:\/\/github.com\/(?<url>(?:\w|\d|\S)+)\.git",/i);
+    if (!repoUrlMatches || !repoUrlMatches.groups) {
+      return {available: false, reason: ThemeNotAvailableReasons.noRepositoryFound};
+    }
+    
+    const repoUrl = `https://raw.githubusercontent.com/${repoUrlMatches.groups.url}/master/package.json`;
+    
+    res = await fetch (repoUrl);
+    if (!res.ok) {
+      return { available: false, reason: ThemeNotAvailableReasons.packageJsonNotDownload };
+    }
+    
+    const packageFile = await res.text();
+    const packageJson = JSON.parse(packageFile);
+    
+    if (packageJson.contributes.themes.length === 0) {
+      return { available: false, reason: ThemeNotAvailableReasons.noThemesContributed };
+    }
+    
+    return {available: true, label: packageJson.contributes.themes.map((t: {label: string}) => t.label) };
   }
 }
