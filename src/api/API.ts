@@ -37,12 +37,12 @@ export class API {
       return {available: false, reason: ThemeNotAvailableReasons.notFound};
     }
     let body = await res.text();
-    const repoUrlMatches = body.match(/"GitHubLink":"https:\/\/github.com\/(?<url>(?:\w|\d|\S)+)\.git",/i);
-    if (!repoUrlMatches || !repoUrlMatches.groups) {
+    const repoUrlMatches = body.match(/"GitHubLink":"https:\/\/github.com\/((?:\w|\d|\S)+)\.git",/i);
+    if (!repoUrlMatches) {
       return {available: false, reason: ThemeNotAvailableReasons.noRepositoryFound};
     }
     
-    const repoUrl = `https://raw.githubusercontent.com/${repoUrlMatches.groups.url}/master/package.json`;
+    const repoUrl = `https://raw.githubusercontent.com/${repoUrlMatches[1]}/master/package.json`;
     
     res = await fetch (repoUrl);
     if (!res.ok) {
