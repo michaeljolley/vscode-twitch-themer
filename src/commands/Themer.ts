@@ -4,7 +4,7 @@ import { IListRecipient } from './IListRecipient';
 import { ITheme } from './ITheme';
 import { IWhisperMessage } from '../chat/IWhisperMessage';
 import { keytar } from '../Common';
-import { KeytarKeys, AccessState, UserLevel } from '../Enum';
+import { KeytarKeys, AccessState, UserLevel, ThemeNotAvailableReasons } from '../Enum';
 import { API } from '../api/API';
 import { IChatMessage } from '../chat/IChatMessage';
 
@@ -14,6 +14,8 @@ import { IChatMessage } from '../chat/IChatMessage';
  */
 export class Themer {
   private _accessState: AccessState = AccessState.Viewers;
+  private _installState: AccessState = AccessState.Followers;
+  private _autoInstall: boolean = false;
   private _originalTheme: string | undefined;
   private _availableThemes: Array<ITheme> = [];
   private _listRecipients: Array<IListRecipient> = [];
@@ -62,6 +64,17 @@ export class Themer {
       .forEach(username =>
         this._listRecipients.push({ username, banned: true })
       );
+
+      /**
+       * Executes whenever a new extension is installed.
+       * Unfortunately this event does not fire with the
+       * new extension as a param, so we must assume that maybe it was
+       * a theme, and we need to refresh the available themes.
+       */
+      vscode.extensions.onDidChange(() => {
+        // Reload the available themes.
+        this.loadThemes();
+      });
   }
 
   public async handleAuthStatusChanged(signedIn: boolean) {
@@ -178,6 +191,9 @@ export class Themer {
       case 'repo':
         await this.repo();
         break;
+      case "install":
+        await this.installTheme(twitchUser, message);
+        break;  
       case 'ban':
         if (username !== undefined) {
           await this.ban(twitchUser, username);
@@ -345,6 +361,143 @@ export class Themer {
     this.clearListRecipients();
   }
 
+  private isBanned(twitchUserName: string): boolean {
+    if (twitchUserName) {
+      const recipient = this.getRecipient(twitchUserName, true);
+      if (recipient && recipient.banned && recipient.banned === true) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Installs the requested THEME and switches to the theme once installed
+   * @param twitchUser - pass through twitch user state
+   * @param message - message sent via chat
+   */
+  private async installTheme(twitchUser: Userstate, message: string): Promise<void> {
+    const twitchUserName: string = twitchUser.username;
+    const twitchDisplayName: string = twitchUser['display-name']
+      ? twitchUser['display-name']
+      : twitchUserName;
+    
+    /** Ensure the user hasn't been banned before installing the theme */
+    if (this.isBanned(twitchUserName)) {
+      return;
+    }
+
+    following: if (this._installState === AccessState.Followers) {
+      if (this.getUserLevel(twitchUser) === UserLevel.broadcaster) {
+        break following;
+      } else if (
+        this._followers.find(
+          x => x.username === twitchUserName.toLocaleLowerCase()
+        )
+      ) {
+        break following;
+      } else if (
+        twitchUser &&
+        (await API.isTwitchUserFollowing(twitchUser['user-id']))
+      ) {
+        this._followers.push({
+          username: twitchUserName ? twitchUserName.toLocaleLowerCase() : ''
+        });
+        break following;
+      } else {
+        return;
+      }
+    } else {
+      break following;
+    }
+
+    subscriber: if (this._installState === AccessState.Subscribers) {
+      if (this.getUserLevel(twitchUser) === UserLevel.broadcaster) {
+        break subscriber;
+      } else if (twitchUser && twitchUser['subscriber']) {
+        break subscriber;
+      } else {
+        return;
+      }
+    } else {
+      break subscriber;
+    }
+
+    moderator: if (this._installState === AccessState.Subscribers) {
+      if (this.getUserLevel(twitchUser) === UserLevel.broadcaster) {
+        break moderator;
+      } else if (twitchUser && twitchUser['subscriber']) {
+        break moderator;
+      } else {
+        return;
+      }
+    } else {
+      break moderator;
+    }
+
+    const theme = message.split(' ')[1];
+
+    // Verify that the extension exists
+    const isValidExtResult = await API.isValidExtensionName(theme);
+    if (!isValidExtResult.available) {
+      // Handle non-existing extension
+      if (isValidExtResult.reason) {
+        switch (isValidExtResult.reason) {
+          case ThemeNotAvailableReasons.notFound:
+            console.error(`The requested theme could not be found in the marketplace.`);
+            break;
+          case ThemeNotAvailableReasons.noRepositoryFound:
+            console.error(`The requested theme does not include a public repository.`);
+            break;
+          case ThemeNotAvailableReasons.packageJsonNotDownload:
+            console.error(`The requested theme's package.json could not be downloaded.`);
+            break;
+          case ThemeNotAvailableReasons.noThemesContributed:
+            console.error(`The requested theme extension does not contribute any themes.`);
+            break;
+          default:
+            console.error(`The requested theme could not be downloaded. Unknown reason.`);
+            break;
+        }
+      }
+      return;
+    }
+
+    try {
+      // Authorize the install of the extension if we do not allow for auto-installed extensions.
+      if (!this._autoInstall) {
+        const msg = `${twitchDisplayName} wants to install theme(s) ${isValidExtResult.label ? isValidExtResult.label.join(', ') : theme}.`;
+        let choice = await vscode.window.showInformationMessage(msg, 'Accept', 'Deny', 'Preview');
+        switch (choice) {
+          case 'Preview':
+            // Open marketplace
+            vscode.env.openExternal(vscode.Uri.parse(`https://marketplace.visualstudio.com/items?itemName=${theme}`));
+            choice = await vscode.window.showInformationMessage(msg, 'Accept', 'Deny');
+            if (choice === 'Deny') {
+              return;
+            } 
+            break;
+          case 'Deny':
+            return;
+        }
+      }
+      
+      // Install the theme
+      await vscode.commands.executeCommand(
+        "workbench.extensions.installExtension",
+        theme
+      );
+
+      const msg = `@${twitchDisplayName}, the theme(s) '${isValidExtResult.label!.join(', ')}' were installed successfully.`;
+      this.sendMessageEventEmitter.fire(msg);
+    }
+    catch (err) {
+      // Handle the error
+      console.error(err);
+      return;
+    }
+  }
+
   /**
    * Changes the theme to a random option from all available themes
    * @param twitchUser - pass through twitch user state
@@ -438,11 +591,8 @@ export class Themer {
     }
 
     /** Ensure the user hasn't been banned before changing the theme */
-    if (twitchUserName) {
-      const recipient = this.getRecipient(twitchUserName, true);
-      if (recipient && recipient.banned && recipient.banned === true) {
-        return;
-      }
+    if (this.isBanned(twitchUserName)) {
+      return;
     }
 
     /** Find theme based on themeName and change theme if it is found */
