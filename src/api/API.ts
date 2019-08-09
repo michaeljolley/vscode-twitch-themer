@@ -30,6 +30,15 @@ export class API {
     return json.data && json.data[0];
   }
 
+  /**
+   * This method attempts to ensure that the extension provided is a valid theme.
+   * We do this by first parsing the extensions metadata on the Marketplace webpage
+   * for the GitHubLink value. We are only interested in the "user" and "repo" names
+   * from the Github link, so we use Regex to match and group the link as needed.
+   * Finally, we fetch the 'package.json' file from the Github repo and verify
+   * that it has at least one Theme contribution listed.
+   * @param extensionName The unique id for the extension. 
+   */
   public static async isValidExtensionName(extensionName: string): Promise<{available: boolean; reason?: ThemeNotAvailableReasons; label?: string[] }> {
     const url = `https://marketplace.visualstudio.com/items?itemName=${extensionName}`;
     let res = await fetch(url, { method: 'GET', headers: { "Accept": "*/*", "User-Agent": "VSCode-Twitch-Themer" } });
@@ -37,7 +46,23 @@ export class API {
       return {available: false, reason: ThemeNotAvailableReasons.notFound};
     }
     let body = await res.text();
-    const repoUrlMatches = body.match(/"GitHubLink":"https:\/\/github.com\/((?:\w|\d|\S)+)\.git",/i);
+    /**
+     * Regex explination:
+     * ([--:\w?@%&+~#=]+)
+     *  () = group within the match, in our case this will be group [1].
+     *  [] = tells regex to look for the characters within the brackets.
+     *  --: = look for all characters between ASCII 45 and 58.
+     *  \w = look for a word.
+     *  + = look for one or more of the characters listed in the brackets.
+     * The rest is to look for that individual character (i.e. ~ = look for the tilde)
+     * 
+     * The following is used because some 'links' include the '.git' suffix:
+     * (?:\.git)?
+     * (?:) = do not group within the match.
+     * \. = look for a period (\ excapes the special '.' which in regex means match anything).
+     * ? = match 0 or 1 of the predicate.
+     */
+    const repoUrlMatches = body.match(/\"GitHubLink\":\"https:\/\/github.com\/([--:\w?@%&+~#=]+)(?:\.git)?\"/i);
     if (!repoUrlMatches) {
       return {available: false, reason: ThemeNotAvailableReasons.noRepositoryFound};
     }

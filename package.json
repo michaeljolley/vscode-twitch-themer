@@ -71,6 +71,12 @@
 					],
 					"default": "Viewers",
 					"description": "Users who are allowed to use the extension via Twitch chat."
+				},
+				"twitchThemer.autoInstall": {
+					"title": "Auto-install Theme Install Requests",
+					"type": "boolean",
+					"default": false,
+					"description": "If checked, will auto-install theme install requests. Otherwise, we will prompt you to install."
 				}
 			}
 		}

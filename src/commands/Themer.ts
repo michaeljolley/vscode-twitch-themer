@@ -45,6 +45,13 @@ export class Themer {
       .get('workbench.colorTheme');
 
     /**
+     * Get the configuration to auto-install or not
+     */
+    this._autoInstall = vscode.workspace
+      .getConfiguration()
+      .get<boolean>('twitchThemer.autoInstall') || false;
+
+    /**
      * Initialize the list of available themes for users
      */
     this.loadThemes();
