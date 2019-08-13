@@ -86,6 +86,17 @@ This command will refresh the list of available themes in the streamers VS Code 
 
 `Note: List of themes and request timers will only be reset if the command is sent from the broadcaster.`
 
+#### Install VS Code themes
+
+This command will look for the specified theme on the Visual Studio Marketplace. If found, it will attempt to pull the package.json for the theme from its repository. If that package.json includes themes, the streamer will be prompted to install, not install and/or preview the theme.
+
+```
+!theme install {Theme Unique Identifier}
+```
+
+`Example: For the [Linux Themes for VS Code](https://marketplace.visualstudio.com/items?itemName=solarliner.linux-themes) extension you would send !theme install solarliner.linux-themes`
+
+
 #### Ban/Unban user from changing themes
 
 These commands will either ban or unban a user from changing the theme via Twitch chat.

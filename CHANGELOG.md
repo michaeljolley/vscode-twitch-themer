@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2019-08-13
+
+### Added
+
+- `!theme install {theme unique identifier}` command that prompts the user to install or preview a theme supplied by chat.
+
 ## [1.2.0] - 2019-07-30
 
 ### Added
@@ -127,7 +133,8 @@ them know it's not a valid theme name
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.2.0...HEAD
+[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.0...HEAD
+[1.3.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.0.1...1.1.0
 [1.0.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.0.0...1.0.1
