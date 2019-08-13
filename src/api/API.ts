@@ -67,7 +67,7 @@ export class API {
       return {available: false, reason: ThemeNotAvailableReasons.noRepositoryFound};
     }
     
-    const repoUrl = `https://raw.githubusercontent.com/${repoUrlMatches[1]}/master/package.json`;
+    const repoUrl = `https://raw.githubusercontent.com/${repoUrlMatches[1].replace('.git','')}/master/package.json`;
     
     res = await fetch (repoUrl);
     if (!res.ok) {
