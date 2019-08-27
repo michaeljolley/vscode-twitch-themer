@@ -312,10 +312,31 @@ export class Themer {
 
     /** Get list of available themes and whisper them to user */
     const themeNames = this._availableThemes.map(m => m.label);
-    this.sendWhisperEventEmitter.fire({
-      user: twitchUserName,
-      message: `Available themes are: ${themeNames.join(', ')}`
-    });
+
+    let message = "Available themes are: ";
+    /** Iterate over the themme names and add to the message
+     *  checking if the length is still under 499. If so, check if the
+     *  next theme name can fit and stay under 499 characters 
+     */
+    for (var name of themeNames) {
+      if (message.length < 499 && name.length <= (499 - message.length)) {
+              message += `${name}, `;
+      } else {
+      /** If no more theme names can be added, go ahead and send the first message 
+       * and start over building the next message */
+      this.sendWhisperEventEmitter({
+        user: twitchUserName,
+        message: message.replace(/(^[,\s]+)|([,\s]+$)/g, '')
+      });
+      message = `${name}, `;
+    }
+  };
+
+  /** Send the final message */
+  this.sendWhisperEventEmitter({
+        user: twitchUserName,
+        message: message.replace(/(^[,\s]+)|([,\s]+$)/g, '')
+      });
   }
 
   /**
