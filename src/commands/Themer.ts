@@ -324,7 +324,7 @@ export class Themer {
       } else {
       /** If no more theme names can be added, go ahead and send the first message 
        * and start over building the next message */
-      this.sendWhisperEventEmitter({
+      this.sendWhisperEventEmitter.fire({
         user: twitchUserName,
         message: message.replace(/(^[,\s]+)|([,\s]+$)/g, '')
       });
@@ -333,7 +333,7 @@ export class Themer {
   };
 
   /** Send the final message */
-  this.sendWhisperEventEmitter({
+  this.sendWhisperEventEmitter.fire({
         user: twitchUserName,
         message: message.replace(/(^[,\s]+)|([,\s]+$)/g, '')
       });
