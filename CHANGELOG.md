@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.1] - 2019-08-29
+
+### Fixed
+
+- Fixed an issue that prevented the whispering of themes if there were too many themes to send. This change will break the list of themes into smaller messages and send multiple whispers.
+
 ## [1.3.0] - 2019-08-13
 
 ### Added
@@ -133,7 +139,8 @@ them know it's not a valid theme name
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.0...HEAD
+[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.1...HEAD
+[1.3.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.0.1...1.1.0
