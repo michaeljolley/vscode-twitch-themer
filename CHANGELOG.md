@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.2] - 2019-08-29
+
+### Fixed
+
+- Cleaned up some npm security issues
+
 ## [1.3.1] - 2019-08-29
 
 ### Fixed
@@ -139,7 +145,8 @@ them know it's not a valid theme name
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.1...HEAD
+[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.2...HEAD
+[1.3.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.1...1.3.2
 [1.3.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.1.0...1.2.0
