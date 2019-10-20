@@ -437,6 +437,18 @@ export class Themer {
 
     const theme = message.split(' ')[1];
 
+    // Verify that the extension isn't already installed
+    // If the extension is installed, send a message to chat
+    // and return.
+    const ithemes = this._availableThemes.filter((value: ITheme) => value.extensionId.toLocaleLowerCase() === theme.toLocaleLowerCase());
+    if (ithemes)
+    {
+      const uniqueThemeLabels = Array.from(new Set(ithemes.map(t => t.label)));
+      const msg = `@${twitchDisplayName}, '${theme}' is already installed. Use the following to use the theme: !theme ${uniqueThemeLabels.join(' -or- !theme ')}`;
+      this.sendMessageEventEmitter.fire(msg);
+      return;
+    }
+
     // Verify that the extension exists
     const isValidExtResult = await API.isValidExtensionName(theme);
     if (!isValidExtResult.available) {
