@@ -9,6 +9,7 @@ import { Userstate } from 'tmi.js';
 import { IChatMessage } from '../chat/IChatMessage';
 import { API } from '../api/API';
 import { IWhisperMessage } from '../chat/IWhisperMessage';
+import { autoConnect } from '../AutoConnect';
 
 chai.should();
 
@@ -317,5 +318,52 @@ suite('Themer Tests', function() {
         done(error);
       }
     });
+  });
+
+  test('Themer should not connect automatically', function(done) {
+    const toggleChatStub = sinon
+      .stub(fakeChatClient, 'toggleChat')
+      .callsFake(() => {});
+
+    try {
+      autoConnect(fakeChatClient)
+        .then(() => {
+          toggleChatStub.called.should.be.false;
+          done();          
+        });      
+    }
+    catch (error) {
+      done(error);
+    }
+    
+  });
+
+  test('Themer should connect automatically', function(done) {
+    const toggleChatStub = sinon
+      .stub(fakeChatClient, 'toggleChat')
+      .callsFake(() => {});
+
+    try {
+      vscode.workspace.getConfiguration('twitchThemer')
+        .update('autoConnect', true)
+        .then(() => {
+
+          autoConnect(fakeChatClient)
+          .then(() => {
+
+            vscode.workspace.getConfiguration('twitchThemer')
+              .update('autoConnect', false);
+
+            toggleChatStub.called.should.be.true;
+            done();
+
+          });
+
+        });
+    }
+    catch (error) {
+      done(error);
+    }
+    
   });
 });
