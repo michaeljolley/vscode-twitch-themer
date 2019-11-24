@@ -4,7 +4,7 @@
 
 | Release | vNext | Contributors
 | -- | -- | --
-| [![Build Status](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_apis/build/status/MichaelJolley.vscode-twitch-themer?branchName=master)](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_build/latest?definitionId=1&branchName=master) | [![Build Status](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_apis/build/status/MichaelJolley.vscode-twitch-themer?branchName=vNext)](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_build/latest?definitionId=1&branchName=vNext) | [![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors)
+| [![Build Status](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_apis/build/status/MichaelJolley.vscode-twitch-themer?branchName=master)](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_build/latest?definitionId=1&branchName=master) | [![Build Status](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_apis/build/status/MichaelJolley.vscode-twitch-themer?branchName=vNext)](https://dev.azure.com/michaeljolley/vscode-twitch-themer/_build/latest?definitionId=1&branchName=vNext) | [![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors)
 
 
 A Visual Studio Code extension that listens to twitch chat and allows viewers to change the streamers VS Code theme by sending **!theme**
@@ -59,13 +59,12 @@ This command will set the theme of the streamers' VS Code workspace to the theme
 
 #### Set Random VS Code theme
 
-This command will set the theme of the streamers' VS Code workspace to a theme that is chosen at random.
+This command will set the theme of the streamers' VS Code workspace to a theme that is chosen at random.  If `dark` or `light` is specified it will only select
+a random theme from the appropriate option.
 
 ```
-!theme random
+!theme random {dark || light}
 ```
-
-`Note: The theme must be previously installed and available within VS Code.`
 
 #### Reset VS Code theme
 
@@ -86,6 +85,17 @@ This command will refresh the list of available themes in the streamers VS Code 
 ```
 
 `Note: List of themes and request timers will only be reset if the command is sent from the broadcaster.`
+
+#### Install VS Code themes
+
+This command will look for the specified theme on the Visual Studio Marketplace. If found, it will attempt to pull the package.json for the theme from its repository. If that package.json includes themes, the streamer will be prompted to install, not install and/or preview the theme.
+
+```
+!theme install {Theme Unique Identifier}
+```
+
+`Example: For the [Linux Themes for VS Code](https://marketplace.visualstudio.com/items?itemName=solarliner.linux-themes) extension you would send !theme install solarliner.linux-themes`
+
 
 #### Ban/Unban user from changing themes
 
@@ -173,6 +183,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/HeCodes2Much"><img src="https://avatars1.githubusercontent.com/u/9284733?v=4" width="100px;" alt="Dakoda Jackson"/><br /><sub><b>Dakoda Jackson</b></sub></a><br /><a href="#userTesting-HeCodes2Much" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/Flyken271"><img src="https://avatars0.githubusercontent.com/u/39961800?v=4" width="100px;" alt="Flyken"/><br /><sub><b>Flyken</b></sub></a><br /><a href="#ideas-Flyken271" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/calebmckay"><img src="https://avatars0.githubusercontent.com/u/11079725?v=4" width="100px;" alt="Caleb McKay"/><br /><sub><b>Caleb McKay</b></sub></a><br /><a href="https://github.com/MichaelJolley/vscode-twitch-themer/commits?author=calebmckay" title="Tests">⚠️</a> <a href="https://github.com/MichaelJolley/vscode-twitch-themer/commits?author=calebmckay" title="Code">💻</a></td>
+    <td align="center"><a href="http://murrayit.org"><img src="https://avatars0.githubusercontent.com/u/20172166?v=4" width="100px;" alt="Chance Murray"/><br /><sub><b>Chance Murray</b></sub></a><br /><a href="https://github.com/MichaelJolley/vscode-twitch-themer/issues?q=author%3Achancesm" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
