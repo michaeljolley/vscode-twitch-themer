@@ -90,7 +90,7 @@ export class API {
       const currentUserId = await keytar.getPassword(KeytarKeys.service, KeytarKeys.userId);
       if (accessToken && currentUserId) {
         const url = `https://api.twitch.tv/helix/streams?user_id=${currentUserId}`;
-        const res = await fetch.default(url, { headers: { 'Authorization': `Bearer ${accessToken}` } });
+        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${accessToken}` } });
         const json = await res.json();
         return (json.data.length > 0) ? true : false;
       }
