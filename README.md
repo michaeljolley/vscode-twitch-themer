@@ -105,6 +105,9 @@ These commands will either ban or unban a user from changing the theme via Twitc
 
 <img width="400px" src="https://user-images.githubusercontent.com/1228996/59153253-bf03f080-8a1a-11e9-9dc3-9fe92b3cb413.png" />
 
+- Twitch Themer: Auto Connect - enables or disables the auto connection feature.
+  *The extension will ensure you are streaming prior to connecting the bot to the Twitch chat service.*
+
 #### Access State
 
 On the settings UI, you can specify whether the extension should only react to all viewers, only followers or only subscribers.
