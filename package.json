@@ -1,125 +1,125 @@
 {
-	"name": "vscode-twitch-themer",
-	"displayName": "Twitch Themer",
-	"description": "Allow viewers to change your VS Code theme via Twitch chat",
-	"publisher": "michaeljolley",
-	"license": "MIT",
-	"author": {
-		"name": "Michael Jolley",
-		"email": "mike@sparcapp.io"
-	},
-	"icon": "resources/logo.png",
-	"version": "1.3.2",
-	"preview": false,
-	"engines": {
-		"vscode": "^1.32.0"
-	},
-	"galleryBanner": {
-		"color": "#373436",
-		"theme": "dark"
-	},
-	"extensionKind": "ui",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/michaeljolley/vscode-twitch-themer"
-	},
-	"homepage": "https://github.com/michaeljolley/vscode-twitch-themer/blob/master/README.md",
-	"categories": [
-		"Other"
-	],
-	"keywords": [
-		"theme",
-		"twitch",
-		"color",
-		"chat"
-	],
-	"activationEvents": [
-		"*",
-		"onCommand:twitchThemer.signIn",
-		"onCommand:twitchThemer.signOut",
-		"onCommand:twitchThemer.toggleChat"
-	],
-	"main": "./dist/extension",
-	"contributes": {
-		"commands": [
-			{
-				"command": "twitchThemer.signIn",
-				"title": "Sign In",
-				"category": "Twitch Themer"
-			},
-			{
-				"command": "twitchThemer.signOut",
-				"title": "Sign Out",
-				"category": "Twitch Themer"
-			},
-			{
-				"command": "twitchThemer.toggleChat",
-				"title": "Toggle Chat",
-				"category": "Twitch Themer"
-			}
-		],
-		"configuration": {
-			"title": "Twitch Themer",
-			"properties": {
-				"twitchThemer.accessState": {
-					"title": "View Access",
-					"type": "string",
-					"enum": [
-						"Viewers",
-						"Followers",
-						"Subscribers"
-					],
-					"default": "Viewers",
-					"description": "Users who are allowed to use the extension via Twitch chat."
-				},
-				"twitchThemer.autoInstall": {
-					"title": "Auto-install Theme Install Requests",
-					"type": "boolean",
-					"default": false,
-					"description": "If checked, will auto-install theme install requests. Otherwise, we will prompt you to install."
-				}
-			}
-		}
-	},
-	"scripts": {
-		"package": "npx vsce package -o release.vsix",
-		"publish": "npx vsce publish",
-		"vscode:prepublish": "webpack --mode production",
-		"webpack": "webpack --mode none",
-		"watch": "webpack --mode none --watch",
-		"postinstall": "node node_modules/vscode/bin/install",
-		"just-test": "node node_modules/vscode/bin/test",
-		"test-compile": "tsc -p ./ && npm run && webpack",
-		"test": "npm run test-compile && node node_modules/vscode/bin/test"
-	},
-	"dependencies": {
-		"keytar": "^4.9.0",
-		"node-fetch": "~2.3.0",
-		"tmi.js": "~1.4.2",
-		"uuid": "~3.3.2"
-	},
-	"devDependencies": {
-		"@types/chai": "^4.1.7",
-		"@types/mocha": "^2.2.42",
-		"@types/node": "^10.12.21",
-		"@types/node-fetch": "^2.1.7",
-		"@types/sinon": "^7.0.7",
-		"@types/tmi.js": "~1.4.0",
-		"@types/uuid": "~3.4.3",
-		"chai": "^4.2.0",
-		"copy-webpack-plugin": "^5.0.2",
-		"eslint": "^5.16.0",
-		"eslint-config-prettier": "^4.3.0",
-		"mocha-junit-reporter": "^1.22.0",
-		"node-loader": "^0.6.0",
-		"sinon": "^7.2.5",
-		"spec-xunit-file": "0.0.1-3",
-		"ts-loader": "^5.3.3",
-		"tslint": "^5.12.1",
-		"tslint-config-prettier": "^1.18.0",
-		"typescript": "^3.3.1",
-		"vscode": "^1.1.28",
-		"webpack": "^4.29.6",
-		"webpack-cli": "^3.2.3"
-	}
+  "name": "vscode-twitch-themer",
+  "displayName": "Twitch Themer",
+  "description": "Allow viewers to change your VS Code theme via Twitch chat",
+  "publisher": "michaeljolley",
+  "license": "MIT",
+  "author": {
+    "name": "Michael Jolley",
+    "email": "mike@sparcapp.io"
+  },
+  "icon": "resources/logo.png",
+  "version": "1.4.0",
+  "preview": false,
+  "engines": {
+    "vscode": "^1.32.0"
+  },
+  "galleryBanner": {
+    "color": "#373436",
+    "theme": "dark"
+  },
+  "extensionKind": "ui",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michaeljolley/vscode-twitch-themer"
+  },
+  "homepage": "https://github.com/michaeljolley/vscode-twitch-themer/blob/master/README.md",
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "theme",
+    "twitch",
+    "color",
+    "chat"
+  ],
+  "activationEvents": [
+    "*",
+    "onCommand:twitchThemer.signIn",
+    "onCommand:twitchThemer.signOut",
+    "onCommand:twitchThemer.toggleChat"
+  ],
+  "main": "./dist/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "twitchThemer.signIn",
+        "title": "Sign In",
+        "category": "Twitch Themer"
+      },
+      {
+        "command": "twitchThemer.signOut",
+        "title": "Sign Out",
+        "category": "Twitch Themer"
+      },
+      {
+        "command": "twitchThemer.toggleChat",
+        "title": "Toggle Chat",
+        "category": "Twitch Themer"
+      }
+    ],
+    "configuration": {
+      "title": "Twitch Themer",
+      "properties": {
+        "twitchThemer.accessState": {
+          "title": "View Access",
+          "type": "string",
+          "enum": [
+            "Viewers",
+            "Followers",
+            "Subscribers"
+          ],
+          "default": "Viewers",
+          "description": "Users who are allowed to use the extension via Twitch chat."
+        },
+        "twitchThemer.autoInstall": {
+          "title": "Auto-install Theme Install Requests",
+          "type": "boolean",
+          "default": false,
+          "description": "If checked, will auto-install theme install requests. Otherwise, we will prompt you to install."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "package": "npx vsce package -o release.vsix",
+    "publish": "npx vsce publish",
+    "vscode:prepublish": "webpack --mode production",
+    "webpack": "webpack --mode none",
+    "watch": "webpack --mode none --watch",
+    "postinstall": "node node_modules/vscode/bin/install",
+    "just-test": "node node_modules/vscode/bin/test",
+    "test-compile": "tsc -p ./ && npm run && webpack",
+    "test": "npm run test-compile && node node_modules/vscode/bin/test"
+  },
+  "dependencies": {
+    "keytar": "^4.9.0",
+    "node-fetch": "~2.3.0",
+    "tmi.js": "~1.4.2",
+    "uuid": "~3.3.2"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^10.12.21",
+    "@types/node-fetch": "^2.1.7",
+    "@types/sinon": "^7.0.7",
+    "@types/tmi.js": "~1.4.0",
+    "@types/uuid": "~3.4.3",
+    "chai": "^4.2.0",
+    "copy-webpack-plugin": "^5.0.2",
+    "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.3.0",
+    "mocha-junit-reporter": "^1.22.0",
+    "node-loader": "^0.6.0",
+    "sinon": "^7.2.5",
+    "spec-xunit-file": "0.0.1-3",
+    "ts-loader": "^5.3.3",
+    "tslint": "^5.12.1",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^3.3.1",
+    "vscode": "^1.1.28",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.2.3"
+  }
 }
