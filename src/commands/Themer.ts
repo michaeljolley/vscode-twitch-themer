@@ -444,7 +444,7 @@ export class Themer {
     if (ithemes)
     {
       const uniqueThemeLabels = Array.from(new Set(ithemes.map(t => t.label)));
-      const msg = `@${twitchDisplayName}, '${theme}' is already installed. Use the following to use the theme: !theme ${uniqueThemeLabels.join(' -or- !theme ')}`;
+      const msg = `@${twitchDisplayName}, '${theme}' is already installed. To switch to it, send: !theme ${uniqueThemeLabels.join(' -or- !theme ')}`;
       this.sendMessageEventEmitter.fire(msg);
       return;
     }
