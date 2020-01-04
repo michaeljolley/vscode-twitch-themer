@@ -469,7 +469,7 @@ export class Themer {
     // If the extension is installed, send a message to chat
     // and return.
     const ithemes = this._availableThemes.filter((value: ITheme) => value.extensionId.toLocaleLowerCase() === theme.toLocaleLowerCase());
-    if (ithemes)
+    if (ithemes.length > 0)
     {
       const uniqueThemeLabels = Array.from(new Set(ithemes.map(t => t.label)));
       const msg = `@${twitchDisplayName}, '${theme}' is already installed. To switch to it, send: !theme ${uniqueThemeLabels.join(' -or- !theme ')}`;
