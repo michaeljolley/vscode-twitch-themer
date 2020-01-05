@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.1] - 2020-01-05
+
+### Fixes
+
+- When requesting to install a theme that's already installed, the correct message will be
+  returned to chat.
+
+### Updates
+
+- Updated various NPM packages for security
+
 ## [1.4.0] - 2019-12-02
 
 ### Update
@@ -151,7 +162,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.0...HEAD
+[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.1...HEAD
+[1.4.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.0...1.4.1
 [1.4.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.2...1.4.0
 [1.3.2]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.1...1.3.2
 [1.3.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.0...1.3.1
