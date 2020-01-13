@@ -9,6 +9,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.1] - 2020-01-05
+
+### Fixes
+
+- When requesting to install a theme that's already installed, the correct message will be
+  returned to chat.
+
+### Updates
+
+- Updated various NPM packages for security
+
+## [1.4.0] - 2019-12-02
+
+### Update
+
+- Added check to see if theme is already installed, before installing. If found, it will send a message to chat with instructions to use it.
+
 ## [1.3.2] - 2019-08-29
 
 ### Fixed
@@ -54,17 +71,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `!theme current` command will now send the current theme to chat
-- New command palette option to select access to commands.  Options are:
+- New command palette option to select access to commands. Options are:
   - `Viewers`: allows all non-banned viewers to send commands
   - `Followers`: allow only non-banned follower & subscribers to send commands
   - `Subscribers`: allow only non-banned subscribers to send commands
 
 ### Changed
 
-- `!theme` will now send the list of available themes via whisper.  This replaces
-`!theme list`
+- `!theme` will now send the list of available themes via whisper. This replaces
+  `!theme list`
 - Extension will no longer consider commas in commands. So if a user accidentally sends
-`!theme {theme name},` it will be interpretted as if no comma was included in the command
+  `!theme {theme name},` it will be interpretted as if no comma was included in the command
 
 ### Removed
 
@@ -86,7 +103,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Broadcaster can use `!theme sub` or `!theme !sub` to activate or deactivate sub only mode
 - Follower Only & Subscriber Only are now also VS Code settings so you don't have to use chat commands
 - If user sends a `!theme {theme name}` with an invalid theme name, the extension will whisper them to let
-them know it's not a valid theme name
+  them know it's not a valid theme name
 
 ## [0.1.0] - 2019-05-16
 
@@ -109,7 +126,7 @@ them know it's not a valid theme name
 
 ### Added
 
-- Added a new `!theme refresh` command that refreshes the list of available themes.  **Can only be used by the broadcaster**
+- Added a new `!theme refresh` command that refreshes the list of available themes. **Can only be used by the broadcaster**
 - Added comments throughout codebase to provide better experience for future contributors
 
 ## [0.0.4] - 2019-05-09
@@ -145,8 +162,10 @@ them know it's not a valid theme name
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[Unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.2...HEAD
-[1.3.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.1...1.3.2
+[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.1...HEAD
+[1.4.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.0...1.4.1
+[1.4.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.2...1.4.0
+[1.3.2]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.1...1.3.2
 [1.3.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.0...1.3.1
 [1.3.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.2.0...1.3.0
 [1.2.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.1.0...1.2.0
