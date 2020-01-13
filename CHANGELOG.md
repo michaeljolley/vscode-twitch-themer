@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- The themer will now connect automatically if you turn on the `autoConnect` setting AND you're already streaming when you open Visual Studio Code.<br/>
+  NOTE: The check to see if you're streaming will only occur **once** when you open vscode.
+
 ---
 
 ## [1.4.1] - 2020-01-05
