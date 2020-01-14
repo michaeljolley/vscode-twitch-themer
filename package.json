@@ -77,7 +77,13 @@
           "type": "boolean",
           "default": false,
           "description": "If checked, will auto-install theme install requests. Otherwise, we will prompt you to install."
-        }
+        },				
+				"twitchThemer.autoConnect": {
+					"title": "Auto Connect",
+					"type": "boolean",
+					"default": false,
+					"description": "Should Twitch Themer automatically connect to Twitch Chat if you're streaming? Twitch Themer will poll Twitch' API to ensure you're streaming prior to connecting."
+				}
       }
     }
   },

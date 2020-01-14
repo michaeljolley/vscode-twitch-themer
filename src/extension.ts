@@ -6,6 +6,7 @@ import { createStatusBarItem } from './StatusBar';
 import { Themer } from './commands/Themer';
 import { IChatMessage } from './chat/IChatMessage';
 import { IWhisperMessage } from './chat/IWhisperMessage';
+import { autoConnect } from './AutoConnect';
 
 let activeExtension: Extension;
 let _authenticationService: AuthenticationService;
@@ -77,6 +78,10 @@ export class Extension {
     );
 
     await _authenticationService.initialize();
+
+    // Auto connect to Twitch Chat if 'twitchThemer.autoConnect' is true (default is false)
+    // and we are currently streaming.
+    await autoConnect(_chatClient);
   }
 
   private onSendMessage(message: string) {
