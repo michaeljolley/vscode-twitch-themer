@@ -7,10 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- The themer will now connect automatically if you turn on the `autoConnect` setting AND you're already streaming when you open Visual Studio Code.<br/>
-  NOTE: The check to see if you're streaming will only occur **once** when you open vscode.
-
 ---
+
+## [1.5.0] - 2020-03-05
+
+### Added
+
+- Themer will now connect automatically if you turn on the `autoConnect` setting AND you're
+  already streaming when you open Visual Studio Code. _NOTE: The check to see if you're streaming will only occur **once** when you open vscode._
 
 ## [1.4.1] - 2020-01-05
 
@@ -165,7 +169,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.1...HEAD
+[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.5.0...HEAD
+[1.5.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.1...1.5.0
 [1.4.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.0...1.4.1
 [1.4.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.2...1.4.0
 [1.3.2]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.1...1.3.2
