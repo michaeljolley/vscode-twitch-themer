@@ -11,8 +11,11 @@ jobs:
       windows:
         imageName: 'vs2017-win2016'
         node_version: 10.x
-      macOS:
-        imageName: 'macos-10.13'
+      macOS-mojave:
+        imageName: 'macOS-10.14'
+        node_version: 10.x
+      macOS-catalina:
+        imageName: 'macOS-10.15'
         node_version: 10.x
 
   pool:
