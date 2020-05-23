@@ -9,7 +9,7 @@
     "email": "mike@sparcapp.io"
   },
   "icon": "resources/logo.png",
-  "version": "1.5.0",
+  "version": "1.6.1",
   "preview": false,
   "engines": {
     "vscode": "^1.32.0"
@@ -126,6 +126,6 @@
     "typescript": "^3.3.1",
     "vscode": "^1.1.28",
     "webpack": "^4.29.6",
-    "webpack-cli": "^3.2.3"
+    "webpack-cli": "^3.3.11"
   }
 }
