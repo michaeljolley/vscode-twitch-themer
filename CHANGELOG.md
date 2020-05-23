@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.1] - 2020-05-23
+
+### Fixed
+
+- Fixed issue caused by a change to authentication in the Twitch API
+
 ## [1.5.0] - 2020-03-05
 
 ### Added
@@ -169,7 +175,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.5.0...HEAD
+[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.1...HEAD
+[1.6.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.5.0...1.6.1
 [1.5.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.1...1.5.0
 [1.4.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.0...1.4.1
 [1.4.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.3.2...1.4.0
