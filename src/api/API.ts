@@ -4,6 +4,8 @@ import { keytar } from '../Common';
 import { KeytarKeys, ThemeNotAvailableReasons } from '../Enum';
 import * as vscode from 'vscode';
 
+export const CLIENT_ID: string = 'ts9wowek7hj9yw0q7gmg27c29i6etn';
+
 export class API {
 
   public static async isTwitchUserFollowing(twitchUserId: string | undefined) {
@@ -13,7 +15,7 @@ export class API {
         const currentUserId = await keytar.getPassword(KeytarKeys.service, KeytarKeys.userId);
         if (accessToken && currentUserId) {
           const url = `https://api.twitch.tv/helix/users/follows?from_id=${twitchUserId}&to_id=${currentUserId}`;
-          const res = await fetch(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
+          const res = await fetch(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': CLIENT_ID } });
           const json = await res.json();
           return (json.data.length > 0) ? true: false;
         }
@@ -25,7 +27,7 @@ export class API {
 
   public static async getUserDetails(token: string | null) {
     const url = 'https://api.twitch.tv/helix/users';
-    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
+    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}`, 'client-id': CLIENT_ID } });
     const json = (await res.json());
     return json.data && json.data[0];
   }
@@ -90,7 +92,7 @@ export class API {
       const currentUserId = await keytar.getPassword(KeytarKeys.service, KeytarKeys.userId);
       if (accessToken && currentUserId) {
         const url = `https://api.twitch.tv/helix/streams?user_id=${currentUserId}`;
-        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
+        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': CLIENT_ID } });
         const json = await res.json();
         return (json.data.length > 0) ? true : false;
       }

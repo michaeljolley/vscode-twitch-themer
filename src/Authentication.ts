@@ -4,7 +4,7 @@ import * as http from 'http';
 import * as path from 'path';
 import * as url from 'url';
 import { v4 } from 'uuid';
-import { API } from './api/API';
+import { API, CLIENT_ID } from './api/API';
 import { KeytarKeys } from './Enum';
 
 import { keytar } from './Common';
@@ -61,7 +61,7 @@ export class AuthenticationService {
         this.createServer(state);
         vscode.env.openExternal(
           vscode.Uri.parse(
-            `https://id.twitch.tv/oauth2/authorize?client_id=ts9wowek7hj9yw0q7gmg27c29i6etn` +
+            `https://id.twitch.tv/oauth2/authorize?client_id=${CLIENT_ID}` +
               `&redirect_uri=http://localhost:5544` +
               `&response_type=token&scope=chat:edit chat:read whispers:edit user:read:email` +
               `&state=${state}`
