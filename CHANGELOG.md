@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.3] - 2020-05-28
+
+### Fixed
+
+- Fixed issue with packaging extension that prevented publishing to the VS Code marketplace
+
 ## [1.6.1] - 2020-05-23
 
 ### Fixed
@@ -175,7 +181,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.1...HEAD
+[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.3...HEAD
+[1.6.3]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.1...1.6.3
 [1.6.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.5.0...1.6.1
 [1.5.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.1...1.5.0
 [1.4.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.0...1.4.1
