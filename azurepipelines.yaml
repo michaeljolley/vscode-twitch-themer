@@ -69,7 +69,7 @@ jobs:
   condition: succeeded()
   
   pool: 
-    vmImage: 'macOS-10.15'
+    vmImage: 'vs2017-win2016'
   
   steps:
   - task: NodeTool@0
