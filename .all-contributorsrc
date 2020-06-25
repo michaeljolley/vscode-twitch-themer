@@ -141,11 +141,21 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "instafluff",
+      "name": "Instafluff",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/35773245?v=4",
+      "profile": "https://twitch.tv/instafluff",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
   "projectName": "vscode-twitch-themer",
   "projectOwner": "MichaelJolley",
   "repoType": "github",
-  "repoHost": "https://github.com"
+  "repoHost": "https://github.com",
+  "skipCi": true
 }
