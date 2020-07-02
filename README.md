@@ -187,6 +187,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://murrayit.org"><img src="https://avatars0.githubusercontent.com/u/20172166?v=4" width="100px;" alt=""/><br /><sub><b>Chance Murray</b></sub></a><br /><a href="https://github.com/MichaelJolley/vscode-twitch-themer/issues?q=author%3Achancesm" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://twitch.tv/instafluff"><img src="https://avatars2.githubusercontent.com/u/35773245?v=4" width="100px;" alt=""/><br /><sub><b>Instafluff</b></sub></a><br /><a href="#ideas-instafluff" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/jport"><img src="https://avatars2.githubusercontent.com/u/2206131?v=4" width="100px;" alt=""/><br /><sub><b>jport</b></sub></a><br /><a href="#ideas-jport" title="Ideas, Planning, & Feedback">🤔</a></td>
+  </tr>
 </table>
 
 <!-- markdownlint-enable -->
