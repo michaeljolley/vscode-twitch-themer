@@ -7,6 +7,8 @@ import { keytar } from '../Common';
 import { KeytarKeys, AccessState, UserLevel, ThemeNotAvailableReasons } from '../Enum';
 import { API } from '../api/API';
 import { IChatMessage } from '../chat/IChatMessage';
+import { Logger } from '../Logger';
+import { LogLevel } from '../Enum';
 
 /**
  * Manages all logic associated with retrieveing themes,
@@ -34,8 +36,9 @@ export class Themer {
   /**
    * constructor
    * @param _state - The global state of the extension
+   * @param logger - The logger used when logging events
    */
-  constructor(private _state: vscode.Memento) {
+  constructor(private _state: vscode.Memento, private logger: Logger) {
     /**
      * Get the current theme so we can reset it later
      * via command or when disconnecting from chat
@@ -426,7 +429,7 @@ export class Themer {
         break following;
       } else if (
         twitchUser &&
-        (await API.isTwitchUserFollowing(twitchUser['user-id']))
+        (await API.isTwitchUserFollowing(twitchUser['user-id'], this.logger))
       ) {
         this._followers.push({
           username: twitchUserName ? twitchUserName.toLocaleLowerCase() : ''
@@ -484,19 +487,19 @@ export class Themer {
       if (isValidExtResult.reason) {
         switch (isValidExtResult.reason) {
           case ThemeNotAvailableReasons.notFound:
-            console.error(`The requested theme could not be found in the marketplace.`);
+            this.logger.error(`The requested theme could not be found in the marketplace.`);
             break;
           case ThemeNotAvailableReasons.noRepositoryFound:
-            console.error(`The requested theme does not include a public repository.`);
+            this.logger.error(`The requested theme does not include a public repository.`);
             break;
           case ThemeNotAvailableReasons.packageJsonNotDownload:
-            console.error(`The requested theme's package.json could not be downloaded.`);
+            this.logger.error(`The requested theme's package.json could not be downloaded.`);
             break;
           case ThemeNotAvailableReasons.noThemesContributed:
-            console.error(`The requested theme extension does not contribute any themes.`);
+            this.logger.error(`The requested theme extension does not contribute any themes.`);
             break;
           default:
-            console.error(`The requested theme could not be downloaded. Unknown reason.`);
+            this.logger.error(`The requested theme could not be downloaded. Unknown reason.`);
             break;
         }
       }
@@ -533,7 +536,7 @@ export class Themer {
     }
     catch (err) {
       // Handle the error
-      console.error(err);
+      this.logger.error(err);
       return;
     }
   }
@@ -605,7 +608,7 @@ export class Themer {
         break following;
       } else if (
         twitchUser &&
-        (await API.isTwitchUserFollowing(twitchUser['user-id']))
+        (await API.isTwitchUserFollowing(twitchUser['user-id'], this.logger))
       ) {
         this._followers.push({
           username: twitchUserName ? twitchUserName.toLocaleLowerCase() : ''

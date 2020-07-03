@@ -7,25 +7,30 @@ import { Themer } from './commands/Themer';
 import { IChatMessage } from './chat/IChatMessage';
 import { IWhisperMessage } from './chat/IWhisperMessage';
 import { autoConnect } from './AutoConnect';
+import { Logger } from './Logger';
 
 let activeExtension: Extension;
 let _authenticationService: AuthenticationService;
 let _chatClient: ChatClient;
 let _themer: Themer;
 let _context: vscode.ExtensionContext;
+let _logger: Logger;
 
 export class Extension {
   /** State of the extension */
   public static twitchClientStatus: TwitchClientStatus;
 
   constructor(context: vscode.ExtensionContext) {
+    _logger = new Logger(vscode.window.createOutputChannel('Twitch Themer'));
     _context = context;
-    _authenticationService = new AuthenticationService();
-    _chatClient = new ChatClient(_context.globalState);
-    _themer = new Themer(_context.globalState);
+    _authenticationService = new AuthenticationService(_logger);
+    _chatClient = new ChatClient(_context.globalState, _logger);
+    _themer = new Themer(_context.globalState, _logger);
   }
 
   public async initialize() {
+
+    _logger.log('Initializing themer...');
 
     const statusBarItem = await createStatusBarItem(
       _context,
@@ -82,6 +87,8 @@ export class Extension {
     // Auto connect to Twitch Chat if 'twitchThemer.autoConnect' is true (default is false)
     // and we are currently streaming.
     await autoConnect(_chatClient);
+
+    _logger.log('Themer initialized.');
   }
 
   private onSendMessage(message: string) {
@@ -122,7 +129,7 @@ export async function activate(context: vscode.ExtensionContext) {
   const extension: Extension = new Extension(context);
   await extension.initialize();
 
-  console.log('Congratulations, Twitch Themer is now active!');
+  _logger.log('Congratulations, Twitch Themer is now active!');
 }
 
 /**

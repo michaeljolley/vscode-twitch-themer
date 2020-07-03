@@ -90,3 +90,11 @@ export enum ThemeNotAvailableReasons {
   /** Occures whent he API cannot find any theme contributions within the package.json from the Github repository */
   noThemesContributed = 'no themes contributed within package.json',
 }
+
+/** */
+export enum LogLevel {
+  'Information' = 'info',
+  'Warning' = 'warn',
+  'Error' = 'error',
+  'Debug' = 'debug'
+}
