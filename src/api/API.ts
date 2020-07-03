@@ -76,13 +76,18 @@ export class API {
     }
     
     const packageFile = await res.text();
-    const packageJson = JSON.parse(packageFile);
+    try {
+      const packageJson = JSON.parse(packageFile);
 
-    if (!packageJson.contributes.themes || packageJson.contributes.themes.length === 0) {
-      return { available: false, reason: ThemeNotAvailableReasons.noThemesContributed };
+      if (!packageJson.contributes.themes || packageJson.contributes.themes.length === 0) {
+        return { available: false, reason: ThemeNotAvailableReasons.noThemesContributed };
+      }
+      
+      return {available: true, label: packageJson.contributes.themes.map((t: {label: string}) => t.label) };
     }
-    
-    return {available: true, label: packageJson.contributes.themes.map((t: {label: string}) => t.label) };
+    catch {
+      return { available: false, reason: ThemeNotAvailableReasons.packageJsonMalformed };
+    }
   }
 
   public static async getStreamIsActive(): Promise<boolean> {

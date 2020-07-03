@@ -142,7 +142,10 @@ export class AuthenticationService {
     });
 
     server.listen('5544', (err: any) => {
-      this.logger.error(err);
+      if (err) {
+        this.logger.error('An error occured while starting the HTTP listener.');
+        this.logger.error(err);
+      }
     });
   }
 }

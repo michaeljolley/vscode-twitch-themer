@@ -179,6 +179,9 @@ export class Themer {
     if (params.length > 0) {
       command = params[0];
     }
+
+    this.logger.debug(`Executing command: '${command === '' ? 'sendThemes' : command}'`);
+
     switch (command) {
       case '':
         await this.sendThemes(twitchUser);
@@ -495,6 +498,9 @@ export class Themer {
           case ThemeNotAvailableReasons.packageJsonNotDownload:
             this.logger.error(`The requested theme's package.json could not be downloaded.`);
             break;
+          case ThemeNotAvailableReasons.packageJsonMalformed:
+            this.logger.error(`The requested theme's package.json could not be parsed.`);
+            break;
           case ThemeNotAvailableReasons.noThemesContributed:
             this.logger.error(`The requested theme extension does not contribute any themes.`);
             break;
@@ -510,6 +516,7 @@ export class Themer {
       // Authorize the install of the extension if we do not allow for auto-installed extensions.
       if (!this._autoInstall) {
         const msg = `${twitchDisplayName} wants to install theme(s) ${isValidExtResult.label ? isValidExtResult.label.join(', ') : theme}.`;
+        this.logger.log(`${msg}`);
         let choice = await vscode.window.showInformationMessage(msg, 'Accept', 'Deny', 'Preview');
         switch (choice) {
           case 'Preview':
@@ -517,19 +524,23 @@ export class Themer {
             vscode.env.openExternal(vscode.Uri.parse(`https://marketplace.visualstudio.com/items?itemName=${theme}`));
             choice = await vscode.window.showInformationMessage(msg, 'Accept', 'Deny');
             if (choice === 'Deny') {
+              this.logger.log(`User denied installing theme(s).`);
               return;
             } 
             break;
           case 'Deny':
+            this.logger.log(`User denied installing theme(s).`);
             return;
         }
       }
       
       // Install the theme
+      this.logger.log('Installing theme...');
       await vscode.commands.executeCommand(
         "workbench.extensions.installExtension",
         theme
       );
+      this.logger.log('Theme extension install request complete.');
 
       const msg = `@${twitchDisplayName}, the theme(s) '${isValidExtResult.label!.join(', ')}' were installed successfully.`;
       this.sendMessageEventEmitter.fire(msg);
