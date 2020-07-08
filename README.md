@@ -189,6 +189,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/jport"><img src="https://avatars2.githubusercontent.com/u/2206131?v=4" width="100px;" alt=""/><br /><sub><b>jport</b></sub></a><br /><a href="#ideas-jport" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="http://brunorocha.org"><img src="https://avatars2.githubusercontent.com/u/458654?v=4" width="100px;" alt=""/><br /><sub><b>Bruno Rocha</b></sub></a><br /><a href="#ideas-rochacbruno" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
