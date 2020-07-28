@@ -8,6 +8,7 @@ import { API } from './api/API';
 import { KeytarKeys } from './Enum';
 
 import { keytar } from './Common';
+import { Logger } from './Logger';
 
 /**
  * Manages state of current user & authenticating user with Twitch
@@ -18,11 +19,14 @@ export class AuthenticationService {
   /** Event that fires on change of the authentication state of the user */
   public onAuthStatusChanged = this.authStatusEventEmitter.event;
 
+  constructor(private logger: Logger) {}
+
   /**
    * Initializes the authentication service.  If the user is
    * already authenticated it will immediately fire that it is logged in.
    */
   public async initialize() {
+    this.logger.log('Initializing authentication...');
     if (keytar) {
       const accessToken = await keytar.getPassword(
         KeytarKeys.service,
@@ -42,6 +46,7 @@ export class AuthenticationService {
       }
     }
     this.authStatusEventEmitter.fire(false);
+    this.logger.log('Initialized authentication.');
   }
 
   /**
@@ -137,7 +142,10 @@ export class AuthenticationService {
     });
 
     server.listen('5544', (err: any) => {
-      console.error(err);
+      if (err) {
+        this.logger.error('An error occured while starting the HTTP listener.');
+        this.logger.error(err);
+      }
     });
   }
 }

@@ -1,12 +1,13 @@
 
+import * as vscode from 'vscode';
 import fetch from 'node-fetch';
 import { keytar } from '../Common';
 import { KeytarKeys, ThemeNotAvailableReasons } from '../Enum';
-import * as vscode from 'vscode';
+import { Logger } from '../Logger';
 
 export class API {
 
-  public static async isTwitchUserFollowing(twitchUserId: string | undefined) {
+  public static async isTwitchUserFollowing(twitchUserId: string | undefined, logger: Logger) {
     if (twitchUserId) {
       if (keytar) {
         const accessToken = await keytar.getPassword(KeytarKeys.service, KeytarKeys.account);
@@ -19,7 +20,7 @@ export class API {
         }
       }
     }
-    console.log('no twitchUserId was passed in.');
+    logger.debug('no twitchUserId was passed in.');
     return false;
   }
 
@@ -75,13 +76,18 @@ export class API {
     }
     
     const packageFile = await res.text();
-    const packageJson = JSON.parse(packageFile);
+    try {
+      const packageJson = JSON.parse(packageFile);
 
-    if (!packageJson.contributes.themes || packageJson.contributes.themes.length === 0) {
-      return { available: false, reason: ThemeNotAvailableReasons.noThemesContributed };
+      if (!packageJson.contributes.themes || packageJson.contributes.themes.length === 0) {
+        return { available: false, reason: ThemeNotAvailableReasons.noThemesContributed };
+      }
+      
+      return {available: true, label: packageJson.contributes.themes.map((t: {label: string}) => t.label) };
     }
-    
-    return {available: true, label: packageJson.contributes.themes.map((t: {label: string}) => t.label) };
+    catch {
+      return { available: false, reason: ThemeNotAvailableReasons.packageJsonMalformed };
+    }
   }
 
   public static async getStreamIsActive(): Promise<boolean> {
