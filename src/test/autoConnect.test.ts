@@ -5,10 +5,12 @@ import * as chai from 'chai';
 import { API } from '../api/API';
 import ChatClient from '../chat/ChatClient';
 import { autoConnect } from '../AutoConnect';
+import { Logger } from '../Logger';
 
 chai.should();
 
 suite.only('AutoConnect Tests', function() {
+  let fakeLogger: Logger;
   let fakeState: vscode.Memento;
   let fakeWorkspaceConfiguration: vscode.WorkspaceConfiguration;
   let fakeChatClient: ChatClient;
@@ -25,6 +27,8 @@ suite.only('AutoConnect Tests', function() {
       isStreaming: false
     };
 
+    fakeLogger = new Logger();
+
     fakeState = {
       get(key: string): any {
         return stateValues[key];
@@ -35,7 +39,7 @@ suite.only('AutoConnect Tests', function() {
       }
     };
 
-    fakeChatClient = new ChatClient(fakeState);
+    fakeChatClient = new ChatClient(fakeState, fakeLogger);
 
     fakeWorkspaceConfiguration = {
       get<T>(section: string, defaultValue?: T): T | undefined {

@@ -10,6 +10,7 @@ import { IChatMessage } from '../chat/IChatMessage';
 import { API } from '../api/API';
 import { IWhisperMessage } from '../chat/IWhisperMessage';
 import { AccessState } from '../Enum';
+import { Logger } from '../Logger';
 
 chai.should();
 
@@ -19,9 +20,10 @@ suite('Themer Tests', function() {
     vscode.WorkspaceConfiguration
   >;
   let isTwitchUserFollowingStub: sinon.SinonStub<
-    [(string | undefined)],
+    [(string | undefined), Logger],
     Promise<boolean>
   >;
+  let fakeLogger: Logger;
   let fakeState: vscode.Memento;
   let fakeWorkspaceConfiguration: vscode.WorkspaceConfiguration;
   let fakeChatClient: ChatClient;
@@ -79,6 +81,7 @@ suite('Themer Tests', function() {
         return Promise.resolve();
       }
     };
+    fakeLogger = new Logger();
     fakeState = {
       get(key: string): any {
         return stateValues[key];
@@ -106,8 +109,8 @@ suite('Themer Tests', function() {
   setup(function() {
     fakeState.update('bannedUsers', []);
     fakeWorkspaceConfiguration.update('workbench.colorTheme', baseTheme);
-    fakeChatClient = new ChatClient(fakeState);
-    fakeThemer = new Themer(fakeState);
+    fakeChatClient = new ChatClient(fakeState, fakeLogger);
+    fakeThemer = new Themer(fakeState, fakeLogger);
     fakeThemer.handleAccessStateChanged(AccessState.Viewers);
     getConfigurationStub.resetHistory();
     isTwitchUserFollowingStub.resetHistory();
@@ -339,7 +342,7 @@ suite('Themer Tests', function() {
     const chatMessage: IChatMessage = { message, userState: moderator };
 
     fakeState.update('bannedUsers', [user.username]);
-    fakeThemer = new Themer(fakeState);
+    fakeThemer = new Themer(fakeState, fakeLogger);
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
@@ -370,7 +373,7 @@ suite('Themer Tests', function() {
     const chatMessage: IChatMessage = { message, userState: user };
 
     fakeState.update('bannedUsers', [moderator.username]);
-    fakeThemer = new Themer(fakeState);
+    fakeThemer = new Themer(fakeState, fakeLogger);
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {

@@ -87,6 +87,16 @@ export enum ThemeNotAvailableReasons {
   noRepositoryFound = 'no repository found',
   /** Occures when the API fails to download the package.json from the Github repo for the extension */
   packageJsonNotDownload = 'package.json could not be downloaded',
-  /** Occures whent he API cannot find any theme contributions within the package.json from the Github repository */
+  /** Occures when the API cannot find any theme contributions within the package.json from the Github repository */
   noThemesContributed = 'no themes contributed within package.json',
+  /** Occures when the JSON.parse function cannot parse the JSON retrieved from Github repository */
+  packageJsonMalformed = 'the package.json could not be parsed'
+}
+
+/** */
+export enum LogLevel {
+  'Information' = 'info',
+  'Warning' = 'warn',
+  'Error' = 'error',
+  'Debug' = 'debug'
 }

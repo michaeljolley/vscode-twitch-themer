@@ -4,6 +4,8 @@ import { IChatMessage } from './IChatMessage';
 import { keytar } from '../Common';
 import { KeytarKeys } from '../Enum';
 import { IWhisperMessage } from './IWhisperMessage';
+import { Logger } from '../Logger';
+import { LogLevel } from '../Enum';
 
 /**
  * Twitch chat client used in communicating via chat/whispers
@@ -25,7 +27,7 @@ export default class ChatClient {
    * constructor
    * @param _state - The global state of the extension
    */
-  constructor(_state: Memento) {
+  constructor(_state: Memento, private logger: Logger) {
     this._client = null;
     this._options = null;
   }
@@ -34,6 +36,7 @@ export default class ChatClient {
    * Connects to Twitch chat
    */
   private async connect() {
+    this.logger.log('Connecting to Twitch...');
     if (keytar && !this.isConnected()) {
       const accessToken = await keytar.getPassword(
         KeytarKeys.service,
@@ -75,6 +78,7 @@ export default class ChatClient {
       if (this._client) {
         this._client.disconnect();
         this._client = null;
+        this.logger.log('Disconnected from chat.');
       }
       this.chatClientConnectionEventEmitter.fire(false);
     }
@@ -97,7 +101,7 @@ export default class ChatClient {
   }
 
   private onConnectedHandler(address: string, port: number) {
-    console.log(`Connected chat client ${address} : ${port}`);
+    this.logger.log(`Connected chat client ${address} : ${port}`);
   }
 
   private onJoinHandler(channel: string, username: string, self: boolean) {
@@ -148,7 +152,7 @@ export default class ChatClient {
     message: string,
     self: boolean
   ) {
-    console.log(`Received ${message} from ${userState['display-name']}`);
+    this.logger.log(`Received ${message} from ${userState['display-name']}`);
     if (self) {
       return;
     }
