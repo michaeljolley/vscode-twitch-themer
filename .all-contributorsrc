@@ -141,11 +141,39 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "instafluff",
+      "name": "Instafluff",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/35773245?v=4",
+      "profile": "https://twitch.tv/instafluff",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "jport",
+      "name": "jport",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/2206131?v=4",
+      "profile": "https://github.com/jport",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "rochacbruno",
+      "name": "Bruno Rocha",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/458654?v=4",
+      "profile": "http://brunorocha.org",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
   "projectName": "vscode-twitch-themer",
   "projectOwner": "MichaelJolley",
   "repoType": "github",
-  "repoHost": "https://github.com"
+  "repoHost": "https://github.com",
+  "skipCi": true
 }
