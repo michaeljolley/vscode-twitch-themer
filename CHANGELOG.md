@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.4] - 2020-07-28
+
+### Added
+
+- Added improved logging throughout the extension
+
 ## [1.6.3] - 2020-05-28
 
 ### Fixed
@@ -181,7 +187,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.3...HEAD
+[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.4...HEAD
+[1.6.3]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.3...1.6.4
 [1.6.3]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.1...1.6.3
 [1.6.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.5.0...1.6.1
 [1.5.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.1...1.5.0
