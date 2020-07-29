@@ -17,6 +17,9 @@ export class API {
           const res = await fetch(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
           const json = await res.json();
           return (json.data.length > 0) ? true: false;
+        } else {
+          logger.debug('failed to retrieve Twitch credentials from the user store');
+          return false;
         }
       }
     }
