@@ -1,18 +1,15 @@
-import { Client, Options, Userstate } from 'tmi.js';
+import ComfyJS, { OnCommandExtra, OnJoinExtra, OnMessageFlags } from "comfy.js";
 import { EventEmitter, Memento } from 'vscode';
 import { IChatMessage } from './IChatMessage';
 import { keytar } from '../Common';
 import { KeytarKeys } from '../Enum';
 import { IWhisperMessage } from './IWhisperMessage';
 import { Logger } from '../Logger';
-import { LogLevel } from '../Enum';
 
 /**
  * Twitch chat client used in communicating via chat/whispers
  */
 export default class ChatClient {
-  private _client: Client | null;
-  private _options: Options | null;
 
   private chatClientMessageEventEmitter = new EventEmitter<IChatMessage>();
   private chatClientConnectionEventEmitter = new EventEmitter<boolean>();
@@ -28,8 +25,7 @@ export default class ChatClient {
    * @param _state - The global state of the extension
    */
   constructor(_state: Memento, private logger: Logger) {
-    this._client = null;
-    this._options = null;
+
   }
 
   /**
@@ -48,22 +44,19 @@ export default class ChatClient {
       );
 
       if (authUserLogin && accessToken) {
-        const opts = {
-          identity: {
-            username: authUserLogin,
-            password: accessToken
-          },
-          channels: [authUserLogin]
-        };
-        this._options = opts;
 
-        this._client = Client(this._options);
-        this._client.on('connected', this.onConnectedHandler.bind(this));
-        this._client.on('message', this.onMessageHandler.bind(this));
-        this._client.on('join', this.onJoinHandler.bind(this));
-        const status = await this._client.connect();
+        ComfyJS.onError = (err: string) => {
+          this.logger.log(err);
+        };
+
+        ComfyJS.onCommand = this.onCommandHandler.bind(this);
+        ComfyJS.onJoin = this.onJoinHandler.bind(this);
+        ComfyJS.onConnected = this.onConnectedHandler.bind(this);
+
+        ComfyJS.Init(authUserLogin, accessToken, authUserLogin);
+
         this.chatClientConnectionEventEmitter.fire(true);
-        return status;
+        return true;
       }
     }
   }
@@ -75,11 +68,8 @@ export default class ChatClient {
     if (this.isConnected()) {
       this.sendMessage('Twitch Themer has left the building!');
 
-      if (this._client) {
-        this._client.disconnect();
-        this._client = null;
-        this.logger.log('Disconnected from chat.');
-      }
+      ComfyJS.Disconnect();
+      this.logger.log('Disconnected from chat.');
       this.chatClientConnectionEventEmitter.fire(false);
     }
   }
@@ -97,15 +87,16 @@ export default class ChatClient {
 
   /** Is the client currently connected to Twitch chat */
   public isConnected(): boolean {
-    return this._client ? this._client.readyState() === 'OPEN' : false;
+    const client = ComfyJS.GetClient();
+    return client ? client.readyState() === 'OPEN' : false;
   }
 
   private onConnectedHandler(address: string, port: number) {
     this.logger.log(`Connected chat client ${address} : ${port}`);
   }
 
-  private onJoinHandler(channel: string, username: string, self: boolean) {
-    if (self && this._client) {
+  private onJoinHandler(user: string, self: boolean, extra: OnJoinExtra) {
+    if (self) {
       this.sendMessage(
         'Twitch Themer is ready to go. Listening for commands beginning with !theme'
       );
@@ -120,10 +111,9 @@ export default class ChatClient {
   public whisper(whisperMessage: IWhisperMessage) {
     if (
       this.isConnected() &&
-      this._client &&
       whisperMessage.user !== undefined
     ) {
-      this._client.whisper(whisperMessage.user, whisperMessage.message);
+      ComfyJS.Whisper(whisperMessage.message, whisperMessage.user);
     }
   }
 
@@ -131,44 +121,42 @@ export default class ChatClient {
    * Sends a message to Twitch chat
    * @param message - Message to send to chat
    */
-  public sendMessage(message: string) {
-    let channel: string[] | undefined;
-    if (this._options) {
-      channel = this._options.channels;
-    }
-    if (this.isConnected() && this._client && channel) {
-      /**
-       * Why are we specifying channel[0] below?  While tmi.js
-       * allows us to connect to multiple channels, we will
-       * only ever be connected to one channel.
-       */
-      this._client.say(channel[0], message);
+  public async sendMessage(message: string) {
+    if (keytar) {
+      const authUserLogin = await keytar.getPassword(
+        KeytarKeys.service,
+        KeytarKeys.userLogin
+      );
+
+      if (this.isConnected() && authUserLogin) {
+        ComfyJS.Say(message, authUserLogin);
+      }
     }
   }
 
-  private async onMessageHandler(
-    channel: string,
-    userState: Userstate,
+  private async onCommandHandler(
+    user: string,
+    command: string,
     message: string,
-    self: boolean
+    flags: OnMessageFlags,
+    extra: OnCommandExtra
   ) {
-    this.logger.log(`Received ${message} from ${userState['display-name']}`);
-    if (self) {
+    this.logger.log(`Received ${message} from ${user}`);
+    if (!message) {
       return;
     }
-    if (!message) {
+    if (command !== 'theme') {
       return;
     }
 
     message = message.toLocaleLowerCase().trim();
-
-    if (message.startsWith('!theme')) {
-      this.chatClientMessageEventEmitter.fire({
-        userState,
-        message: message
-          .replace('!theme', '')
-          .trim()
-      });
-    }
+    this.chatClientMessageEventEmitter.fire({
+      user,
+      message: message
+        .replace('!theme', '')
+        .trim(),
+      flags,
+      extra
+    });
   }
 }

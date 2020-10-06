@@ -5,16 +5,16 @@ import * as sinon from 'sinon';
 
 import ChatClient from '../chat/ChatClient';
 import { Themer } from '../commands/Themer';
-import { Userstate } from 'tmi.js';
 import { IChatMessage } from '../chat/IChatMessage';
 import { API } from '../api/API';
 import { IWhisperMessage } from '../chat/IWhisperMessage';
 import { AccessState } from '../Enum';
 import { Logger } from '../Logger';
+import { OnCommandExtra, OnMessageFlags } from 'comfy.js';
 
 chai.should();
 
-suite('Themer Tests', function() {
+suite('Themer Tests', function () {
   let getConfigurationStub: sinon.SinonStub<
     [(string | undefined)?, (vscode.Uri | null | undefined)?],
     vscode.WorkspaceConfiguration
@@ -28,32 +28,100 @@ suite('Themer Tests', function() {
   let fakeWorkspaceConfiguration: vscode.WorkspaceConfiguration;
   let fakeChatClient: ChatClient;
   let fakeThemer: Themer;
-  let isTwitchUserFollowingReturn : boolean = false;
+  let isTwitchUserFollowingReturn: boolean = false;
   const baseTheme: string = 'Visual Studio Light';
   const testTheme: string = 'Visual Studio Dark';
   const badTheme: string = 'HotDog Stand';
-  const testBroadcastUser: string = 'theMichaelJolley';
-  const broadcaster: Userstate = {
-    username: testBroadcastUser.toLocaleLowerCase(),
-    'display-name': testBroadcastUser,
-    badges: { broadcaster: '1' }
+  const testBroadcastUser: string = 'BaldBeardedBuilder';
+  const broadcaster: OnMessageFlags = {
+    broadcaster: true,
+    mod: false,
+    subscriber: false,
+    vip: false,
+    founder: false,
+    highlighted: false,
+    customReward: false
   };
-  const moderator: Userstate = {
-    username: 'parithon',
-    'display-name': 'parithon',
-    badges: { moderator: '1' }
+  const moderator: OnMessageFlags = {
+    broadcaster: false,
+    mod: true,
+    subscriber: false,
+    vip: false,
+    founder: false,
+    highlighted: false,
+    customReward: false
   };
-  const subscriber: Userstate = {
-    username: 'spellbee2',
-    'display-name': 'spellbee2',
-    subscriber: true
+  const subscriber: OnMessageFlags = {
+    broadcaster: false,
+    mod: false,
+    subscriber: true,
+    vip: false,
+    founder: false,
+    highlighted: false,
+    customReward: false
   };
-  const user: Userstate = {
-    username: 'surlydev',
-    'display-name': 'SurlyDev'
+  const user: OnMessageFlags = {
+    broadcaster: false,
+    mod: false,
+    subscriber: false,
+    vip: false,
+    founder: false,
+    highlighted: false,
+    customReward: false
+  };
+  const rewardFlags: OnMessageFlags = {
+    broadcaster: false,
+    mod: false,
+    subscriber: false,
+    vip: false,
+    founder: false,
+    highlighted: false,
+    customReward: true
   };
 
-  suiteSetup(function() {
+  const standardExtra: OnCommandExtra = {
+    id: 'string',
+    channel: 'string',
+    roomId: 'string',
+    messageType: 'chat',
+    messageEmotes: {},
+    isEmoteOnly: false,
+    userId: 'string',
+    username: 'roberttables',
+    displayName: 'roberttables',
+    userColor: 'string',
+    userBadges: {},
+    customRewardId: '',
+    flags: {},
+    timestamp: 'string',
+    sinceLastCommand: {
+      any: 0,
+      user: 0
+    }
+  };
+
+  const rewardExtra: OnCommandExtra = {
+    id: 'string',
+    channel: 'string',
+    roomId: 'string',
+    messageType: 'chat',
+    messageEmotes: {},
+    isEmoteOnly: false,
+    userId: 'string',
+    username: 'roberttables',
+    displayName: 'roberttables',
+    userColor: 'string',
+    userBadges: {},
+    customRewardId: 'blahblahblah',
+    flags: {},
+    timestamp: 'string',
+    sinceLastCommand: {
+      any: 0,
+      user: 0
+    }
+  };
+
+  suiteSetup(function () {
     const fakeConfig: {
       [key: string]: any;
     } = {
@@ -101,12 +169,12 @@ suite('Themer Tests', function() {
       });
   });
 
-  suiteTeardown(function() {
+  suiteTeardown(function () {
     getConfigurationStub.restore();
     isTwitchUserFollowingStub.restore();
   });
 
-  setup(function() {
+  setup(function () {
     fakeState.update('bannedUsers', []);
     fakeWorkspaceConfiguration.update('workbench.colorTheme', baseTheme);
     fakeChatClient = new ChatClient(fakeState, fakeLogger);
@@ -117,17 +185,17 @@ suite('Themer Tests', function() {
     isTwitchUserFollowingReturn = false;
   });
 
-  test(`Themer should explain how to use extension to chat`, function(done) {
+  test(`Themer should explain how to use extension to chat`, function (done) {
     let sentMessage: string = '';
     const sendMessageStub = sinon
       .stub(fakeChatClient, 'sendMessage')
-      .callsFake((message: string) => {
+      .callsFake(async (message: string) => {
         sentMessage = message;
       });
-    fakeThemer.onSendMesssage(sendMessageStub);
+    fakeThemer.onSendMessage(sendMessageStub);
 
     const message = 'help';
-    const chatMessage: IChatMessage = { message, userState: user };
+    const chatMessage: IChatMessage = { message, flags: user, user: 'test', extra: standardExtra };
 
     const helpMessage: string = `You can change the theme of the stream's VS\
               Code by sending '!theme random'. You can also choose a theme\
@@ -145,17 +213,17 @@ suite('Themer Tests', function() {
     });
   });
 
-  test(`Themer should return current theme (${baseTheme})`, function(done) {
+  test(`Themer should return current theme (${baseTheme})`, function (done) {
     let sentMessage: string = '';
     const sendMessageStub = sinon
       .stub(fakeChatClient, 'sendMessage')
-      .callsFake((message: string) => {
+      .callsFake(async (message: string) => {
         sentMessage = message;
       });
-    fakeThemer.onSendMesssage(sendMessageStub);
+    fakeThemer.onSendMessage(sendMessageStub);
 
     const message = 'current';
-    const chatMessage: IChatMessage = { message, userState: user };
+    const chatMessage: IChatMessage = { message, flags: user, user: 'test', extra: standardExtra };
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
@@ -169,17 +237,17 @@ suite('Themer Tests', function() {
     });
   });
 
-  test(`Themer should return info about the GitHub repo`, function(done) {
+  test(`Themer should return info about the GitHub repo`, function (done) {
     let sentMessage: string = '';
     const sendMessageStub = sinon
       .stub(fakeChatClient, 'sendMessage')
-      .callsFake((message: string) => {
+      .callsFake(async (message: string) => {
         sentMessage = message;
       });
-    fakeThemer.onSendMesssage(sendMessageStub);
+    fakeThemer.onSendMessage(sendMessageStub);
 
     const message = 'repo';
-    const chatMessage: IChatMessage = { message, userState: user };
+    const chatMessage: IChatMessage = { message, flags: user, user: 'test', extra: standardExtra };
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
@@ -194,10 +262,10 @@ suite('Themer Tests', function() {
     });
   });
 
-  test('Themer should reset theme to original theme when requested', function(done) {
+  test('Themer should reset theme to original theme when requested', function (done) {
     fakeWorkspaceConfiguration.update('workbench.colorTheme', testTheme);
 
-    fakeThemer.resetTheme(broadcaster).then(() => {
+    fakeThemer.resetTheme('roberttables', user).then(() => {
       try {
         fakeWorkspaceConfiguration
           .get<string>('workbench.colorTheme')!
@@ -209,8 +277,8 @@ suite('Themer Tests', function() {
     });
   });
 
-  test(`Themer should change current theme to ${testTheme}`, function(done) {
-    const chatMessage: IChatMessage = { message: testTheme, userState: user };
+  test(`Themer should change current theme to ${testTheme}`, function (done) {
+    const chatMessage: IChatMessage = { message: testTheme, flags: user, user: 'test', extra: standardExtra };
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
@@ -226,7 +294,7 @@ suite('Themer Tests', function() {
   });
 
   test(`Themer should remove trailing comma and change current theme to ${testTheme}`, function (done) {
-    const chatMessage: IChatMessage = { message: `${testTheme},`, userState: user };
+    const chatMessage: IChatMessage = { message: `${testTheme},`, flags: user, user: 'test', extra: standardExtra };
 
     fakeThemer.handleCommands(chatMessage)
       .then(() => {
@@ -241,7 +309,7 @@ suite('Themer Tests', function() {
       });
   });
 
-  test('Themer should return a comma seperated list of themes', function(done) {
+  test('Themer should return a comma separated list of themes', function (done) {
     let recipient: string;
     let whisperedMessage: string;
 
@@ -254,12 +322,12 @@ suite('Themer Tests', function() {
     fakeThemer.onSendWhisper(whisperStub);
 
     const message = '';
-    const chatMessage: IChatMessage = { message, userState: user };
+    const chatMessage: IChatMessage = { message, flags: user, user: 'test', extra: standardExtra };
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         whisperStub.calledOnce.should.be.true;
         recipient!.should.exist;
-        recipient!.should.equal(user.username);
+        recipient!.should.equal('test');
         whisperedMessage.should.exist;
         whisperedMessage.split(', ').length.should.be.greaterThan(0);
         done();
@@ -269,8 +337,8 @@ suite('Themer Tests', function() {
     });
   });
 
-  test(`Themer should change the theme to a random theme when using !theme random`, function(done) {
-    const chatMessage: IChatMessage = { message: 'random', userState: user };
+  test(`Themer should change the theme to a random theme when using !theme random`, function (done) {
+    const chatMessage: IChatMessage = { message: 'random', flags: user, user: 'test', extra: standardExtra };
 
     fakeWorkspaceConfiguration.update('workbench.colorTheme', baseTheme);
 
@@ -286,8 +354,8 @@ suite('Themer Tests', function() {
     });
   });
 
-  test(`Themer should change the theme to a random dark theme when using !theme random dark`, function(done) {
-    const chatMessage: IChatMessage = { message: 'random dark', userState: user };
+  test(`Themer should change the theme to a random dark theme when using !theme random dark`, function (done) {
+    const chatMessage: IChatMessage = { message: 'random dark', flags: user, user: 'test', extra: standardExtra };
 
     /* baseTheme is light.  Set now so we can be sure we get a dark theme after running the command */
     fakeWorkspaceConfiguration.update('workbench.colorTheme', baseTheme);
@@ -304,8 +372,8 @@ suite('Themer Tests', function() {
     });
   });
 
-  test(`Themer should change the theme to a random light theme when using !theme random light`, function(done) {
-    const chatMessage: IChatMessage = { message: 'random light', userState: user };
+  test(`Themer should change the theme to a random light theme when using !theme random light`, function (done) {
+    const chatMessage: IChatMessage = { message: 'random light', flags: user, user: 'test', extra: standardExtra };
 
     /* testTheme is dark.  Set now so we can be sure we get a light theme after running the command */
     fakeWorkspaceConfiguration.update('workbench.colorTheme', testTheme);
@@ -322,14 +390,14 @@ suite('Themer Tests', function() {
     });
   });
 
-  test('Themer should ban a user', function(done) {
-    const message = `ban ${user.username}`;
-    const chatMessage: IChatMessage = { message, userState: moderator };
+  test('Themer should ban a user', function (done) {
+    const message = `ban mantas159159`;
+    const chatMessage: IChatMessage = { message, flags: moderator, user: 'test', extra: standardExtra };
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeState.get<any[]>('bannedUsers')!.should.not.be.empty;
-        fakeState.get<any[]>('bannedUsers')!.should.contain(user.username);
+        fakeState.get<any[]>('bannedUsers')!.should.contain('mantas159159');
         done();
       } catch (error) {
         done(error);
@@ -337,16 +405,16 @@ suite('Themer Tests', function() {
     });
   });
 
-  test('Themer should unban a user', function(done) {
-    const message = `!ban ${user.username}`;
-    const chatMessage: IChatMessage = { message, userState: moderator };
+  test('Themer should unban a user', function (done) {
+    const message = `!ban mantas159159`;
+    const chatMessage: IChatMessage = { message, flags: moderator, user: 'test', extra: standardExtra };
 
-    fakeState.update('bannedUsers', [user.username]);
+    fakeState.update('bannedUsers', [user]);
     fakeThemer = new Themer(fakeState, fakeLogger);
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeState.get<any[]>('bannedUsers')!.should.not.contain(user.username);
+        fakeState.get<any[]>('bannedUsers')!.should.not.contain('mantas159159');
         done();
       } catch (error) {
         done(error);
@@ -354,9 +422,9 @@ suite('Themer Tests', function() {
     });
   });
 
-  test('Themer should not ban if user is not a moderator', function(done) {
-    const message = `ban ${moderator.username}`;
-    const chatMessage: IChatMessage = { message, userState: user };
+  test('Themer should not ban if user is not a moderator', function (done) {
+    const message = `ban exegete46`;
+    const chatMessage: IChatMessage = { message, flags: user, user: 'test', extra: standardExtra };
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
@@ -368,11 +436,11 @@ suite('Themer Tests', function() {
     });
   });
 
-  test('Themer should not unban if user is not a moderator', function(done) {
-    const message = `!ban ${moderator.username}`;
-    const chatMessage: IChatMessage = { message, userState: user };
+  test('Themer should not unban if user is not a moderator', function (done) {
+    const message = `!ban exegete46`;
+    const chatMessage: IChatMessage = { message, flags: user, user: 'test', extra: standardExtra };
 
-    fakeState.update('bannedUsers', [moderator.username]);
+    fakeState.update('bannedUsers', ['exegete46']);
     fakeThemer = new Themer(fakeState, fakeLogger);
 
     fakeThemer.handleCommands(chatMessage).then(() => {
@@ -380,7 +448,7 @@ suite('Themer Tests', function() {
         fakeState.get<string>('bannedUsers')!.should.not.be.empty;
         fakeState
           .get<string>('bannedUsers')!
-          .should.contain(moderator.username);
+          .should.contain('exegete46');
         done();
       } catch (error) {
         done(error);
@@ -388,8 +456,8 @@ suite('Themer Tests', function() {
     });
   });
 
-  test('Themer should prevent theme changes by viewers if the AccessState is set to Followers', function(done) {
-    const chatMessage: IChatMessage = { message: testTheme, userState: user };
+  test('Themer should prevent theme changes by viewers if the AccessState is set to Followers', function (done) {
+    const chatMessage: IChatMessage = { message: testTheme, flags: user, user: 'test', extra: standardExtra };
     isTwitchUserFollowingReturn = false;
 
     fakeThemer.handleAccessStateChanged(AccessState.Followers);
@@ -405,8 +473,8 @@ suite('Themer Tests', function() {
     });
   });
 
-  test('Themer should allow theme changes by followers if the AccessState is set to Followers', function(done) {
-    const chatMessage: IChatMessage = { message: testTheme, userState: user };
+  test('Themer should allow theme changes by followers if the AccessState is set to Followers', function (done) {
+    const chatMessage: IChatMessage = { message: testTheme, flags: user, user: 'test', extra: standardExtra };
     isTwitchUserFollowingReturn = true;
 
     fakeThemer.handleAccessStateChanged(AccessState.Followers);
@@ -422,8 +490,8 @@ suite('Themer Tests', function() {
     });
   });
 
-  test('Themer should prevent theme changes by viewers if the AccessState is set to Subscribers', function(done) {
-    const chatMessage: IChatMessage = { message: testTheme, userState: user };
+  test('Themer should prevent theme changes by viewers if the AccessState is set to Subscribers', function (done) {
+    const chatMessage: IChatMessage = { message: testTheme, flags: user, user: 'test', extra: standardExtra };
     isTwitchUserFollowingReturn = false;
 
     fakeThemer.handleAccessStateChanged(AccessState.Subscribers);
@@ -439,8 +507,8 @@ suite('Themer Tests', function() {
     });
   });
 
-  test('Themer should prevent theme changes by followers if the AccessState is set to Subscribers', function(done) {
-    const chatMessage: IChatMessage = { message: testTheme, userState: user };
+  test('Themer should prevent theme changes by followers if the AccessState is set to Subscribers', function (done) {
+    const chatMessage: IChatMessage = { message: testTheme, flags: user, user: 'test', extra: standardExtra };
     isTwitchUserFollowingReturn = true;
     fakeThemer.handleAccessStateChanged(AccessState.Subscribers);
 
@@ -456,8 +524,8 @@ suite('Themer Tests', function() {
     });
   });
 
-  test('Themer should allow theme changes by subscribers if the AccessState is set to Subscribers', function(done) {
-    const chatMessage: IChatMessage = { message: testTheme, userState: subscriber };
+  test('Themer should allow theme changes by subscribers if the AccessState is set to Subscribers', function (done) {
+    const chatMessage: IChatMessage = { message: testTheme, flags: subscriber, user: 'test', extra: standardExtra };
 
     fakeThemer.handleAccessStateChanged(AccessState.Subscribers);
     fakeThemer.handleCommands(chatMessage).then(() => {
