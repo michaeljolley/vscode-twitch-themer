@@ -340,13 +340,14 @@ suite('Themer Tests', function () {
   test(`Themer should change the theme to a random theme when using !theme random`, function (done) {
     const chatMessage: IChatMessage = { message: 'random', flags: user, user: 'test', extra: standardExtra };
 
-    fakeWorkspaceConfiguration.update('workbench.colorTheme', baseTheme);
+    const currentTheme = fakeWorkspaceConfiguration.get('workbench.colorTheme') || baseTheme;
+    // fakeWorkspaceConfiguration.update('workbench.colorTheme', baseTheme);
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeWorkspaceConfiguration
           .get<string>('workbench.colorTheme')!
-          .should.not.equal(baseTheme);
+          .should.not.equal(currentTheme);
         done();
       } catch (error) {
         done(error);
@@ -358,13 +359,14 @@ suite('Themer Tests', function () {
     const chatMessage: IChatMessage = { message: 'random dark', flags: user, user: 'test', extra: standardExtra };
 
     /* baseTheme is light.  Set now so we can be sure we get a dark theme after running the command */
-    fakeWorkspaceConfiguration.update('workbench.colorTheme', baseTheme);
+    const currentTheme = fakeWorkspaceConfiguration.get('workbench.colorTheme') || baseTheme;
+    // fakeWorkspaceConfiguration.update('workbench.colorTheme', baseTheme);
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeWorkspaceConfiguration
           .get<string>('workbench.colorTheme')!
-          .should.not.equal(baseTheme);
+          .should.not.equal(currentTheme);
         done();
       } catch (error) {
         done(error);
@@ -409,7 +411,7 @@ suite('Themer Tests', function () {
     const message = `!ban mantas159159`;
     const chatMessage: IChatMessage = { message, flags: moderator, user: 'test', extra: standardExtra };
 
-    fakeState.update('bannedUsers', [user]);
+    fakeState.update('bannedUsers', ['test']);
     fakeThemer = new Themer(fakeState, fakeLogger);
 
     fakeThemer.handleCommands(chatMessage).then(() => {

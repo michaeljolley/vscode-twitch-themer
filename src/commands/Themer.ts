@@ -38,23 +38,6 @@ export class Themer {
    */
   constructor(private _state: vscode.Memento, private logger: Logger) {
     /**
-     * Get the current theme so we can reset it later
-     * via command or when disconnecting from chat
-     */
-    const theme: string | undefined = vscode.workspace
-      .getConfiguration()
-      .get('workbench.colorTheme');
-
-    if (theme) {
-      this._originalTheme = this._availableThemes.filter(
-        f =>
-          f.label.toLocaleLowerCase() === theme.toLocaleLowerCase() ||
-          (f.themeId &&
-            f.themeId.toLocaleLowerCase() === theme.toLocaleLowerCase())
-      )[0];
-    }
-
-    /**
      * Get the configuration to auto-install or not
      */
     this._autoInstall = vscode.workspace
@@ -65,6 +48,21 @@ export class Themer {
      * Initialize the list of available themes for users
      */
     this.loadThemes();
+
+    /**
+     * Get the current theme so we can reset it later
+     * via command or when disconnecting from chat
+     */
+    const theme: string = vscode.workspace
+      .getConfiguration()
+      .get('workbench.colorTheme') || 'Visual Studio Dark+';
+
+    this._originalTheme = this._availableThemes.filter(
+      f =>
+        f.label.toLocaleLowerCase() === theme.toLocaleLowerCase() ||
+        (f.themeId &&
+          f.themeId.toLocaleLowerCase() === theme.toLocaleLowerCase())
+    )[0];
 
     /**
      * Gets the access state from the workspace
@@ -309,7 +307,6 @@ export class Themer {
    * @param twitchUser - pass through the twitch user state
    */
   public async resetTheme(user: string, onMessageFlags: OnMessageFlags) {
-    console.dir(this._originalTheme);
     if (this._originalTheme) {
       await this.changeTheme(user, onMessageFlags, this._originalTheme.label);
     }
@@ -607,7 +604,7 @@ export class Themer {
     )[0];
 
     if (theme) {
-      this.setTheme(user, theme);
+      await this.setTheme(user, theme);
     } else {
       this.sendMessageEventEmitter.fire(
         `${user}, ${themeName} is not a valid theme name or \
