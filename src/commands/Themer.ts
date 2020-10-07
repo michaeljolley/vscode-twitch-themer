@@ -8,6 +8,7 @@ import { API } from '../api/API';
 import { IChatMessage } from '../chat/IChatMessage';
 import { Logger } from '../Logger';
 import { OnMessageFlags } from 'comfy.js';
+import { ICommand } from './ICommand';
 
 /**
  * Manages all logic associated with retrieving themes,
@@ -21,6 +22,7 @@ export class Themer {
   private _availableThemes: Array<ITheme> = [];
   private _listRecipients: Array<IListRecipient> = [];
   private _followers: Array<IListRecipient> = [];
+  private _commands: ICommand = {};
 
   private sendWhisperEventEmitter = new vscode.EventEmitter<IWhisperMessage>();
   private sendMessageEventEmitter = new vscode.EventEmitter<string>();
@@ -37,6 +39,17 @@ export class Themer {
    * @param logger - The logger used when logging events
    */
   constructor(private _state: vscode.Memento, private logger: Logger) {
+    /**
+     * Gather command names from the extension settings
+     */
+    this.initCommands();
+    // If this extension configuration changes, ensure the command trigger is updated
+    vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent) => {
+      if (e.affectsConfiguration('twitchThemer')) {
+        this.initCommands();
+      }
+    });
+
     /**
      * Get the configuration to auto-install or not
      */
@@ -144,33 +157,33 @@ export class Themer {
       case '':
         await this.sendThemes(chatMessage.user);
         break;
-      case 'current':
+      case this._commands['current']:
         await this.currentTheme();
         break;
-      case 'reset':
+      case this._commands['reset']:
         await this.resetTheme(chatMessage.user, chatMessage.flags);
         break;
-      case 'random':
+      case this._commands['random']:
         await this.randomTheme(chatMessage.user, chatMessage.flags, chatMessage.message);
         break;
-      case 'help':
+      case this._commands['help']:
         await this.help();
         break;
-      case 'refresh':
+      case this._commands['refresh']:
         await this.refreshThemes(chatMessage.flags);
         break;
-      case 'repo':
+      case this._commands['repo']:
         await this.repo();
         break;
-      case "install":
+      case this._commands["install"]:
         await this.installTheme(chatMessage.user, chatMessage.flags, chatMessage.message);
         break;
-      case 'ban':
+      case this._commands['ban']:
         if (username !== undefined) {
           await this.ban(chatMessage.flags, username);
         }
         break;
-      case '!ban':
+      case `!${this._commands["ban"]}`:
         if (username !== undefined) {
           await this.unban(chatMessage.flags, username);
         }
@@ -323,6 +336,19 @@ export class Themer {
     if (this.getUserLevel(onMessageFlags) > UserLevel.viewer) {
       this.loadThemes();
     }
+  }
+
+  private initCommands() {
+    const configuration = vscode.workspace.getConfiguration('twitchThemer');
+    this._commands['install'] = configuration.get<string>("twitchThemer.installCommand") || "install";
+    this._commands['current'] = configuration.get<string>("twitchThemer.currentCommand") || "current";
+    this._commands['help'] = configuration.get<string>("twitchThemer.helpCommand") || "help";
+    this._commands['random'] = configuration.get<string>("twitchThemer.randomCommand") || "random";
+    this._commands['dark'] = configuration.get<string>("twitchThemer.darkCommand") || "dark";
+    this._commands['light'] = configuration.get<string>("twitchThemer.lightCommand") || "light";
+    this._commands['refresh'] = configuration.get<string>("twitchThemer.refreshCommand") || "refresh";
+    this._commands['repo'] = configuration.get<string>("twitchThemer.repoCommand") || "repo";
+    this._commands['ban'] = configuration.get<string>("twitchThemer.banCommand") || "ban";
   }
 
   private async loadThemes() {
@@ -518,10 +544,10 @@ export class Themer {
     let filter: number = 0;
     if (params.length > 1) {
       switch (params[1].toLocaleLowerCase()) {
-        case 'dark':
+        case this._commands['dark']:
           filter = 1;
           break;
-        case 'light':
+        case this._commands['light']:
           filter = 2;
           break;
         default:

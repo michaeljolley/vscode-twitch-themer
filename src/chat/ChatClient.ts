@@ -1,5 +1,5 @@
 import ComfyJS, { OnCommandExtra, OnJoinExtra, OnMessageFlags } from "comfy.js";
-import { EventEmitter, Memento } from 'vscode';
+import { ConfigurationChangeEvent, EventEmitter, Memento, workspace } from 'vscode';
 import { IChatMessage } from './IChatMessage';
 import { keytar } from '../Common';
 import { KeytarKeys } from '../Enum';
@@ -13,6 +13,7 @@ export default class ChatClient {
 
   private chatClientMessageEventEmitter = new EventEmitter<IChatMessage>();
   private chatClientConnectionEventEmitter = new EventEmitter<boolean>();
+  private _commandTrigger: string;
 
   /** Event that fires when an appropriate message is received */
   public onChatMessageReceived = this.chatClientMessageEventEmitter.event;
@@ -25,7 +26,13 @@ export default class ChatClient {
    * @param _state - The global state of the extension
    */
   constructor(_state: Memento, private logger: Logger) {
-
+    this._commandTrigger = workspace.getConfiguration().get<string>('twitchThemer.themeCommand') || "theme"
+    // If this extension configuration changes, ensure the command trigger is updated
+    workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
+      if (e.affectsConfiguration('twitchThemer')) {
+        this._commandTrigger = workspace.getConfiguration().get<string>('twitchThemer.themeCommand') || "theme"
+      }
+    });
   }
 
   /**
@@ -87,7 +94,7 @@ export default class ChatClient {
 
   /** Is the client currently connected to Twitch chat */
   public isConnected(): boolean {
-    const client = ComfyJS.GetClient();
+    const client = ComfyJS ? ComfyJS.GetClient() : undefined
     return client ? client.readyState() === 'OPEN' : false;
   }
 
@@ -145,7 +152,7 @@ export default class ChatClient {
     if (!message) {
       return;
     }
-    if (command !== 'theme') {
+    if (command !== this._commandTrigger) {
       return;
     }
 
@@ -153,7 +160,7 @@ export default class ChatClient {
     this.chatClientMessageEventEmitter.fire({
       user,
       message: message
-        .replace('!theme', '')
+        .replace('!' + this._commandTrigger, '')
         .trim(),
       flags,
       extra
