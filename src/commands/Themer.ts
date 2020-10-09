@@ -340,15 +340,15 @@ export class Themer {
 
   private initCommands() {
     const configuration = vscode.workspace.getConfiguration('twitchThemer');
-    this._commands['install'] = configuration.get<string>("twitchThemer.installCommand") || "install";
-    this._commands['current'] = configuration.get<string>("twitchThemer.currentCommand") || "current";
-    this._commands['help'] = configuration.get<string>("twitchThemer.helpCommand") || "help";
-    this._commands['random'] = configuration.get<string>("twitchThemer.randomCommand") || "random";
-    this._commands['dark'] = configuration.get<string>("twitchThemer.darkCommand") || "dark";
-    this._commands['light'] = configuration.get<string>("twitchThemer.lightCommand") || "light";
-    this._commands['refresh'] = configuration.get<string>("twitchThemer.refreshCommand") || "refresh";
-    this._commands['repo'] = configuration.get<string>("twitchThemer.repoCommand") || "repo";
-    this._commands['ban'] = configuration.get<string>("twitchThemer.banCommand") || "ban";
+    this._commands['install'] = configuration.get<string>("installCommand") || "install";
+    this._commands['current'] = configuration.get<string>("currentCommand") || "current";
+    this._commands['help'] = configuration.get<string>("helpCommand") || "help";
+    this._commands['random'] = configuration.get<string>("randomCommand") || "random";
+    this._commands['dark'] = configuration.get<string>("darkCommand") || "dark";
+    this._commands['light'] = configuration.get<string>("lightCommand") || "light";
+    this._commands['refresh'] = configuration.get<string>("refreshCommand") || "refresh";
+    this._commands['repo'] = configuration.get<string>("repoCommand") || "repo";
+    this._commands['ban'] = configuration.get<string>("banCommand") || "ban";
   }
 
   private async loadThemes() {
