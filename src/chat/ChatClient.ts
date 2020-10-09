@@ -1,4 +1,4 @@
-import ComfyJS, { OnCommandExtra, OnJoinExtra, OnMessageFlags } from "comfy.js";
+import { ComfyJSInstance, OnCommandExtra, OnJoinExtra, OnMessageFlags } from "comfy.js";
 import { ConfigurationChangeEvent, EventEmitter, Memento, workspace } from 'vscode';
 import { IChatMessage } from './IChatMessage';
 import { keytar } from '../Common';
@@ -6,11 +6,13 @@ import { KeytarKeys } from '../Enum';
 import { IWhisperMessage } from './IWhisperMessage';
 import { Logger } from '../Logger';
 
+const ComfyJS: ComfyJSInstance = require('comfy.js');
+
 /**
  * Twitch chat client used in communicating via chat/whispers
  */
 export default class ChatClient {
-
+  
   private chatClientMessageEventEmitter = new EventEmitter<IChatMessage>();
   private chatClientConnectionEventEmitter = new EventEmitter<boolean>();
   private _commandTrigger: string;
@@ -26,6 +28,7 @@ export default class ChatClient {
    * @param _state - The global state of the extension
    */
   constructor(_state: Memento, private logger: Logger) {
+    // this.ConfyJS = require('comfy.js');
     this._commandTrigger = workspace.getConfiguration().get<string>('twitchThemer.themeCommand') || "theme"
     // If this extension configuration changes, ensure the command trigger is updated
     workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
@@ -94,7 +97,7 @@ export default class ChatClient {
 
   /** Is the client currently connected to Twitch chat */
   public isConnected(): boolean {
-    const client = ComfyJS ? ComfyJS.GetClient() : undefined
+    const client = ComfyJS.GetClient();
     return client ? client.readyState() === 'OPEN' : false;
   }
 
