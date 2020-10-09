@@ -1,5 +1,5 @@
 import { ComfyJSInstance, OnCommandExtra, OnJoinExtra, OnMessageFlags } from "comfy.js";
-import { ConfigurationChangeEvent, EventEmitter, Memento, workspace } from 'vscode';
+import { ConfigurationChangeEvent, EventEmitter, Memento, workspace, WorkspaceConfiguration } from 'vscode';
 import { IChatMessage } from './IChatMessage';
 import { keytar } from '../Common';
 import { KeytarKeys } from '../Enum';
@@ -15,7 +15,7 @@ export default class ChatClient {
   
   private chatClientMessageEventEmitter = new EventEmitter<IChatMessage>();
   private chatClientConnectionEventEmitter = new EventEmitter<boolean>();
-  private _commandTrigger: string;
+  private _commandTrigger: string = "theme";
 
   /** Event that fires when an appropriate message is received */
   public onChatMessageReceived = this.chatClientMessageEventEmitter.event;
@@ -28,14 +28,18 @@ export default class ChatClient {
    * @param _state - The global state of the extension
    */
   constructor(_state: Memento, private logger: Logger) {
-    // this.ConfyJS = require('comfy.js');
-    this._commandTrigger = workspace.getConfiguration().get<string>('twitchThemer.themeCommand') || "theme"
+    this.initCmdTrigger()
     // If this extension configuration changes, ensure the command trigger is updated
     workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
       if (e.affectsConfiguration('twitchThemer')) {
-        this._commandTrigger = workspace.getConfiguration().get<string>('twitchThemer.themeCommand') || "theme"
+        this.initCmdTrigger()
       }
     });
+  }
+
+  private initCmdTrigger() {
+    const configuration: WorkspaceConfiguration = workspace.getConfiguration('twitchThemer');
+    this._commandTrigger = configuration.get<string>('themeCommand') || "theme"
   }
 
   /**
@@ -108,7 +112,7 @@ export default class ChatClient {
   private onJoinHandler(user: string, self: boolean, extra: OnJoinExtra) {
     if (self) {
       this.sendMessage(
-        'Twitch Themer is ready to go. Listening for commands beginning with !theme'
+        `Twitch Themer is ready to go. Listening for commands beginning with !${this._commandTrigger}`
       );
     }
   }
