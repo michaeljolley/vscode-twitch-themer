@@ -1,18 +1,21 @@
-import ComfyJS, { OnCommandExtra, OnJoinExtra, OnMessageFlags } from "comfy.js";
-import { EventEmitter, Memento } from 'vscode';
+import { ComfyJSInstance, OnCommandExtra, OnJoinExtra, OnMessageFlags } from "comfy.js";
+import { ConfigurationChangeEvent, EventEmitter, Memento, workspace, WorkspaceConfiguration } from 'vscode';
 import { IChatMessage } from './IChatMessage';
 import { keytar } from '../Common';
 import { KeytarKeys } from '../Enum';
 import { IWhisperMessage } from './IWhisperMessage';
 import { Logger } from '../Logger';
 
+const ComfyJS: ComfyJSInstance = require('comfy.js');
+
 /**
  * Twitch chat client used in communicating via chat/whispers
  */
 export default class ChatClient {
-
+  
   private chatClientMessageEventEmitter = new EventEmitter<IChatMessage>();
   private chatClientConnectionEventEmitter = new EventEmitter<boolean>();
+  private _commandTrigger: string = "theme";
 
   /** Event that fires when an appropriate message is received */
   public onChatMessageReceived = this.chatClientMessageEventEmitter.event;
@@ -25,7 +28,18 @@ export default class ChatClient {
    * @param _state - The global state of the extension
    */
   constructor(_state: Memento, private logger: Logger) {
+    this.initCmdTrigger()
+    // If this extension configuration changes, ensure the command trigger is updated
+    workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
+      if (e.affectsConfiguration('twitchThemer')) {
+        this.initCmdTrigger()
+      }
+    });
+  }
 
+  private initCmdTrigger() {
+    const configuration: WorkspaceConfiguration = workspace.getConfiguration('twitchThemer');
+    this._commandTrigger = configuration.get<string>('themeCommand') || "theme"
   }
 
   /**
@@ -98,7 +112,7 @@ export default class ChatClient {
   private onJoinHandler(user: string, self: boolean, extra: OnJoinExtra) {
     if (self) {
       this.sendMessage(
-        'Twitch Themer is ready to go. Listening for commands beginning with !theme'
+        `Twitch Themer is ready to go. Listening for commands beginning with !${this._commandTrigger}`
       );
     }
   }
@@ -145,7 +159,7 @@ export default class ChatClient {
     if (!message) {
       return;
     }
-    if (command !== 'theme') {
+    if (command !== this._commandTrigger) {
       return;
     }
 
@@ -153,7 +167,7 @@ export default class ChatClient {
     this.chatClientMessageEventEmitter.fire({
       user,
       message: message
-        .replace('!theme', '')
+        .replace('!' + this._commandTrigger, '')
         .trim(),
       flags,
       extra

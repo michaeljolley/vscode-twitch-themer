@@ -83,6 +83,66 @@
           "type": "boolean",
           "default": false,
           "description": "Should Twitch Themer automatically connect to Twitch Chat if you're streaming? Twitch Themer will poll Twitch' API to ensure you're streaming prior to connecting."
+        },
+        "twitchThemer.themeCommand": {
+          "title": "Theme Command",
+          "type": "string",
+          "default": "theme",
+          "description": "The command trigger to use."
+        },
+        "twitchThemer.installCommand": {
+          "title": "Install SubCommand",
+          "type": "string",
+          "default": "install",
+          "description": "The install sub-command trigger to use."
+        },
+        "twitchThemer.currentCommand": {
+          "title": "Current SubCommand",
+          "type": "string",
+          "default": "current",
+          "description": "The current sub-command trigger to use."
+        },
+        "twitchThemer.helpCommand": {
+          "title": "Help SubCommand",
+          "type": "string",
+          "default": "help",
+          "description": "The help sub-command trigger to use."
+        },
+        "twitchThemer.refreshCommand": {
+          "title": "Refresh SubCommand",
+          "type": "string",
+          "default": "refresh",
+          "description": "The refresh sub-command trigger to use."
+        },        
+        "twitchThemer.repoCommand": {
+          "title": "Repo SubCommand",
+          "type": "string",
+          "default": "repo",
+          "description": "The repo sub-command trigger to use."
+        },
+        "twitchThemer.banCommand": {
+          "title": "Ban SubCommand",
+          "type": "string",
+          "default": "ban",
+          "description": "The ban sub-command trigger to use."
+        },
+        "twitchThemer.random": {
+          "title": "Random SubCommand",
+          "type": "string",
+          "default": "random",
+          "description": "The random sub-command trigger to use."
+        },
+        "twitchThemer.dark": {
+          "title": "Dark SubCommand",
+          "type": "string",
+          "default": "dark",
+          "description": "The 'dark' sub-command trigger to use."
+        },
+        "twitchThemer.light": {
+          "title": "Light SubCommand",
+          "type": "string",
+          "default": "light",
+          "description": "The 'light' sub-command trigger to use."
         }
       }
     }

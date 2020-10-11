@@ -21,7 +21,7 @@ This will send a list of installed VS Code themes to the requestor via whisper.
 !theme
 ```
 
-`Note: Only 1 whisper per user will be sent per day.`
+> Note: Only 1 whisper per user will be sent per day.
 
 #### Send response to chat of current theme
 
@@ -55,7 +55,7 @@ This command will set the theme of the streamers' VS Code workspace to the theme
 !theme {theme name}
 ```
 
-`Note: The theme must be previously installed and available within VS Code.`
+> Note: The theme must be previously installed and available within VS Code.
 
 #### Set Random VS Code theme
 
@@ -74,7 +74,7 @@ This command will set the theme of the streamers' VS Code workspace back to the 
 !theme reset
 ```
 
-`Note: Everytime the extension disconnects from chat, the theme will be reset.`
+> Note: Everytime the extension disconnects from chat, the theme will be reset.
 
 #### Refresh VS Code themes
 
@@ -84,7 +84,7 @@ This command will refresh the list of available themes in the streamers VS Code 
 !theme refresh
 ```
 
-`Note: List of themes and request timers will only be reset if the command is sent from the broadcaster.`
+> Note: List of themes and request timers will only be reset if the command is sent from the broadcaster.
 
 #### Install VS Code themes
 
@@ -94,7 +94,7 @@ This command will look for the specified theme on the Visual Studio Marketplace.
 !theme install {Theme Unique Identifier}
 ```
 
-`Example: For the [Linux Themes for VS Code](https://marketplace.visualstudio.com/items?itemName=solarliner.linux-themes) extension you would send !theme install solarliner.linux-themes`
+> **Example**: For the [Linux Themes for VS Code](https://marketplace.visualstudio.com/items?itemName=solarliner.linux-themes) extension, you would send `!theme install solarliner.linux-themes`
 
 
 #### Ban/Unban user from changing themes
@@ -107,7 +107,7 @@ These commands will either ban or unban a user from changing the theme via Twitc
 !theme !ban {username}
 ```
 
-`Note: List of banned users will reset on extension activation/start up.`
+> Note: List of banned users will reset on extension activation/start up.
 
 ----
 
@@ -121,6 +121,35 @@ These commands will either ban or unban a user from changing the theme via Twitc
 #### Access State
 
 On the settings UI, you can specify whether the extension should only react to all viewers, only followers or only subscribers.
+
+#### Auto Connect
+
+This setting will toggle whether the extension will automatically connect to Twitch when you launch Visual Studio Code.
+
+#### Auto Install
+
+This setting will toggle whether the extension will automatically install requested themes or show a prompt.
+
+#### Command Triggers
+
+You can change the trigger commands for the bot. For example, you can change `!theme` to `!colour` by changing the **Theme Command** setting.
+
+---
+
+### Available Triggers
+
+Trigger|Example|Description
+-|-|-
+theme|!theme|The main trigger for the bot
+ban|!theme ban {username}|This will ban a user from using the command
+current|!theme current|The bot will say the current in chat
+help|!theme help|The bot will give some guidance in chat
+install|!theme install {theme-unique-id}|Installs a theme extension
+random|!theme random|Randomly changes the theme of vscode
+dark|!theme random dark|Randomly chooses a dark theme
+light|!theme random light|Randomly chooses a light theme
+refresh|!theme refresh|Refreshes the currently install themes
+repo|!theme repo|The bot will say the repo location for this extension
 
 ----
 
