@@ -9,7 +9,7 @@ import { Logger } from '../Logger';
 
 chai.should();
 
-suite.only('AutoConnect Tests', function() {
+suite('AutoConnect Tests', function() {
   let fakeLogger: Logger;
   let fakeState: vscode.Memento;
   let fakeWorkspaceConfiguration: vscode.WorkspaceConfiguration;
