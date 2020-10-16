@@ -51,6 +51,15 @@ suite('Themer Tests', function () {
     highlighted: false,
     customReward: false
   };
+  const vip: OnMessageFlags = {
+    broadcaster: false,
+    mod: false,
+    subscriber: false,
+    vip: true,
+    founder: false,
+    highlighted: false,
+    customReward: false
+  };
   const subscriber: OnMessageFlags = {
     broadcaster: false,
     mod: false,
@@ -530,6 +539,107 @@ suite('Themer Tests', function () {
     const chatMessage: IChatMessage = { message: testTheme, flags: subscriber, user: 'test', extra: standardExtra };
 
     fakeThemer.handleAccessStateChanged(AccessState.Subscribers);
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.equal(testTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test('Themer should prevent theme changes by subscribers if the AccessState is set to VIPs', function (done) {
+    const chatMessage: IChatMessage = { message: testTheme, flags: subscriber, user: 'test', extra: standardExtra };
+
+    fakeThemer.handleAccessStateChanged(AccessState.VIPs);
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.equal(baseTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test('Themer should allow theme changes by vips if the AccessState is set to VIPs', function (done) {
+    const chatMessage: IChatMessage = { message: testTheme, flags: vip, user: 'test', extra: standardExtra };
+    isTwitchUserFollowingReturn = true;
+
+    fakeThemer.handleAccessStateChanged(AccessState.VIPs);
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.equal(testTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test('Themer should prevent theme changes by vips if the AccessState is set to Moderators', function (done) {
+    const chatMessage: IChatMessage = { message: testTheme, flags: vip, user: 'test', extra: standardExtra };
+    isTwitchUserFollowingReturn = true;
+
+    fakeThemer.handleAccessStateChanged(AccessState.Moderators);
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.equal(baseTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test('Themer should allow theme changes by moderators if the AccessState is set to Moderators', function (done) {
+    const chatMessage: IChatMessage = { message: testTheme, flags: moderator, user: 'test', extra: standardExtra };
+    isTwitchUserFollowingReturn = true;
+
+    fakeThemer.handleAccessStateChanged(AccessState.Moderators);
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.equal(testTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test('Themer should prevent theme changes by moderators if the AccessState is set to Broadcaster', function (done) {
+    const chatMessage: IChatMessage = { message: testTheme, flags: moderator, user: 'test', extra: standardExtra };
+    isTwitchUserFollowingReturn = true;
+
+    fakeThemer.handleAccessStateChanged(AccessState.Broadcaster);
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.equal(baseTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test('Themer should allow theme changes by broadcaster if the AccessState is set to Broadcaster', function (done) {
+    const chatMessage: IChatMessage = { message: testTheme, flags: broadcaster, user: 'test', extra: standardExtra };
+    isTwitchUserFollowingReturn = true;
+
+    fakeThemer.handleAccessStateChanged(AccessState.Broadcaster);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeWorkspaceConfiguration
