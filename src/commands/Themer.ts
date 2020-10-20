@@ -306,7 +306,7 @@ export class Themer {
         });
         message = `${name}, `;
       }
-    }
+    };
 
     /** Send the final message */
     this.sendWhisperEventEmitter.fire({
