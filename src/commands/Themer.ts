@@ -126,6 +126,7 @@ export class Themer {
   private getUserLevel(onMessageFlags: OnMessageFlags): UserLevel {
     if (onMessageFlags.broadcaster) return UserLevel.broadcaster;
     if (onMessageFlags.mod) return UserLevel.moderator;
+    if (onMessageFlags.vip) return UserLevel.vip;
     return UserLevel.viewer;
   }
 
@@ -580,40 +581,25 @@ export class Themer {
    * @param themeName - Name of the theme to be applied
    */
   private async changeTheme(user: string, onMessageFlags: OnMessageFlags, themeName: string) {
+    let userAccessState = AccessState.Viewers;
+    const userLevel = this.getUserLevel(onMessageFlags);
 
-    following: if (this._accessState === AccessState.Followers) {
-      if (this.getUserLevel(onMessageFlags) === UserLevel.broadcaster) {
-        break following;
-      } else if (
-        this._followers.find(
-          x => x.username === user.toLocaleLowerCase()
-        )
-      ) {
-        break following;
-      } else if (
-        (await API.isTwitchUserFollowing(user.toLocaleLowerCase(), this.logger))
-      ) {
-        this._followers.push({
-          username: user.toLocaleLowerCase()
-        });
-        break following;
-      } else {
-        return;
-      }
-    } else {
-      break following;
+    if (userLevel === UserLevel.broadcaster) {
+      userAccessState = AccessState.Broadcaster;
+    } else if (userLevel === UserLevel.moderator) {
+      userAccessState = AccessState.Moderators;
+    } else if (userLevel === UserLevel.vip) {
+      userAccessState = AccessState.VIPs;
+    } else if (onMessageFlags.subscriber) {
+      userAccessState = AccessState.Subscribers;
+    } else if (this._followers.find(x => x.username === user.toLocaleLowerCase())) {
+      userAccessState = AccessState.Followers;
+    } else if (await API.isTwitchUserFollowing(user.toLocaleLowerCase(), this.logger)) {
+      this._followers.push({ username: user.toLocaleLowerCase() });
+      userAccessState = AccessState.Followers;
     }
-
-    subscriber: if (this._accessState === AccessState.Subscribers) {
-      if (this.getUserLevel(onMessageFlags) === UserLevel.broadcaster) {
-        break subscriber;
-      } else if (onMessageFlags.subscriber) {
-        break subscriber;
-      } else {
-        return;
-      }
-    } else {
-      break subscriber;
+    if (userAccessState < this._accessState) {
+      return;
     }
 
     /** Ensure the user hasn't been banned before changing the theme */

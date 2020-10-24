@@ -67,7 +67,10 @@
           "enum": [
             "Viewers",
             "Followers",
-            "Subscribers"
+            "Subscribers",
+            "VIPs",
+            "Moderators",
+            "Broadcaster"
           ],
           "default": "Viewers",
           "description": "Users who are allowed to use the extension via Twitch chat."
@@ -170,7 +173,7 @@
     "@types/node": "^10.12.21",
     "@types/node-fetch": "^2.1.7",
     "@types/sinon": "^7.0.7",
-    "@types/tmi.js": "~1.4.0",
+    "@types/tmi.js": "~1.4.2",
     "@types/uuid": "~3.4.3",
     "chai": "^4.2.0",
     "copy-webpack-plugin": "^5.1.1",
