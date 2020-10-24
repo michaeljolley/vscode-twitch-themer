@@ -177,11 +177,21 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "jwalter",
+      "name": "jwalter",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/349523?v=4",
+      "profile": "https://github.com/jwalter",
+      "contributions": [
+        "code",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7,
   "projectName": "vscode-twitch-themer",
-  "projectOwner": "MichaelJolley",
+  "projectOwner": "builders-club",
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true
