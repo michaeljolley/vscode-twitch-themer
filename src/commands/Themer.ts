@@ -696,7 +696,7 @@ export class Themer {
    */
   private async repo() {
     const repoMessage = 'You can find the source code for this VS \
-        Code extension at https://github.com/MichaelJolley/vscode-twitch-themer. \
+        Code extension at https://github.com/builders-club/vscode-twitch-themer . \
         Feel free to fork & contribute.';
     this.sendMessageEventEmitter.fire(repoMessage);
   }
