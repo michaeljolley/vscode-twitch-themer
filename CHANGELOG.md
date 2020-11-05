@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added the ability to change the triggers used for the bot
+
 ---
 
 ## [1.6.4] - 2020-07-28
