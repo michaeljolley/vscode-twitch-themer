@@ -7,12 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.7.0] - 2020-11-05
+
 ### Added
 
 - Added the ability to change the triggers used for the bot
 - Added capability to pause the themer for {x} minutes based on channel point redemptions
-
----
+- Added new access level for VIPs
 
 ## [1.6.4] - 2020-07-28
 
@@ -192,8 +195,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.4...HEAD
-[1.6.3]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.3...1.6.4
+[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.7.0...HEAD
+[1.7.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.3...1.7.0
+[1.6.4]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.3...1.6.4
 [1.6.3]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.1...1.6.3
 [1.6.1]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.5.0...1.6.1
 [1.5.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.4.1...1.5.0
