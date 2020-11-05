@@ -1,5 +1,4 @@
 import * as vscode from 'vscode';
-import { Userstate } from 'tmi.js';
 import { IListRecipient } from './IListRecipient';
 import { ITheme } from './ITheme';
 import { IWhisperMessage } from '../chat/IWhisperMessage';
@@ -8,21 +7,22 @@ import { KeytarKeys, AccessState, UserLevel, ThemeNotAvailableReasons } from '..
 import { API } from '../api/API';
 import { IChatMessage } from '../chat/IChatMessage';
 import { Logger } from '../Logger';
-import { LogLevel } from '../Enum';
+import { OnMessageFlags } from 'comfy.js';
+import { ICommand } from './ICommand';
 
 /**
- * Manages all logic associated with retrieveing themes,
+ * Manages all logic associated with retrieving themes,
  * changing themes, etc.
  */
 export class Themer {
   private _accessState: AccessState = AccessState.Viewers;
   private _installState: AccessState = AccessState.Followers;
   private _autoInstall: boolean = false;
-  private _originalTheme: string | undefined;
+  private _originalTheme: ITheme | undefined;
   private _availableThemes: Array<ITheme> = [];
   private _listRecipients: Array<IListRecipient> = [];
   private _followers: Array<IListRecipient> = [];
-  private _currentUserLogin: string | undefined;
+  private _commands: ICommand = {};
 
   private sendWhisperEventEmitter = new vscode.EventEmitter<IWhisperMessage>();
   private sendMessageEventEmitter = new vscode.EventEmitter<string>();
@@ -31,7 +31,7 @@ export class Themer {
   public onSendWhisper = this.sendWhisperEventEmitter.event;
 
   /** Event that fires when themer needs to send a message */
-  public onSendMesssage = this.sendMessageEventEmitter.event;
+  public onSendMessage = this.sendMessageEventEmitter.event;
 
   /**
    * constructor
@@ -40,12 +40,15 @@ export class Themer {
    */
   constructor(private _state: vscode.Memento, private logger: Logger) {
     /**
-     * Get the current theme so we can reset it later
-     * via command or when disconnecting from chat
+     * Gather command names from the extension settings
      */
-    this._originalTheme = vscode.workspace
-      .getConfiguration()
-      .get('workbench.colorTheme');
+    this.initCommands();
+    // If this extension configuration changes, ensure the command trigger is updated
+    vscode.workspace.onDidChangeConfiguration((e: vscode.ConfigurationChangeEvent) => {
+      if (e.affectsConfiguration('twitchThemer')) {
+        this.initCommands();
+      }
+    });
 
     /**
      * Get the configuration to auto-install or not
@@ -58,6 +61,21 @@ export class Themer {
      * Initialize the list of available themes for users
      */
     this.loadThemes();
+
+    /**
+     * Get the current theme so we can reset it later
+     * via command or when disconnecting from chat
+     */
+    const theme: string = vscode.workspace
+      .getConfiguration()
+      .get('workbench.colorTheme') || 'Visual Studio Dark+';
+
+    this._originalTheme = this._availableThemes.filter(
+      f =>
+        f.label.toLocaleLowerCase() === theme.toLocaleLowerCase() ||
+        (f.themeId &&
+          f.themeId.toLocaleLowerCase() === theme.toLocaleLowerCase())
+    )[0];
 
     /**
      * Gets the access state from the workspace
@@ -75,66 +93,25 @@ export class Themer {
         this._listRecipients.push({ username, banned: true })
       );
 
-      /**
-       * Executes whenever a new extension is installed.
-       * Unfortunately this event does not fire with the
-       * new extension as a param, so we must assume that maybe it was
-       * a theme, and we need to refresh the available themes.
-       */
-      vscode.extensions.onDidChange(() => {
-        // Reload the available themes.
-        this.loadThemes();
-      });
+    /**
+     * Executes whenever a new extension is installed.
+     * Unfortunately this event does not fire with the
+     * new extension as a param, so we must assume that maybe it was
+     * a theme, and we need to refresh the available themes.
+     */
+    vscode.extensions.onDidChange(() => {
+      // Reload the available themes.
+      this.loadThemes();
+    });
   }
 
-  public async handleAuthStatusChanged(signedIn: boolean) {
+  public handleConnectionChanges(signedIn: boolean) {
     if (signedIn) {
-      if (keytar) {
-        const login = await keytar.getPassword(
-          KeytarKeys.service,
-          KeytarKeys.userLogin
-        );
-        this._currentUserLogin = login ? login : undefined;
-        const tempUserState: Userstate = {
-          username: this._currentUserLogin,
-          'display-name': this._currentUserLogin,
-          badges: { broadcaster: '1' }
-        };
-        this.refreshThemes(tempUserState);
-      }
+      this.loadThemes();
     } else {
-      const tempUserState: Userstate = {
-        username: this._currentUserLogin,
-        'display-name': this._currentUserLogin,
-        badges: { broadcaster: '1' }
-      };
-      this._currentUserLogin = undefined;
-      this.resetTheme(tempUserState);
-    }
-  }
-
-  public async handleChatConnectionChanged(signedIn: boolean) {
-    if (signedIn) {
-      if (keytar) {
-        const login = await keytar.getPassword(
-          KeytarKeys.service,
-          KeytarKeys.userLogin
-        );
-        this._currentUserLogin = login ? login : undefined;
-        const tempUserState: Userstate = {
-          username: this._currentUserLogin,
-          'display-name': this._currentUserLogin,
-          badges: { broadcaster: '1' }
-        };
-        this.refreshThemes(tempUserState);
+      if (this._originalTheme) {
+        this.setTheme('Themer', this._originalTheme);
       }
-    } else {
-      const tempUserState: Userstate = {
-        username: this._currentUserLogin,
-        'display-name': this._currentUserLogin,
-        badges: { broadcaster: '1' }
-      };
-      this.resetTheme(tempUserState);
     }
   }
 
@@ -146,15 +123,10 @@ export class Themer {
     this._accessState = accessState;
   }
 
-  private getUserLevel(userState: Userstate): UserLevel {
-    if (userState.badges) {
-      if (userState.badges.broadcaster) {
-        return UserLevel.broadcaster;
-      } else if (userState.badges.moderator) {
-        return UserLevel.moderator;
-      }
-    }
-
+  private getUserLevel(onMessageFlags: OnMessageFlags): UserLevel {
+    if (onMessageFlags.broadcaster) return UserLevel.broadcaster;
+    if (onMessageFlags.mod) return UserLevel.moderator;
+    if (onMessageFlags.vip) return UserLevel.vip;
     return UserLevel.viewer;
   }
 
@@ -163,10 +135,10 @@ export class Themer {
    * @param chatMessage - User & message received from Twitch
    */
   public async handleCommands(chatMessage: IChatMessage) {
-    const twitchUser: Userstate = chatMessage.userState;
     let message: string = chatMessage.message.replace(',', '');
 
     let username: string | undefined;
+
     /** Determine if the param is a (un)ban request */
     const ban = message.match(/((?:!)?ban) (\w*)/);
     if (ban) {
@@ -184,41 +156,41 @@ export class Themer {
 
     switch (command) {
       case '':
-        await this.sendThemes(twitchUser);
+        await this.sendThemes(chatMessage.user);
         break;
-      case 'current':
+      case this._commands['current']:
         await this.currentTheme();
         break;
-      case 'reset':
-        await this.resetTheme(twitchUser);
+      case this._commands['reset']:
+        await this.resetTheme(chatMessage.user, chatMessage.flags);
         break;
-      case 'random':
-        await this.randomTheme(twitchUser, message);
+      case this._commands['random']:
+        await this.randomTheme(chatMessage.user, chatMessage.flags, chatMessage.message);
         break;
-      case 'help':
+      case this._commands['help']:
         await this.help();
         break;
-      case 'refresh':
-        await this.refreshThemes(twitchUser);
+      case this._commands['refresh']:
+        await this.refreshThemes(chatMessage.flags);
         break;
-      case 'repo':
+      case this._commands['repo']:
         await this.repo();
         break;
-      case "install":
-        await this.installTheme(twitchUser, message);
-        break;  
-      case 'ban':
+      case this._commands["install"]:
+        await this.installTheme(chatMessage.user, chatMessage.flags, chatMessage.message);
+        break;
+      case this._commands['ban']:
         if (username !== undefined) {
-          await this.ban(twitchUser, username);
+          await this.ban(chatMessage.flags, username);
         }
         break;
-      case '!ban':
+      case `!${this._commands["ban"]}`:
         if (username !== undefined) {
-          await this.unban(twitchUser, username);
+          await this.unban(chatMessage.flags, username);
         }
         break;
       default:
-        await this.changeTheme(twitchUser, message);
+        await this.changeTheme(chatMessage.user, chatMessage.flags, message);
         break;
     }
   }
@@ -252,11 +224,11 @@ export class Themer {
 
   /**
    * Bans a user from using the themer plugin.
-   * @param twitchUser The user requesting the ban
+   * @param onMessageFlags The user requesting the ban
    * @param username The user to ban
    */
-  private async ban(twitchUser: Userstate, username: string) {
-    if (this.getUserLevel(twitchUser) > UserLevel.viewer) {
+  private async ban(onMessageFlags: OnMessageFlags, username: string) {
+    if (this.getUserLevel(onMessageFlags) > UserLevel.viewer) {
       const recipient = this.getRecipient(username);
       if (recipient === undefined) {
         this._listRecipients.push({
@@ -274,11 +246,11 @@ export class Themer {
 
   /**
    * Unbans a user allowing them to use the themer plugin.
-   * @param twitchUser The user requesting the unban
+   * @param onMessageFlags The user flags of the user requesting the unban
    * @param username The user to unban
    */
-  private async unban(twitchUser: Userstate, username: string) {
-    if (this.getUserLevel(twitchUser) > UserLevel.viewer) {
+  private async unban(onMessageFlags: OnMessageFlags, username: string) {
+    if (this.getUserLevel(onMessageFlags) > UserLevel.viewer) {
       const recipient = this.getRecipient(username, true);
       if (recipient !== undefined) {
         const index = this._listRecipients.indexOf(recipient);
@@ -291,13 +263,12 @@ export class Themer {
 
   /**
    * Send a whisper to the requesting user with a list of available themes
-   * @param twitchUser - User that will receive whisper of available themes
+   * @param user - User that will receive whisper of available themes
    */
-  private async sendThemes(twitchUser: Userstate) {
-    const twitchUserName: string = twitchUser.username.toLocaleLowerCase();
+  private async sendThemes(user: string) {
 
     /** Ensure that we haven't sent them the list recently. */
-    const lastSent = this.getRecipient(twitchUserName);
+    const lastSent = this.getRecipient(user);
 
     if (lastSent && lastSent.banned && lastSent.banned === true) {
       return;
@@ -311,7 +282,7 @@ export class Themer {
       }
     } else {
       this._listRecipients.push({
-        username: twitchUserName,
+        username: user,
         lastSent: new Date()
       });
     }
@@ -320,52 +291,65 @@ export class Themer {
     const themeNames = this._availableThemes.map(m => m.label);
 
     let message = "Available themes are: ";
-    /** Iterate over the themme names and add to the message
+    /** Iterate over the theme names and add to the message
      *  checking if the length is still under 499. If so, check if the
      *  next theme name can fit and stay under 499 characters 
      */
     for (var name of themeNames) {
       if (message.length < 499 && name.length <= (499 - message.length)) {
-              message += `${name}, `;
+        message += `${name}, `;
       } else {
-      /** If no more theme names can be added, go ahead and send the first message 
-       * and start over building the next message */
-      this.sendWhisperEventEmitter.fire({
-        user: twitchUserName,
-        message: message.replace(/(^[,\s]+)|([,\s]+$)/g, '')
-      });
-      message = `${name}, `;
-    }
-  };
+        /** If no more theme names can be added, go ahead and send the first message 
+         * and start over building the next message */
+        this.sendWhisperEventEmitter.fire({
+          user,
+          message: message.replace(/(^[,\s]+)|([,\s]+$)/g, '')
+        });
+        message = `${name}, `;
+      }
+    };
 
-  /** Send the final message */
-  this.sendWhisperEventEmitter.fire({
-        user: twitchUserName,
-        message: message.replace(/(^[,\s]+)|([,\s]+$)/g, '')
-      });
+    /** Send the final message */
+    this.sendWhisperEventEmitter.fire({
+      user,
+      message: message.replace(/(^[,\s]+)|([,\s]+$)/g, '')
+    });
   }
 
   /**
    * Resets the theme to the one that was active when the extension was loaded
    * @param twitchUser - pass through the twitch user state
    */
-  public async resetTheme(twitchUser: Userstate) {
+  public async resetTheme(user: string, onMessageFlags: OnMessageFlags) {
     if (this._originalTheme) {
-      await this.changeTheme(twitchUser, this._originalTheme);
+      await this.changeTheme(user, onMessageFlags, this._originalTheme.label);
     }
   }
 
   /**
    * Refreshes the list of available themes
-   * @param twitchUser - Userstate of user requesting to refresh the theme list
+   * @param onMessageFlags - User flags of user requesting to refresh the theme list
    */
-  private async refreshThemes(twitchUser: Userstate) {
+  private async refreshThemes(onMessageFlags: OnMessageFlags) {
     /** We only refresh the list of themes
      * if the requester was a moderator/broadcaster
      */
-    if (this.getUserLevel(twitchUser) > UserLevel.viewer) {
+    if (this.getUserLevel(onMessageFlags) > UserLevel.viewer) {
       this.loadThemes();
     }
+  }
+
+  private initCommands() {
+    const configuration = vscode.workspace.getConfiguration('twitchThemer');
+    this._commands['install'] = configuration.get<string>("installCommand") || "install";
+    this._commands['current'] = configuration.get<string>("currentCommand") || "current";
+    this._commands['help'] = configuration.get<string>("helpCommand") || "help";
+    this._commands['random'] = configuration.get<string>("randomCommand") || "random";
+    this._commands['dark'] = configuration.get<string>("darkCommand") || "dark";
+    this._commands['light'] = configuration.get<string>("lightCommand") || "light";
+    this._commands['refresh'] = configuration.get<string>("refreshCommand") || "refresh";
+    this._commands['repo'] = configuration.get<string>("repoCommand") || "repo";
+    this._commands['ban'] = configuration.get<string>("banCommand") || "ban";
   }
 
   private async loadThemes() {
@@ -397,7 +381,7 @@ export class Themer {
 
   private isBanned(twitchUserName: string): boolean {
     if (twitchUserName) {
-      const recipient = this.getRecipient(twitchUserName, true);
+      const recipient = this.getRecipient(twitchUserName.toLocaleLowerCase(), true);
       if (recipient && recipient.banned && recipient.banned === true) {
         return true;
       }
@@ -410,32 +394,27 @@ export class Themer {
    * @param twitchUser - pass through twitch user state
    * @param message - message sent via chat
    */
-  private async installTheme(twitchUser: Userstate, message: string): Promise<void> {
-    const twitchUserName: string = twitchUser.username;
-    const twitchDisplayName: string = twitchUser['display-name']
-      ? twitchUser['display-name']
-      : twitchUserName;
-    
+  private async installTheme(user: string, onMessageFlags: OnMessageFlags, message: string): Promise<void> {
+
     /** Ensure the user hasn't been banned before installing the theme */
-    if (this.isBanned(twitchUserName)) {
+    if (this.isBanned(user)) {
       return;
     }
 
     following: if (this._installState === AccessState.Followers) {
-      if (this.getUserLevel(twitchUser) === UserLevel.broadcaster) {
+      if (this.getUserLevel(onMessageFlags) === UserLevel.broadcaster) {
         break following;
       } else if (
         this._followers.find(
-          x => x.username === twitchUserName.toLocaleLowerCase()
+          x => x.username === user.toLocaleLowerCase()
         )
       ) {
         break following;
       } else if (
-        twitchUser &&
-        (await API.isTwitchUserFollowing(twitchUser['user-id'], this.logger))
+        (await API.isTwitchUserFollowing(user, this.logger))
       ) {
         this._followers.push({
-          username: twitchUserName ? twitchUserName.toLocaleLowerCase() : ''
+          username: user.toLocaleLowerCase()
         });
         break following;
       } else {
@@ -446,9 +425,9 @@ export class Themer {
     }
 
     subscriber: if (this._installState === AccessState.Subscribers) {
-      if (this.getUserLevel(twitchUser) === UserLevel.broadcaster) {
+      if (this.getUserLevel(onMessageFlags) === UserLevel.broadcaster) {
         break subscriber;
-      } else if (twitchUser && twitchUser['subscriber']) {
+      } else if (onMessageFlags.subscriber) {
         break subscriber;
       } else {
         return;
@@ -458,9 +437,9 @@ export class Themer {
     }
 
     moderator: if (this._installState === AccessState.Subscribers) {
-      if (this.getUserLevel(twitchUser) === UserLevel.broadcaster) {
+      if (this.getUserLevel(onMessageFlags) === UserLevel.broadcaster) {
         break moderator;
-      } else if (twitchUser && twitchUser['subscriber']) {
+      } else if (onMessageFlags.mod) {
         break moderator;
       } else {
         return;
@@ -475,10 +454,9 @@ export class Themer {
     // If the extension is installed, send a message to chat
     // and return.
     const ithemes = this._availableThemes.filter((value: ITheme) => value.extensionId.toLocaleLowerCase() === theme.toLocaleLowerCase());
-    if (ithemes.length > 0)
-    {
+    if (ithemes.length > 0) {
       const uniqueThemeLabels = Array.from(new Set(ithemes.map(t => t.label)));
-      const msg = `@${twitchDisplayName}, '${theme}' is already installed. To switch to it, send: !theme ${uniqueThemeLabels.join(' -or- !theme ')}`;
+      const msg = `@${user}, '${theme}' is already installed. To switch to it, send: !theme ${uniqueThemeLabels.join(' -or- !theme ')}`;
       this.sendMessageEventEmitter.fire(msg);
       return;
     }
@@ -515,7 +493,7 @@ export class Themer {
     try {
       // Authorize the install of the extension if we do not allow for auto-installed extensions.
       if (!this._autoInstall) {
-        const msg = `${twitchDisplayName} wants to install theme(s) ${isValidExtResult.label ? isValidExtResult.label.join(', ') : theme}.`;
+        const msg = `${user} wants to install theme(s) ${isValidExtResult.label ? isValidExtResult.label.join(', ') : theme}.`;
         this.logger.log(`${msg}`);
         let choice = await vscode.window.showInformationMessage(msg, 'Accept', 'Deny', 'Preview');
         switch (choice) {
@@ -526,14 +504,14 @@ export class Themer {
             if (choice === 'Deny') {
               this.logger.log(`User denied installing theme(s).`);
               return;
-            } 
+            }
             break;
           case 'Deny':
             this.logger.log(`User denied installing theme(s).`);
             return;
         }
       }
-      
+
       // Install the theme
       this.logger.log('Installing theme...');
       await vscode.commands.executeCommand(
@@ -542,7 +520,7 @@ export class Themer {
       );
       this.logger.log('Theme extension install request complete.');
 
-      const msg = `@${twitchDisplayName}, the theme(s) '${isValidExtResult.label!.join(', ')}' were installed successfully.`;
+      const msg = `@${user}, the theme(s) '${isValidExtResult.label!.join(', ')}' were installed successfully.`;
       this.sendMessageEventEmitter.fire(msg);
     }
     catch (err) {
@@ -557,7 +535,7 @@ export class Themer {
    * @param twitchUser - pass through twitch user state
    * @param message - message sent via chat
    */
-  private async randomTheme(twitchUser: Userstate, message: string) {
+  private async randomTheme(user: string, onMessageFlags: OnMessageFlags, message: string) {
 
     const currentTheme = vscode.workspace
       .getConfiguration()
@@ -567,10 +545,10 @@ export class Themer {
     let filter: number = 0;
     if (params.length > 1) {
       switch (params[1].toLocaleLowerCase()) {
-        case 'dark':
+        case this._commands['dark']:
           filter = 1;
           break;
-        case 'light':
+        case this._commands['light']:
           filter = 2;
           break;
         default:
@@ -579,7 +557,7 @@ export class Themer {
     }
 
     const themes = this._availableThemes.filter(f => {
-      switch(filter) {
+      switch (filter) {
         case 1:
           return f.isDark && f.label !== currentTheme && f.themeId !== currentTheme;
         case 2:
@@ -593,7 +571,7 @@ export class Themer {
       const max = themes.length;
       const randomNumber = Math.floor(Math.random() * max);
       const chosenTheme = themes[randomNumber].label;
-      await this.changeTheme(twitchUser, chosenTheme);
+      await this.changeTheme(user, onMessageFlags, chosenTheme);
     }
   }
 
@@ -602,50 +580,30 @@ export class Themer {
    * @param twitchUser - User state of who requested the theme be applied
    * @param themeName - Name of the theme to be applied
    */
-  private async changeTheme(twitchUser: Userstate, themeName: string) {
-    const twitchUserName: string = twitchUser.username;
-    const twitchDisplayName: string = twitchUser['display-name']
-      ? twitchUser['display-name']
-      : twitchUserName;
+  private async changeTheme(user: string, onMessageFlags: OnMessageFlags, themeName: string) {
+    let userAccessState = AccessState.Viewers;
+    const userLevel = this.getUserLevel(onMessageFlags);
 
-    following: if (this._accessState === AccessState.Followers) {
-      if (this.getUserLevel(twitchUser) === UserLevel.broadcaster) {
-        break following;
-      } else if (
-        this._followers.find(
-          x => x.username === twitchUserName.toLocaleLowerCase()
-        )
-      ) {
-        break following;
-      } else if (
-        twitchUser &&
-        (await API.isTwitchUserFollowing(twitchUser['user-id'], this.logger))
-      ) {
-        this._followers.push({
-          username: twitchUserName ? twitchUserName.toLocaleLowerCase() : ''
-        });
-        break following;
-      } else {
-        return;
-      }
-    } else {
-      break following;
+    if (userLevel === UserLevel.broadcaster) {
+      userAccessState = AccessState.Broadcaster;
+    } else if (userLevel === UserLevel.moderator) {
+      userAccessState = AccessState.Moderators;
+    } else if (userLevel === UserLevel.vip) {
+      userAccessState = AccessState.VIPs;
+    } else if (onMessageFlags.subscriber) {
+      userAccessState = AccessState.Subscribers;
+    } else if (this._followers.find(x => x.username === user.toLocaleLowerCase())) {
+      userAccessState = AccessState.Followers;
+    } else if (await API.isTwitchUserFollowing(user.toLocaleLowerCase(), this.logger)) {
+      this._followers.push({ username: user.toLocaleLowerCase() });
+      userAccessState = AccessState.Followers;
     }
-
-    subscriber: if (this._accessState === AccessState.Subscribers) {
-      if (this.getUserLevel(twitchUser) === UserLevel.broadcaster) {
-        break subscriber;
-      } else if (twitchUser && twitchUser['subscriber']) {
-        break subscriber;
-      } else {
-        return;
-      }
-    } else {
-      break subscriber;
+    if (userAccessState < this._accessState) {
+      return;
     }
 
     /** Ensure the user hasn't been banned before changing the theme */
-    if (this.isBanned(twitchUserName)) {
+    if (this.isBanned(user)) {
       return;
     }
 
@@ -658,26 +616,30 @@ export class Themer {
     )[0];
 
     if (theme) {
-      const themeExtension = vscode.extensions.getExtension(theme.extensionId);
-
-      if (themeExtension !== undefined) {
-        const conf = vscode.workspace.getConfiguration();
-        await themeExtension.activate().then(async f => {
-          await conf.update(
-            'workbench.colorTheme',
-            theme.themeId || theme.label,
-            vscode.ConfigurationTarget.Global
-          );
-          vscode.window.showInformationMessage(
-            `Theme changed to ${theme.label} by ${twitchDisplayName}`
-          );
-        });
-      }
+      await this.setTheme(user, theme);
     } else {
       this.sendMessageEventEmitter.fire(
-        `${twitchDisplayName}, ${themeName} is not a valid theme name or \
+        `${user}, ${themeName} is not a valid theme name or \
         isn't installed.  You can use !theme to get a list of available themes.`
       );
+    }
+  }
+
+  private async setTheme(user: string, theme: ITheme) {
+    const themeExtension = vscode.extensions.getExtension(theme.extensionId);
+
+    if (themeExtension !== undefined) {
+      const conf = vscode.workspace.getConfiguration();
+      await themeExtension.activate().then(async f => {
+        await conf.update(
+          'workbench.colorTheme',
+          theme.themeId || theme.label,
+          vscode.ConfigurationTarget.Global
+        );
+        vscode.window.showInformationMessage(
+          `Theme changed to ${theme.label} by ${user}`
+        );
+      });
     }
   }
 

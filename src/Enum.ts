@@ -11,8 +11,14 @@ export enum AccessState {
   /** Subscribers only */
   Subscribers,
 
+  /** VIPs only */
+  VIPs,
+
   /** Moderators only */
   Moderators,
+
+  /** Broadcaster only */
+  Broadcaster,
 }
 
 /**
@@ -73,8 +79,12 @@ export enum UserLevel {
   /** Moderator */
   moderator = 1,
 
+  /** VIP */
+  vip = 2,
+
   /** Broadcaster */
-  broadcaster = 2
+  broadcaster = 3,
+
 }
 
 /**

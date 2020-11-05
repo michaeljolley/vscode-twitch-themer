@@ -9,16 +9,16 @@ import { Logger } from '../Logger';
 
 chai.should();
 
-suite.only('AutoConnect Tests', function() {
+suite('AutoConnect Tests', function () {
   let fakeLogger: Logger;
   let fakeState: vscode.Memento;
   let fakeWorkspaceConfiguration: vscode.WorkspaceConfiguration;
   let fakeChatClient: ChatClient;
-  let getConfigurationStub: sinon.SinonStub<[(string|undefined)?,(vscode.Uri|null|undefined)?], vscode.WorkspaceConfiguration>;
+  let getConfigurationStub: sinon.SinonStub<[(string | undefined)?, (vscode.Uri | null | undefined)?], vscode.WorkspaceConfiguration>;
   let getIsStreamActiveStub: sinon.SinonStub<[], Promise<boolean>>;
   let toggleChatStub: sinon.SinonStub<[], void>;
 
-  suiteSetup(function() {
+  suiteSetup(function () {
     const themerConfig: { [key: string]: any } = {
       "autoConnect": false
     };
@@ -63,15 +63,15 @@ suite.only('AutoConnect Tests', function() {
     getIsStreamActiveStub = sinon.stub(API, 'getStreamIsActive')
       .callsFake((): Promise<boolean> => Promise.resolve(fakeState.get<boolean>("isStreaming") || false));
 
-    toggleChatStub = sinon.stub(fakeChatClient, 'toggleChat').callsFake(() => {});
+    toggleChatStub = sinon.stub(fakeChatClient, 'toggleChat').callsFake(() => { });
   });
 
-  suiteTeardown(function() {
+  suiteTeardown(function () {
     getConfigurationStub.restore();
     getIsStreamActiveStub.restore();
   });
 
-  setup(async function() {
+  setup(async function () {
     await fakeWorkspaceConfiguration.update("autoConnect", false);
     await fakeState.update("isStreaming", false);
     getConfigurationStub.resetHistory();
@@ -79,13 +79,13 @@ suite.only('AutoConnect Tests', function() {
     toggleChatStub.resetHistory();
   });
 
-  test(`AutoConnect should not check API; autoconnect disabled`, async function() {
+  test(`AutoConnect should not check API; autoconnect disabled`, async function () {
     await autoConnect(fakeChatClient);
     getConfigurationStub.calledOnce.should.be.true;
     getIsStreamActiveStub.calledOnce.should.be.false;
   });
 
-  test(`AutoConnect should check API but should not connect; not streaming`, async function() {    
+  test(`AutoConnect should check API but should not connect; not streaming`, async function () {
     await fakeWorkspaceConfiguration.update("autoConnect", true);
     await autoConnect(fakeChatClient);
     getConfigurationStub.calledOnce.should.be.true;
@@ -93,7 +93,7 @@ suite.only('AutoConnect Tests', function() {
     toggleChatStub.calledOnce.should.be.false;
   });
 
-  test(`AutoConnect should connect; streaming`, async function() {
+  test(`AutoConnect should connect; streaming`, async function () {
     await fakeWorkspaceConfiguration.update('autoConnect', true);
     await fakeState.update("isStreaming", true);
     await autoConnect(fakeChatClient);

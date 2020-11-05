@@ -5,3 +5,4 @@ node_modules
 .env
 .vscode/settings.json
 dist
+package-lock.json

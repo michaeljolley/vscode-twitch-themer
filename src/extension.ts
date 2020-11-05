@@ -62,7 +62,7 @@ export class Extension {
       }
     );
 
-    const themerOnSendMessage = _themer.onSendMesssage(this.onSendMessage);
+    const themerOnSendMessage = _themer.onSendMessage(this.onSendMessage);
     const themerOnSendWhisper = _themer.onSendWhisper(this.onSendWhisper);
     const chatOnChatMessageReceived = _chatClient.onChatMessageReceived(this.onChatMessageReceived);
     const authOnAuthStatusChanged = _authenticationService.onAuthStatusChanged(this.onAuthStatusChanged);
@@ -107,11 +107,11 @@ export class Extension {
     if (!signedIn) {
       _chatClient.disconnect();
     }
-    _themer.handleAuthStatusChanged(signedIn);
+    _themer.handleConnectionChanges(signedIn);
   }
 
   private async onChatConnectionChanged(connected: boolean) {
-    await _themer.handleChatConnectionChanged(connected);
+    await _themer.handleConnectionChanges(connected);
   }
 
   public deactivate() {
@@ -122,7 +122,7 @@ export class Extension {
 /**
  * Activates the extension in VS Code and registers commands available
  * in the command palette
- * @param context - Context the extesion is being run in
+ * @param context - Context the extension is being run in
  */
 export async function activate(context: vscode.ExtensionContext) {
 
