@@ -1,5 +1,3 @@
-
-import * as vscode from 'vscode';
 import fetch from 'node-fetch';
 import { keytar } from '../Common';
 import { KeytarKeys, ThemeNotAvailableReasons } from '../Enum';
@@ -16,7 +14,7 @@ export class API {
           const url = `https://api.twitch.tv/helix/users/follows?from_id=${twitchUserId}&to_id=${currentUserId}`;
           const res = await fetch(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
           const json = await res.json();
-          return (json.data.length > 0) ? true: false;
+          return (json.data.length > 0) ? true : false;
         } else {
           logger.debug('failed to retrieve Twitch credentials from the user store');
           return false;
@@ -43,11 +41,11 @@ export class API {
    * that it has at least one Theme contribution listed.
    * @param extensionName The unique id for the extension. 
    */
-  public static async isValidExtensionName(extensionName: string): Promise<{available: boolean; reason?: ThemeNotAvailableReasons; label?: string[] }> {
+  public static async isValidExtensionName(extensionName: string): Promise<{ available: boolean; reason?: ThemeNotAvailableReasons; label?: string[] }> {
     const url = `https://marketplace.visualstudio.com/items?itemName=${extensionName}`;
     let res = await fetch(url, { method: 'GET', headers: { "Accept": "*/*", "User-Agent": "VSCode-Twitch-Themer" } });
     if (res.status === 404) {
-      return {available: false, reason: ThemeNotAvailableReasons.notFound};
+      return { available: false, reason: ThemeNotAvailableReasons.notFound };
     }
     let body = await res.text();
     /**
@@ -68,16 +66,16 @@ export class API {
      */
     const repoUrlMatches = body.match(/\"GitHubLink\":\"https:\/\/github.com\/([--:\w?@%&+~#=]+)(?:\.git)?\"/i);
     if (!repoUrlMatches) {
-      return {available: false, reason: ThemeNotAvailableReasons.noRepositoryFound};
+      return { available: false, reason: ThemeNotAvailableReasons.noRepositoryFound };
     }
-    
-    const repoUrl = `https://raw.githubusercontent.com/${repoUrlMatches[1].replace('.git','')}/master/package.json`;
-    
-    res = await fetch (repoUrl);
+
+    const repoUrl = `https://raw.githubusercontent.com/${repoUrlMatches[1].replace('.git', '')}/master/package.json`;
+
+    res = await fetch(repoUrl);
     if (!res.ok) {
       return { available: false, reason: ThemeNotAvailableReasons.packageJsonNotDownload };
     }
-    
+
     const packageFile = await res.text();
     try {
       const packageJson = JSON.parse(packageFile);
@@ -85,8 +83,8 @@ export class API {
       if (!packageJson.contributes.themes || packageJson.contributes.themes.length === 0) {
         return { available: false, reason: ThemeNotAvailableReasons.noThemesContributed };
       }
-      
-      return {available: true, label: packageJson.contributes.themes.map((t: {label: string}) => t.label) };
+
+      return { available: true, label: packageJson.contributes.themes.map((t: { label: string }) => t.label) };
     }
     catch {
       return { available: false, reason: ThemeNotAvailableReasons.packageJsonMalformed };
