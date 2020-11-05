@@ -21,9 +21,9 @@
   "extensionKind": "ui",
   "repository": {
     "type": "git",
-    "url": "https://github.com/michaeljolley/vscode-twitch-themer"
+    "url": "https://github.com/builders-club/vscode-twitch-themer"
   },
-  "homepage": "https://github.com/michaeljolley/vscode-twitch-themer/blob/master/README.md",
+  "homepage": "https://github.com/builders-club/vscode-twitch-themer/blob/master/README.md",
   "categories": [
     "Other"
   ],
