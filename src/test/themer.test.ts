@@ -274,8 +274,34 @@ suite('Themer Tests', function () {
   test('Themer should reset theme to original theme when requested', function (done) {
     fakeWorkspaceConfiguration.update('workbench.colorTheme', testTheme);
 
-    fakeThemer.resetTheme('roberttables', user).then(() => {
+    fakeThemer.resetTheme('roberttables', '123', user).then(() => {
       try {
+        fakeWorkspaceConfiguration
+          .get<string>('workbench.colorTheme')!
+          .should.equal(baseTheme);
+        done();
+      } catch (error) {
+        done(error);
+      }
+    });
+  });
+
+  test('Themer should respond with a paused message if paused', function (done) {
+    let sentMessage: string = '';
+    const sendMessageStub = sinon
+      .stub(fakeChatClient, 'sendMessage')
+      .callsFake(async (message: string) => {
+        sentMessage = message;
+      });
+    fakeThemer.onSendMessage(sendMessageStub);
+
+    const chatMessage: IChatMessage = { message: testTheme, flags: user, user: 'test', extra: standardExtra };
+
+    fakeThemer.setPauseStatus(true);
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      try {
+        sendMessageStub.calledOnce.should.be.true;
+        sentMessage.should.equal(`test, theme changes are paused. Please try again in a few minutes.`);
         fakeWorkspaceConfiguration
           .get<string>('workbench.colorTheme')!
           .should.equal(baseTheme);

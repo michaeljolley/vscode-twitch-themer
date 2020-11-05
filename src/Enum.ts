@@ -76,15 +76,20 @@ export enum UserLevel {
   /** Viewer only */
   viewer = 0,
 
-  /** Moderator */
-  moderator = 1,
+  /** Follower */
+  follower = 1,
+
+  /** Subscriber */
+  subscriber = 2,
 
   /** VIP */
-  vip = 2,
+  vip = 3,
+
+  /** Moderator */
+  moderator = 4,
 
   /** Broadcaster */
-  broadcaster = 3,
-
+  broadcaster = 5,
 }
 
 /**
