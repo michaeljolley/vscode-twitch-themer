@@ -87,6 +87,18 @@
           "default": false,
           "description": "Should Twitch Themer automatically connect to Twitch Chat if you're streaming? Twitch Themer will poll Twitch' API to ensure you're streaming prior to connecting."
         },
+        "twitchThemer.redemptionHoldPeriodMinutes": {
+          "title": "Point Redemption Pause Minutes",
+          "type": "number",
+          "default": "5",
+          "description": "The number of minutes to pause theme changes if someone uses a point redemption."
+        },
+        "twitchThemer.redemptionHoldId": {
+          "title": "Pause Changes Reward Id",
+          "type": "string",
+          "default": "",
+          "description": "The unique id of the channel point redemption reward."
+        },
         "twitchThemer.themeCommand": {
           "title": "Theme Command",
           "type": "string",

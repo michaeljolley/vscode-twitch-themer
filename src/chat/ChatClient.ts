@@ -1,4 +1,5 @@
-import { ComfyJSInstance, OnCommandExtra, OnJoinExtra, OnMessageFlags } from "comfy.js";
+import * as vscode from 'vscode';
+import { ComfyJSInstance, OnCommandExtra, OnJoinExtra, EmoteSet, OnMessageExtra, OnMessageFlags } from "comfy.js";
 import { ConfigurationChangeEvent, EventEmitter, Memento, workspace, WorkspaceConfiguration } from 'vscode';
 import { IChatMessage } from './IChatMessage';
 import { keytar } from '../Common';
@@ -12,10 +13,11 @@ const ComfyJS: ComfyJSInstance = require('comfy.js');
  * Twitch chat client used in communicating via chat/whispers
  */
 export default class ChatClient {
-  
+
   private chatClientMessageEventEmitter = new EventEmitter<IChatMessage>();
   private chatClientConnectionEventEmitter = new EventEmitter<boolean>();
   private _commandTrigger: string = "theme";
+  private _redemptionHoldId: string = "";
 
   /** Event that fires when an appropriate message is received */
   public onChatMessageReceived = this.chatClientMessageEventEmitter.event;
@@ -35,6 +37,14 @@ export default class ChatClient {
         this.initCmdTrigger()
       }
     });
+
+    /**
+     * Gets the point redemption id from the workspace
+     */
+    this._redemptionHoldId = vscode.workspace
+      .getConfiguration()
+      .get('twitchThemer.redemptionHoldId', "");
+
   }
 
   private initCmdTrigger() {
@@ -63,6 +73,7 @@ export default class ChatClient {
           this.logger.log(err);
         };
 
+        ComfyJS.onChat = this.onChatHandler.bind(this);
         ComfyJS.onCommand = this.onCommandHandler.bind(this);
         ComfyJS.onJoin = this.onJoinHandler.bind(this);
         ComfyJS.onConnected = this.onConnectedHandler.bind(this);
@@ -171,6 +182,45 @@ export default class ChatClient {
         .trim(),
       flags,
       extra
+    });
+  }
+
+  private async onChatHandler(
+    user: string,
+    message: string,
+    flags: OnMessageFlags,
+    self: boolean,
+    extra: OnMessageExtra
+  ) {
+    this.logger.log(`Received ${message} from ${user}`);
+    if (!message || this._redemptionHoldId.length === 0) {
+      return;
+    }
+
+    // Ensure this message is a point redemption and matches
+    // our point redemption Id
+    if (!flags.customReward ||
+      extra.customRewardId !== this._redemptionHoldId) {
+      return;
+    }
+
+    message = message.toLocaleLowerCase().trim();
+    const onCommandExtra: OnCommandExtra = {
+      ...extra,
+      ...{
+        sinceLastCommand: {
+          any: 0,
+          user: 0
+        },
+        messageEmotes: {}
+      }
+    };
+
+    this.chatClientMessageEventEmitter.fire({
+      user,
+      message: message,
+      flags,
+      extra: onCommandExtra
     });
   }
 }

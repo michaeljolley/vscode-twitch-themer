@@ -23,6 +23,8 @@ export class Themer {
   private _listRecipients: Array<IListRecipient> = [];
   private _followers: Array<IListRecipient> = [];
   private _commands: ICommand = {};
+  private _redemptionHoldPeriodMinutes: number = 5;
+  private _pauseThemer: boolean = false;
 
   private sendWhisperEventEmitter = new vscode.EventEmitter<IWhisperMessage>();
   private sendMessageEventEmitter = new vscode.EventEmitter<string>();
@@ -127,6 +129,7 @@ export class Themer {
     if (onMessageFlags.broadcaster) return UserLevel.broadcaster;
     if (onMessageFlags.mod) return UserLevel.moderator;
     if (onMessageFlags.vip) return UserLevel.vip;
+    if (onMessageFlags.subscriber) return UserLevel.subscriber;
     return UserLevel.viewer;
   }
 
@@ -162,10 +165,10 @@ export class Themer {
         await this.currentTheme();
         break;
       case this._commands['reset']:
-        await this.resetTheme(chatMessage.user, chatMessage.flags);
+        await this.resetTheme(chatMessage.user, chatMessage.extra.userId, chatMessage.flags);
         break;
       case this._commands['random']:
-        await this.randomTheme(chatMessage.user, chatMessage.flags, chatMessage.message);
+        await this.randomTheme(chatMessage.user, chatMessage.extra.userId, chatMessage.flags, chatMessage.message);
         break;
       case this._commands['help']:
         await this.help();
@@ -190,7 +193,7 @@ export class Themer {
         }
         break;
       default:
-        await this.changeTheme(chatMessage.user, chatMessage.flags, message);
+        await this.changeTheme(chatMessage.user, chatMessage.extra.userId, chatMessage.flags, message);
         break;
     }
   }
@@ -320,9 +323,9 @@ export class Themer {
    * Resets the theme to the one that was active when the extension was loaded
    * @param twitchUser - pass through the twitch user state
    */
-  public async resetTheme(user: string, onMessageFlags: OnMessageFlags) {
+  public async resetTheme(user: string, userId: string, onMessageFlags: OnMessageFlags) {
     if (this._originalTheme) {
-      await this.changeTheme(user, onMessageFlags, this._originalTheme.label);
+      await this.changeTheme(user, userId, onMessageFlags, this._originalTheme.label);
     }
   }
 
@@ -350,6 +353,7 @@ export class Themer {
     this._commands['refresh'] = configuration.get<string>("refreshCommand") || "refresh";
     this._commands['repo'] = configuration.get<string>("repoCommand") || "repo";
     this._commands['ban'] = configuration.get<string>("banCommand") || "ban";
+    this._redemptionHoldPeriodMinutes = configuration.get<number>("redemptionHoldPeriodMinutes") || 5;
   }
 
   private async loadThemes() {
@@ -377,6 +381,10 @@ export class Themer {
      * to re-request the list of themes so they can continue playing.
      */
     this.clearListRecipients();
+  }
+
+  public setPauseStatus(isPaused: boolean) {
+    this._pauseThemer = isPaused;
   }
 
   private isBanned(twitchUserName: string): boolean {
@@ -535,7 +543,7 @@ export class Themer {
    * @param twitchUser - pass through twitch user state
    * @param message - message sent via chat
    */
-  private async randomTheme(user: string, onMessageFlags: OnMessageFlags, message: string) {
+  private async randomTheme(user: string, userId: string, onMessageFlags: OnMessageFlags, message: string) {
 
     const currentTheme = vscode.workspace
       .getConfiguration()
@@ -571,7 +579,7 @@ export class Themer {
       const max = themes.length;
       const randomNumber = Math.floor(Math.random() * max);
       const chosenTheme = themes[randomNumber].label;
-      await this.changeTheme(user, onMessageFlags, chosenTheme);
+      await this.changeTheme(user, userId, onMessageFlags, chosenTheme);
     }
   }
 
@@ -580,7 +588,7 @@ export class Themer {
    * @param twitchUser - User state of who requested the theme be applied
    * @param themeName - Name of the theme to be applied
    */
-  private async changeTheme(user: string, onMessageFlags: OnMessageFlags, themeName: string) {
+  private async changeTheme(user: string, userId: string, onMessageFlags: OnMessageFlags, themeName: string) {
     let userAccessState = AccessState.Viewers;
     const userLevel = this.getUserLevel(onMessageFlags);
 
@@ -594,7 +602,7 @@ export class Themer {
       userAccessState = AccessState.Subscribers;
     } else if (this._followers.find(x => x.username === user.toLocaleLowerCase())) {
       userAccessState = AccessState.Followers;
-    } else if (await API.isTwitchUserFollowing(user.toLocaleLowerCase(), this.logger)) {
+    } else if (await API.isTwitchUserFollowing(userId.toLocaleLowerCase(), this.logger)) {
       this._followers.push({ username: user.toLocaleLowerCase() });
       userAccessState = AccessState.Followers;
     }
@@ -616,7 +624,29 @@ export class Themer {
     )[0];
 
     if (theme) {
-      await this.setTheme(user, theme);
+
+      if (this._pauseThemer) {
+        this.sendMessageEventEmitter.fire(
+          `${user}, theme changes are paused. Please try again in a few minutes.`
+        );
+      } else {
+        await this.setTheme(user, theme);
+
+        if (onMessageFlags.customReward) {
+          // start a "pause" timer 
+          this.setPauseStatus(true);
+          this.sendMessageEventEmitter.fire(
+            `${user} has redeemed pausing the theme on ${themeName} for ${this._redemptionHoldPeriodMinutes} minute${(this._redemptionHoldPeriodMinutes === 1 ? '' : 's')}.`
+          );
+          setTimeout(() => {
+            this.setPauseStatus(false);
+            this.sendMessageEventEmitter.fire(
+              `Twitch Themer has resumed listening for requests.`
+            );
+          }, this._redemptionHoldPeriodMinutes * 60000);
+        }
+      }
+
     } else {
       this.sendMessageEventEmitter.fire(
         `${user}, ${themeName} is not a valid theme name or \
