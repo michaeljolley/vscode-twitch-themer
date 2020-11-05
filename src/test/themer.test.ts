@@ -262,7 +262,7 @@ suite('Themer Tests', function () {
       try {
         sendMessageStub.calledOnce.should.be.true;
         sentMessage.should.equal('You can find the source code for this VS \
-        Code extension at https://github.com/MichaelJolley/vscode-twitch-themer. \
+        Code extension at https://github.com/builders-club/vscode-twitch-themer . \
         Feel free to fork & contribute.');
         done();
       } catch (error) {
