@@ -33,4 +33,4 @@ jobs:
           npm install
       - name: Run Tests
         run: |
-          npm run test
+          npm run just-test
