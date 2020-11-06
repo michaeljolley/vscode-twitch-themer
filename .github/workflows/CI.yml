@@ -11,9 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Keytar dependencies
-        run: |
-          sudo apt-get install libsecret-1-dev
       - name: Install dependencies
         run: |
           npm install
@@ -25,9 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Keytar dependencies
-        run: |
-          sudo apt-get install libsecret-1-dev
       - name: Install dependencies
         run: |
           npm install
