@@ -4,6 +4,7 @@ on:
     branches: [ main, dev ]
 jobs:
   invite:
+    if: github.event.head_commit.committer.name != 'Versioning Action'
     runs-on: ubuntu-latest
     steps:
       - name: Invite contributor to the organization
