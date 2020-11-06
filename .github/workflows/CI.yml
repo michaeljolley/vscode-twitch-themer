@@ -11,12 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Node version
-        run: |
-          node -v
       - name: Install dependencies
-        run: |
-          npm install
+        with:
+          node-version: '12'
+          run: |
+            npm install
       - name: Build extension
         run: |
           npm run test-compile
