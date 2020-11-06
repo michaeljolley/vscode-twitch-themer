@@ -19,18 +19,4 @@ jobs:
           npm install
       - name: Build extension
         run: |
-          npm run test-compile
-  test:
-    if: github.event.head_commit.committer.name != 'Versioning Action'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2-beta
-        with:
-          node-version: '12'
-      - name: Install dependencies
-        run: |
-          npm install
-      - name: Run Tests
-        run: |
-          npm run just-test
+          npm run compile
