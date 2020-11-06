@@ -10,7 +10,7 @@ jobs:
     if: github.event.head_commit.committer.name != 'Versioning Action'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@
+      - uses: actions/checkout@v2
       - name: Install dependencies
         run: |
           npm install
