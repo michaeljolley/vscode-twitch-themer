@@ -1,0 +1,15 @@
+name: Add To Builders Club
+on:
+  push:
+    branches: [ main, dev ]
+jobs:
+  invite:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Invite contributor to the organization
+        uses: lekterable/inclusive-organization-action@v1.1.0
+        with:
+          organization: builders-club
+          team: contributors
+        env:
+          ACCESS_TOKEN: ${{ secrets.ORG_ADMIN_ACCESS_TOKEN }}
