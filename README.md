@@ -11,6 +11,20 @@ A Visual Studio Code extension that listens to twitch chat and allows viewers to
 
 ![](./resources/screenshot-example.gif)
 
+<a name="quickstart"></a>
+## Quickstart Guide
+
+
+Install [VS Code](https://code.visualstudio.com/Download) if you don't already have it.
+
+Install [Twitch Themer](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) from the Visual Studio Marketplace
+Connect Twitch Themer to Twitch from the [Command Palette](#command-palette) (Ctrl + Shift + P)
+
+This opens the Twitch Authentication page. Login to your Twitch account
+
+Done!
+
+<a name="twitch-chat-commands"></a>
 ## Twitch Chat Commands
 
 #### Receive a list of available theme names
@@ -111,6 +125,7 @@ These commands will either ban or unban a user from changing the theme via Twitc
 
 ----
 
+<a name="settings"></a>
 ## Settings
 
 <img width="400px" src="https://user-images.githubusercontent.com/1228996/59153253-bf03f080-8a1a-11e9-9dc3-9fe92b3cb413.png" />
@@ -153,6 +168,7 @@ repo|!theme repo|The bot will say the repo location for this extension
 
 ----
 
+<a name="connect-disconnect"></a>
 ## Connecting / Disconnecting Twitch Chat
 
 <img width="250px" src="https://user-images.githubusercontent.com/1228996/59153329-338b5f00-8a1c-11e9-8086-07619ea691d3.png" />
@@ -163,6 +179,7 @@ Click on the icon to toggle between connecting/disconnecting from Twitch chat.
 
 ----
 
+<a name="command-palette"></a>
 ## Command Palette
 
 #### Twitch Themer: Sign In
@@ -175,6 +192,7 @@ Removes your Twitch authentication and, if connected, leaves Twitch chat.
 
 ---
 
+<a name="credits"></a>
 ## Attribution & Credits
 
 * Thanks to [Sivamuthu Kumar](https://github.com/ksivamuthu) for the authentication code that we blatantly plagiarized from his [VSCode Peacock Twitch Extension](https://github.com/ksivamuthu/vscode-peacock-twitch-client).
@@ -182,12 +200,14 @@ Removes your Twitch authentication and, if connected, leaves Twitch chat.
 
 ----
 
+<a name="release-notes"></a>
 ## Release Notes
 
 See [CHANGELOG.md](CHANGELOG.md)
 
 ----
 
+<a name="contributing"></a>
 ## Contributing
 
 Want to contribute? Check out our [Code of Conduct](CODE_OF_CONDUCT.md) and [Contributing](CONTRIBUTING.md) docs. This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.  Contributions of any kind welcome!
