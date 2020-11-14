@@ -15,7 +15,7 @@ A Visual Studio Code extension that listens to twitch chat and allows viewers to
 Install [VS Code](https://code.visualstudio.com/Download) if you don't already have it.
 
 Install [Twitch Themer](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) from the Visual Studio Marketplace
-Connect Twitch Themer to Twitch from the [Command Pallete](#command-palette) (Ctrl + Shift + P)
+Connect Twitch Themer to Twitch from the [Command Palette](#command-palette) (Ctrl + Shift + P)
 
 This opens the Twitch Authentication page. Login to your Twitch account
 
