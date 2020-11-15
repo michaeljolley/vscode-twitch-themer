@@ -1,7 +1,7 @@
 # Twitch Themer
 
 [![Marketplace](https://vsmarketplacebadge.apphb.com/version/MichaelJolley.vscode-twitch-themer.svg?color=blue&style=?style=for-the-badge&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/MichaelJolley.vscode-twitch-themer.svg?color=blue&style=flat-square)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![MIT](https://img.shields.io/badge/license-MIT-orange.svg?color=blue&style=flat-square)](https://opensource.org/licenses/MIT) ![CI](https://github.com/builders-club/vscode-twitch-themer/workflows/CI/badge.svg?branch=main)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-19-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 A Visual Studio Code extension that listens to twitch chat and allows viewers to change the streamers VS Code theme by sending **!theme**
@@ -219,6 +219,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/dejansky"><img src="https://avatars2.githubusercontent.com/u/54706884?v=4" width="100px;" alt=""/><br /><sub><b>Dejan </b></sub></a><br /><a href="#ideas-dejansky" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/jwalter"><img src="https://avatars3.githubusercontent.com/u/349523?v=4" width="100px;" alt=""/><br /><sub><b>jwalter</b></sub></a><br /><a href="https://github.com/builders-club/vscode-twitch-themer/commits?author=jwalter" title="Code">💻</a> <a href="https://github.com/builders-club/vscode-twitch-themer/commits?author=jwalter" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/Develeon64"><img src="https://avatars2.githubusercontent.com/u/14893682?v=4" width="100px;" alt=""/><br /><sub><b>Develeon</b></sub></a><br /><a href="#ideas-Develeon64" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://toefrog.github.io/Blog/"><img src="https://avatars0.githubusercontent.com/u/1122675?v=4" width="100px;" alt=""/><br /><sub><b>ToeFrog</b></sub></a><br /><a href="https://github.com/builders-club/vscode-twitch-themer/commits?author=ToeFrog" title="Documentation">📖</a></td>
   </tr>
 </table>
 
