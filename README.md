@@ -18,7 +18,6 @@ Install [VS Code](https://code.visualstudio.com/Download) if you don't already h
 
 Install [Twitch Themer](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) from the Visual Studio Marketplace
 
-
 Connect Twitch Themer to Twitch from the Command Palette (Ctrl + Shift + P)
 
 This opens the Twitch Authentication page. Login to your Twitch account
@@ -189,7 +188,6 @@ Removes your Twitch authentication and, if connected, leaves Twitch chat.
 
 ---
 
-<a name="credits"></a>
 ## Attribution & Credits
 
 * Thanks to [Sivamuthu Kumar](https://github.com/ksivamuthu) for the authentication code that we blatantly plagiarized from his [VSCode Peacock Twitch Extension](https://github.com/ksivamuthu/vscode-peacock-twitch-client).
