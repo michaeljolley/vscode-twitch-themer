@@ -8,6 +8,19 @@ A Visual Studio Code extension that listens to twitch chat and allows viewers to
 
 ![](./resources/screenshot-example.gif)
 
+## Quickstart Guide
+
+
+Install [VS Code](https://code.visualstudio.com/Download) if you don't already have it.
+
+Install [Twitch Themer](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) from the Visual Studio Marketplace
+
+Connect Twitch Themer to Twitch from the Command Palette (Ctrl + Shift + P)
+
+This opens the Twitch Authentication page. Login to your Twitch account
+
+Done!
+
 ## Twitch Chat Commands
 
 #### Receive a list of available theme names
@@ -178,7 +191,6 @@ Removes your Twitch authentication and, if connected, leaves Twitch chat.
 * Thanks to [Brian Clark](https://github.com/clarkio) for his videos on creating VS Code extensions and his [VSCode Twitch Highlighter](https://github.com/clarkio/vscode-twitch-highlighter) extension that really is what brought about the idea for this extension.
 
 ----
-
 ## Release Notes
 
 See [CHANGELOG.md](CHANGELOG.md)
