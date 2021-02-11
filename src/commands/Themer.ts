@@ -180,7 +180,7 @@ export class Themer {
         await this.repo();
         break;
       case this._commands["install"]:
-        await this.installTheme(chatMessage.user, chatMessage.flags, chatMessage.message);
+        await this.installTheme(chatMessage.user, chatMessage.extra.userId, chatMessage.flags, chatMessage.message);
         break;
       case this._commands['ban']:
         if (username !== undefined) {
@@ -402,7 +402,7 @@ export class Themer {
    * @param twitchUser - pass through twitch user state
    * @param message - message sent via chat
    */
-  private async installTheme(user: string, onMessageFlags: OnMessageFlags, message: string): Promise<void> {
+  private async installTheme(user: string, userId: string, onMessageFlags: OnMessageFlags, message: string): Promise<void> {
 
     /** Ensure the user hasn't been banned before installing the theme */
     if (this.isBanned(user)) {
@@ -419,7 +419,7 @@ export class Themer {
       ) {
         break following;
       } else if (
-        (await API.isTwitchUserFollowing(user, this.logger))
+        (await API.isTwitchUserFollowing(userId, this.logger))
       ) {
         this._followers.push({
           username: user.toLocaleLowerCase()
@@ -602,7 +602,7 @@ export class Themer {
       userAccessState = AccessState.Subscribers;
     } else if (this._followers.find(x => x.username === user.toLocaleLowerCase())) {
       userAccessState = AccessState.Followers;
-    } else if (await API.isTwitchUserFollowing(userId.toLocaleLowerCase(), this.logger)) {
+    } else if (await API.isTwitchUserFollowing(userId, this.logger)) {
       this._followers.push({ username: user.toLocaleLowerCase() });
       userAccessState = AccessState.Followers;
     }
