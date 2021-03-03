@@ -18,7 +18,9 @@
     "color": "#373436",
     "theme": "dark"
   },
-  "extensionKind": "ui",
+  "extensionKind": [
+    "ui"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/builders-club/vscode-twitch-themer"
