@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+import * as JSON from 'comment-json';
 import { keytar } from '../Common';
 import { KeytarKeys, ThemeNotAvailableReasons } from '../Enum';
 import { Logger } from '../Logger';
@@ -41,7 +42,7 @@ export class API {
    * that it has at least one Theme contribution listed.
    * @param extensionName The unique id for the extension. 
    */
-  public static async isValidExtensionName(extensionName: string): Promise<{ available: boolean; reason?: ThemeNotAvailableReasons; label?: string[] }> {
+  public static async isValidExtensionName(extensionName: string, logger: Logger): Promise<{ available: boolean; reason?: ThemeNotAvailableReasons; label?: string[] }> {
     const url = `https://marketplace.visualstudio.com/items?itemName=${extensionName}`;
     let res = await fetch(url, { method: 'GET', headers: { "Accept": "*/*", "User-Agent": "VSCode-Twitch-Themer" } });
     if (res.status === 404) {
@@ -76,8 +77,8 @@ export class API {
       return { available: false, reason: ThemeNotAvailableReasons.packageJsonNotDownload };
     }
 
-    const packageFile = await res.text();
     try {
+      const packageFile = await res.text();
       const packageJson = JSON.parse(packageFile);
 
       if (!packageJson.contributes.themes || packageJson.contributes.themes.length === 0) {
@@ -86,7 +87,8 @@ export class API {
 
       return { available: true, label: packageJson.contributes.themes.map((t: { label: string }) => t.label) };
     }
-    catch {
+    catch (err) {
+      logger.error(err);
       return { available: false, reason: ThemeNotAvailableReasons.packageJsonMalformed };
     }
   }

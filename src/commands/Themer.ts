@@ -470,7 +470,7 @@ export class Themer {
     }
 
     // Verify that the extension exists
-    const isValidExtResult = await API.isValidExtensionName(theme);
+    const isValidExtResult = await API.isValidExtensionName(theme, this.logger);
     if (!isValidExtResult.available) {
       // Handle non-existing extension
       if (isValidExtResult.reason) {
