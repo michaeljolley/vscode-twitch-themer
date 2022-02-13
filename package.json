@@ -174,7 +174,7 @@
     "test": "npm run compile && node node_modules/vscode/bin/test"
   },
   "dependencies": {
-    "comfy.js": "^1.1.5",
+    "comfy.js": "^1.1.12",
     "keytar": "^4.9.0",
     "node-fetch": "~2.6.1",
     "uuid": "~8.3.1"
