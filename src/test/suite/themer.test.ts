@@ -3,13 +3,13 @@ import * as vscode from 'vscode';
 import * as chai from 'chai';
 import * as sinon from 'sinon';
 
-import ChatClient from '../chat/ChatClient';
-import { Themer } from '../commands/Themer';
-import { IChatMessage } from '../chat/IChatMessage';
-import { API } from '../api/API';
-import { IWhisperMessage } from '../chat/IWhisperMessage';
-import { AccessState } from '../Enum';
-import { Logger } from '../Logger';
+import ChatClient from '../../chat/ChatClient';
+import { Themer } from '../../commands/Themer';
+import { IChatMessage } from '../../chat/IChatMessage';
+import { API } from '../../api/API';
+import { IWhisperMessage } from '../../chat/IWhisperMessage';
+import { AccessState } from '../../Enum';
+import { Logger } from '../../Logger';
 import { OnCommandExtra, OnMessageFlags } from 'comfy.js';
 
 chai.should();

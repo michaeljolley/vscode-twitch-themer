@@ -1,1 +1,0 @@
-// This file is included only to ensure the 'results' folder is created in the 'out/test' folder.

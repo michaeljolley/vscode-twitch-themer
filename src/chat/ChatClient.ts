@@ -167,9 +167,7 @@ export default class ChatClient {
     extra: OnCommandExtra
   ) {
     this.logger.log(`Received ${message} from ${user}`);
-    if (!message) {
-      return;
-    }
+
     if (command !== this._commandTrigger) {
       return;
     }
@@ -177,9 +175,7 @@ export default class ChatClient {
     message = message.toLocaleLowerCase().trim();
     this.chatClientMessageEventEmitter.fire({
       user,
-      message: message
-        .replace('!' + this._commandTrigger, '')
-        .trim(),
+      message,
       flags,
       extra
     });

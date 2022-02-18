@@ -5,7 +5,6 @@
 {
 	"version": "0.2.0",
 	"configurations": [
-		
 		{
 			"name": "Run Extension",
 			"type": "extensionHost",
@@ -19,6 +18,19 @@
 			],
 			"preLaunchTask": "npm: webpack"
 		},
+		{
+			"name": "Extension Tests",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceFolder}",
+				"--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
+			],
+			"outFiles": [
+				"${workspaceFolder}/out/test/**/*.js"
+			]
+		}
 		{
 			"name": "Extension Tests",
 			"type": "extensionHost",

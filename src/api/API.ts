@@ -3,6 +3,7 @@ import * as JSON from 'comment-json';
 import { keytar } from '../Common';
 import { KeytarKeys, ThemeNotAvailableReasons } from '../Enum';
 import { Logger } from '../Logger';
+import { PackageJson } from './PackageJson';
 
 export class API {
 
@@ -79,16 +80,16 @@ export class API {
 
     try {
       const packageFile = await res.text();
-      const packageJson = JSON.parse(packageFile);
+      const packageJson = JSON.parse(packageFile) as unknown as PackageJson;
 
       if (!packageJson.contributes.themes || packageJson.contributes.themes.length === 0) {
         return { available: false, reason: ThemeNotAvailableReasons.noThemesContributed };
       }
 
-      return { available: true, label: packageJson.contributes.themes.map((t: { label: string }) => t.label) };
+      return { available: true, label: packageJson.contributes.themes.map((t) => t.label) };
     }
     catch (err) {
-      logger.error(err);
+      logger.error(err as unknown as string);
       return { available: false, reason: ThemeNotAvailableReasons.packageJsonMalformed };
     }
   }
