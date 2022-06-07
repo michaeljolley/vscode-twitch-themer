@@ -175,7 +175,7 @@
   },
   "dependencies": {
     "comfy.js": "^1.1.5",
-    "keytar": "^4.9.0",
+    "keytar": "^7.1.0",
     "node-fetch": "~2.6.1",
     "uuid": "~8.3.1"
   },
