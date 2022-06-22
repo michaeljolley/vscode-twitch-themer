@@ -19,7 +19,7 @@ export class AuthenticationService {
   /** Event that fires on change of the authentication state of the user */
   public onAuthStatusChanged = this.authStatusEventEmitter.event;
 
-  constructor(private logger: Logger) { }
+  constructor(private logger: Logger) {}
 
   /**
    * Initializes the authentication service.  If the user is
@@ -42,11 +42,12 @@ export class AuthenticationService {
       );
       if (accessToken && userId && userLogin) {
         this.authStatusEventEmitter.fire(true);
+        this.logger.log(`Twitch access token found. Successfully logged in.`);
         return;
       }
     }
     this.authStatusEventEmitter.fire(false);
-    this.logger.log('Initialized authentication.');
+    this.logger.log('Authentication failed.');
   }
 
   /**
@@ -67,13 +68,15 @@ export class AuthenticationService {
         vscode.env.openExternal(
           vscode.Uri.parse(
             `https://id.twitch.tv/oauth2/authorize?client_id=ts9wowek7hj9yw0q7gmg27c29i6etn` +
-            `&redirect_uri=http://localhost:5544` +
-            `&response_type=token&scope=chat:edit chat:read whispers:edit user:read:email` +
-            `&state=${state}`
+              `&redirect_uri=http://localhost:5544` +
+              `&response_type=token&scope=chat:edit chat:read whispers:edit user:read:email` +
+              `&state=${state}`
           )
         );
+        this.logger.log(`Attempting to authenticate with Twitch.`);
       } else {
         this.authStatusEventEmitter.fire(true);
+        this.logger.log(`Twitch access token found. Successfully logged in.`);
       }
     }
   }
@@ -88,6 +91,7 @@ export class AuthenticationService {
       keytar.deletePassword(KeytarKeys.service, KeytarKeys.userLogin);
     }
     vscode.window.showInformationMessage('Signing out of Twitch');
+    this.logger.log(`Signed out of Twitch`);
     this.authStatusEventEmitter.fire(false);
   }
 
