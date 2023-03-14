@@ -11,7 +11,7 @@
     "email": "mike@baldbeardedbuilder.com"
   },
   "scripts": {
-    "publish": "npx @vscode/vsce publish",
+    "package": "npx @vscode/vsce package -o release.vsix",
     "compile": "webpack",
     "watch": "webpack --watch",
     "compile:prod": "webpack --mode production --devtool hidden-source-map",
