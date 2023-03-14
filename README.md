@@ -1,7 +1,7 @@
 # Twitch Themer
 
-[![Marketplace](https://vsmarketplacebadge.apphb.com/version/MichaelJolley.vscode-twitch-themer.svg?color=blue&style=?style=for-the-badge&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/MichaelJolley.vscode-twitch-themer.svg?color=blue&style=flat-square)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![MIT](https://img.shields.io/badge/license-MIT-orange.svg?color=blue&style=flat-square)](https://opensource.org/licenses/MIT) ![CI](https://github.com/builders-club/vscode-twitch-themer/workflows/CI/badge.svg?branch=main)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.svg?style=flat-square)](#contributors-)
+[![Marketplace](https://img.shields.io/visual-studio-marketplace/v/MichaelJolley.vscode-twitch-themer)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![Installs](https://img.shields.io/visual-studio-marketplace/i/MichaelJolley.vscode-twitch-themer?color=blue&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![MIT](https://img.shields.io/badge/license-MIT-orange.png?color=blue&style=flat-round)](https://opensource.org/licenses/MIT) ![CI](https://img.shields.io/github/actions/workflow/status/builders-club/vscode-twitch-themer/CI.yml?logo=github)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.png?style=flat-round)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 A Visual Studio Code extension that listens to twitch chat and allows viewers to change the streamers VS Code theme by sending **!theme**
