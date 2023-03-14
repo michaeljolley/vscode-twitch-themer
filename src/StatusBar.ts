@@ -1,8 +1,7 @@
 import * as vscode from 'vscode';
 import { AuthenticationService } from './Authentication';
 import ChatClient from './chat/ChatClient';
-import { TwitchClientStatus, Commands, KeytarKeys } from './Enum';
-import { keytar } from './Common';
+import { TwitchClientStatus, Commands, ExtensionKeys } from './Enum';
 
 /**
  * Creates the status bar item to use in updating users of the status of the extension
@@ -33,14 +32,16 @@ export async function createStatusBarItem(
   async function processAuthChange(status: boolean) {
     await updateStatusBarItem(
       statusBarItem,
-      status ? TwitchClientStatus.loggedIn : TwitchClientStatus.loggedOut
+      status ? TwitchClientStatus.loggedIn : TwitchClientStatus.loggedOut,
+      context.globalState
     );
   }
 
   async function processChatStatusChange(status: boolean) {
     await updateStatusBarItem(
       statusBarItem,
-      status ? TwitchClientStatus.chatConnected : TwitchClientStatus.loggedOut
+      status ? TwitchClientStatus.chatConnected : TwitchClientStatus.loggedOut,
+      context.globalState
     );
   }
 }
@@ -53,16 +54,16 @@ export async function createStatusBarItem(
  */
 async function updateStatusBarItem(
   statusBarItem: vscode.StatusBarItem,
-  authStatus: TwitchClientStatus
+  authStatus: TwitchClientStatus,
+  state: vscode.Memento
 ) {
   const icon = '$(paintcan)'; // The octicon to use for the status bar icon (https://octicons.github.com/)
   let text = `${icon}`;
   statusBarItem.show();
 
   let user: string | null = null;
-  if (keytar) {
-    user = await keytar.getPassword(KeytarKeys.service, KeytarKeys.userLogin);
-  }
+  user = state.get(ExtensionKeys.userLogin) as string | null;
+  
 
   switch (authStatus) {
     case TwitchClientStatus.loggingIn:

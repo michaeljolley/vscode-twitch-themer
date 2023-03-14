@@ -2,8 +2,7 @@ import * as vscode from 'vscode';
 import { IListRecipient } from './IListRecipient';
 import { ITheme } from './ITheme';
 import { IWhisperMessage } from '../chat/IWhisperMessage';
-import { keytar } from '../Common';
-import { KeytarKeys, AccessState, UserLevel, ThemeNotAvailableReasons } from '../Enum';
+import { ExtensionKeys, AccessState, UserLevel, ThemeNotAvailableReasons } from '../Enum';
 import { API } from '../api/API';
 import { IChatMessage } from '../chat/IChatMessage';
 import { Logger } from '../Logger';
@@ -51,7 +50,7 @@ export class Themer {
         this.initCommands();
       }
     });
-
+    
     /**
      * Get the configuration to auto-install or not
      */
@@ -419,7 +418,7 @@ export class Themer {
       ) {
         break following;
       } else if (
-        (await API.isTwitchUserFollowing(userId, this.logger))
+        (await API.isTwitchUserFollowing(userId, this._state, this.logger))
       ) {
         this._followers.push({
           username: user.toLocaleLowerCase()
@@ -531,7 +530,7 @@ export class Themer {
       const msg = `@${user}, the theme(s) '${isValidExtResult.label!.join(', ')}' were installed successfully.`;
       this.sendMessageEventEmitter.fire(msg);
     }
-    catch (err) {
+    catch (err: any) {
       // Handle the error
       this.logger.error(err);
       return;
@@ -602,7 +601,7 @@ export class Themer {
       userAccessState = AccessState.Subscribers;
     } else if (this._followers.find(x => x.username === user.toLocaleLowerCase())) {
       userAccessState = AccessState.Followers;
-    } else if (await API.isTwitchUserFollowing(userId, this.logger)) {
+    } else if (await API.isTwitchUserFollowing(userId, this._state, this.logger)) {
       this._followers.push({ username: user.toLocaleLowerCase() });
       userAccessState = AccessState.Followers;
     }

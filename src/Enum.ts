@@ -36,20 +36,17 @@ export enum Commands {
 }
 
 /**
- * Keys for values stored in keytar
+ * Keys for values stored in stored variables
  */
-export enum KeytarKeys {
-  /** Service name */
-  service = 'vscode-twitch-themer',
-
+export enum ExtensionKeys {
   /** Key for access token */
-  account = 'vscode-twitch-account',
+  account = 'vscode-twitch-themer-account',
 
   /** Key for current auth'd user's id */
-  userId = 'vscode-twitch-user-id',
+  userId = 'vscode-twitch-themer-user-id',
 
   /** Key for current auth'd user's login */
-  userLogin = 'vscode-twitch-user-login'
+  userLogin = 'vscode-twitch-themer-user-login'
 }
 
 /**

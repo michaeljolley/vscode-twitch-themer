@@ -5,10 +5,9 @@ import * as path from 'path';
 import * as url from 'url';
 import { v4 } from 'uuid';
 import { API } from './api/API';
-import { KeytarKeys } from './Enum';
 
-import { keytar } from './Common';
 import { Logger } from './Logger';
+import { ExtensionKeys } from './Enum';
 
 /**
  * Manages state of current user & authenticating user with Twitch
@@ -19,7 +18,7 @@ export class AuthenticationService {
   /** Event that fires on change of the authentication state of the user */
   public onAuthStatusChanged = this.authStatusEventEmitter.event;
 
-  constructor(private logger: Logger) {}
+  constructor(private _state: vscode.Memento, private logger: Logger) {}
 
   /**
    * Initializes the authentication service.  If the user is
@@ -27,25 +26,22 @@ export class AuthenticationService {
    */
   public async initialize() {
     this.logger.log('Initializing authentication...');
-    if (keytar) {
-      const accessToken = await keytar.getPassword(
-        KeytarKeys.service,
-        KeytarKeys.account
-      );
-      const userId = await keytar.getPassword(
-        KeytarKeys.service,
-        KeytarKeys.userId
-      );
-      const userLogin = await keytar.getPassword(
-        KeytarKeys.service,
-        KeytarKeys.userLogin
-      );
-      if (accessToken && userId && userLogin) {
-        this.authStatusEventEmitter.fire(true);
-        this.logger.log(`Twitch access token found. Successfully logged in.`);
-        return;
-      }
+   
+    const accessToken = this._state.get(
+      ExtensionKeys.account
+    );
+    const userId = this._state.get(
+      ExtensionKeys.userId
+    );
+    const userLogin = this._state.get(
+      ExtensionKeys.userLogin
+    );
+    if (accessToken && userId && userLogin) {
+      this.authStatusEventEmitter.fire(true);
+      this.logger.log(`Twitch access token found. Successfully logged in.`);
+      return;
     }
+    
     this.authStatusEventEmitter.fire(false);
     this.logger.log('Authentication failed.');
   }
@@ -57,27 +53,24 @@ export class AuthenticationService {
    * to the extension.
    */
   public async handleSignIn() {
-    if (keytar) {
-      const accessToken = await keytar.getPassword(
-        KeytarKeys.service,
-        KeytarKeys.account
+    const accessToken = this._state.get(
+      ExtensionKeys.account
+    ) as string | null;
+    if (!accessToken) {
+      const state = v4();
+      this.createServer(state);
+      vscode.env.openExternal(
+        vscode.Uri.parse(
+          `https://id.twitch.tv/oauth2/authorize?client_id=ts9wowek7hj9yw0q7gmg27c29i6etn` +
+            `&redirect_uri=http://localhost:5544` +
+            `&response_type=token&scope=chat:edit chat:read whispers:edit user:read:email` +
+            `&state=${state}`
+        )
       );
-      if (!accessToken) {
-        const state = v4();
-        this.createServer(state);
-        vscode.env.openExternal(
-          vscode.Uri.parse(
-            `https://id.twitch.tv/oauth2/authorize?client_id=ts9wowek7hj9yw0q7gmg27c29i6etn` +
-              `&redirect_uri=http://localhost:5544` +
-              `&response_type=token&scope=chat:edit chat:read whispers:edit user:read:email` +
-              `&state=${state}`
-          )
-        );
-        this.logger.log(`Attempting to authenticate with Twitch.`);
-      } else {
-        this.authStatusEventEmitter.fire(true);
-        this.logger.log(`Twitch access token found. Successfully logged in.`);
-      }
+      this.logger.log(`Attempting to authenticate with Twitch.`);
+    } else {
+      this.authStatusEventEmitter.fire(true);
+      this.logger.log(`Twitch access token found. Successfully logged in.`);
     }
   }
 
@@ -85,11 +78,11 @@ export class AuthenticationService {
    * Removes any OAuth tokens stored for the user
    */
   public handleSignOut() {
-    if (keytar) {
-      keytar.deletePassword(KeytarKeys.service, KeytarKeys.account);
-      keytar.deletePassword(KeytarKeys.service, KeytarKeys.userId);
-      keytar.deletePassword(KeytarKeys.service, KeytarKeys.userLogin);
-    }
+    
+    this._state.update(ExtensionKeys.account, null);
+    this._state.update(ExtensionKeys.userId, null);
+    this._state.update(ExtensionKeys.userLogin, null);
+    
     vscode.window.showInformationMessage('Signing out of Twitch');
     this.logger.log(`Signed out of Twitch`);
     this.authStatusEventEmitter.fire(false);
@@ -107,36 +100,33 @@ export class AuthenticationService {
         res.end(file);
       } else if (mReqPath === '/oauth') {
         const q: any = mReq.query;
-        if (keytar) {
-          if (q.state === state) {
-            keytar.setPassword(
-              KeytarKeys.service,
-              KeytarKeys.account,
-              q.access_token
-            );
-            const authUser = await API.getUserDetails(q.access_token);
-            keytar.setPassword(
-              KeytarKeys.service,
-              KeytarKeys.userId,
-              authUser.id
-            );
-            keytar.setPassword(
-              KeytarKeys.service,
-              KeytarKeys.userLogin,
-              authUser.login
-            );
-            this.authStatusEventEmitter.fire(true);
-          } else {
-            vscode.window.showErrorMessage(
-              'Error while logging in. State mismatch error'
-            );
-            this.authStatusEventEmitter.fire(false);
-          }
-
-          setTimeout(() => {
-            server.close();
-          }, 3000);
+       
+        if (q.state === state) {
+          this._state.update(
+            ExtensionKeys.account,
+            q.access_token
+          );
+          const authUser = await API.getUserDetails(q.access_token);
+          this._state.update(
+            ExtensionKeys.userId,
+            authUser.id
+          );
+          this._state.update(
+            ExtensionKeys.userLogin,
+            authUser.login
+          );
+          this.authStatusEventEmitter.fire(true);
+        } else {
+          vscode.window.showErrorMessage(
+            'Error while logging in. State mismatch error'
+          );
+          this.authStatusEventEmitter.fire(false);
         }
+
+        setTimeout(() => {
+          server.close();
+        }, 3000);
+        
         res.writeHead(200);
         res.end(file);
       } else if (mReqPath === '/favicon.ico') {
