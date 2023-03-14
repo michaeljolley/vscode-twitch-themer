@@ -11,10 +11,16 @@ export class API {
       const currentUserId = state.get(ExtensionKeys.userId);
 
       if (accessToken && currentUserId) {
-        const url = `https://api.twitch.tv/helix/users/follows?from_id=${twitchUserId}&to_id=${currentUserId}`;
-        const res = await axios.post(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
-        const json: any = res.data;
-        return (json.data.length > 0) ? true : false;
+        const url = `https://api.twitch.tv/helix/channels/followers?user_id=${twitchUserId}&broadcaster_id=${currentUserId}`;
+        try {
+          const res = await axios.get(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
+          const json: any = res.data;
+          return (json.data.length > 0) ? true : false;
+        }
+        catch (err: any) {
+          logger.debug(`failed to retrieve Twitch user following status: ${err.message}`);
+          return false;
+        }
       } else {
         logger.debug('failed to retrieve Twitch credentials from the user store');
         return false;
@@ -26,7 +32,7 @@ export class API {
 
   public static async getUserDetails(token: string | null) {
     const url = 'https://api.twitch.tv/helix/users';
-    const res = await axios.post(url, { headers: { 'Authorization': `Bearer ${token}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
+    const res = await axios.get(url, { headers: { 'Authorization': `Bearer ${token}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
     const json: any = res.data;
     return json.data && json.data[0];
   }
@@ -95,7 +101,7 @@ export class API {
     const currentUserId = _state.get(ExtensionKeys.userId);
     if (accessToken && currentUserId) {
       const url = `https://api.twitch.tv/helix/streams?user_id=${currentUserId}`;
-      const res = await axios.post(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
+      const res = await axios.get(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
       const json: any = res.data;
       return (json.data.length > 0) ? true : false;
     }

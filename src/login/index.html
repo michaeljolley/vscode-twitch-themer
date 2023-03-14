@@ -3,6 +3,8 @@
 <head>
     <script type="text/javascript">
         window.onload = function () {
+            console.log(window.location.pathname)
+            console.log(window.location.href)
             if (window.location.pathname === '/oauth') {
                 window.close();
                 return;

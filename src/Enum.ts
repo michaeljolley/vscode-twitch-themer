@@ -3,22 +3,22 @@
  */
 export enum AccessState {
   /** All viewers */
-  Viewers,
+  Viewers = 0,
 
   /** Followers only */
-  Followers,
+  Followers = 1,
 
   /** Subscribers only */
-  Subscribers,
+  Subscribers = 2,
 
   /** VIPs only */
-  VIPs,
+  VIPs = 3,
 
   /** Moderators only */
-  Moderators,
+  Moderators = 4,
 
   /** Broadcaster only */
-  Broadcaster,
+  Broadcaster = 5,
 }
 
 /**

@@ -63,7 +63,7 @@ export class AuthenticationService {
         vscode.Uri.parse(
           `https://id.twitch.tv/oauth2/authorize?client_id=ts9wowek7hj9yw0q7gmg27c29i6etn` +
             `&redirect_uri=http://localhost:5544` +
-            `&response_type=token&scope=chat:edit chat:read whispers:edit user:read:email` +
+            `&response_type=token&scope=chat:edit chat:read whispers:edit user:read:email moderator:read:followers` +
             `&state=${state}`
         )
       );
