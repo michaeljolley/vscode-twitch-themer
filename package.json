@@ -35,7 +35,9 @@
     "color": "#373436",
     "theme": "dark"
   },
-  "extensionKind": "ui",
+  "extensionKind": [
+    "ui"
+  ],
   "categories": [
     "Other"
   ],
@@ -46,7 +48,6 @@
     "chat"
   ],
   "activationEvents": [
-    "*",
     "onCommand:twitchThemer.signIn",
     "onCommand:twitchThemer.signOut",
     "onCommand:twitchThemer.toggleChat"
