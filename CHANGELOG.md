@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.0] - 2023-03-14
+
+### Updated
+
+- Updated to use the new VS Code extensions API
+- Replaced node-fetch with axios
+
 ## [1.7.8] - 2021-02-11
 
 ### Fixed
@@ -202,7 +209,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Pre-release version to gather feedback from the community and help identify gaps.
 
-[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.7.8...HEAD
+[unreleased]: https://github.com/michaeljolley/vscode-twitch-themer/compare/2.0.0...HEAD
+[2.0.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.7.8...2.0.0
 [1.7.8]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.7.0...1.7.8
 [1.7.0]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.3...1.7.0
 [1.6.4]: https://github.com/michaeljolley/vscode-twitch-themer/compare/1.6.3...1.6.4

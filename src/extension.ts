@@ -23,7 +23,7 @@ export class Extension {
   constructor(context: vscode.ExtensionContext) {
     _logger = new Logger(vscode.window.createOutputChannel('Twitch Themer'));
     _context = context;
-    _authenticationService = new AuthenticationService(_logger);
+    _authenticationService = new AuthenticationService(_context.globalState, _logger);
     _chatClient = new ChatClient(_context.globalState, _logger);
     _themer = new Themer(_context.globalState, _logger);
   }
@@ -86,7 +86,7 @@ export class Extension {
 
     // Auto connect to Twitch Chat if 'twitchThemer.autoConnect' is true (default is false)
     // and we are currently streaming.
-    await autoConnect(_chatClient);
+    await autoConnect(_chatClient, _context.globalState);
 
     _logger.log('Themer initialized.');
   }
@@ -128,6 +128,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   const extension: Extension = new Extension(context);
   await extension.initialize();
+  activeExtension = extension;
 
   _logger.log('Congratulations, Twitch Themer is now active!');
 }

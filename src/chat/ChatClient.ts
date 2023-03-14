@@ -2,8 +2,7 @@ import * as vscode from 'vscode';
 import { ComfyJSInstance, OnCommandExtra, OnJoinExtra, EmoteSet, OnMessageExtra, OnMessageFlags } from "comfy.js";
 import { ConfigurationChangeEvent, EventEmitter, Memento, workspace, WorkspaceConfiguration } from 'vscode';
 import { IChatMessage } from './IChatMessage';
-import { keytar } from '../Common';
-import { KeytarKeys } from '../Enum';
+import { ExtensionKeys } from '../Enum';
 import { IWhisperMessage } from './IWhisperMessage';
 import { Logger } from '../Logger';
 
@@ -29,7 +28,7 @@ export default class ChatClient {
    * constructor
    * @param _state - The global state of the extension
    */
-  constructor(_state: Memento, private logger: Logger) {
+  constructor(private _state: Memento, private logger: Logger) {
     this.initCmdTrigger()
     // If this extension configuration changes, ensure the command trigger is updated
     workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
@@ -57,15 +56,13 @@ export default class ChatClient {
    */
   private async connect() {
     this.logger.log('Connecting to Twitch...');
-    if (keytar && !this.isConnected()) {
-      const accessToken = await keytar.getPassword(
-        KeytarKeys.service,
-        KeytarKeys.account
-      );
-      const authUserLogin = await keytar.getPassword(
-        KeytarKeys.service,
-        KeytarKeys.userLogin
-      );
+    if (!this.isConnected()) {
+      const accessToken = this._state.get(
+        ExtensionKeys.account
+      ) as string | null;
+      const authUserLogin = this._state.get(
+        ExtensionKeys.userLogin
+      ) as string | null;
 
       if (authUserLogin && accessToken) {
 
@@ -147,16 +144,13 @@ export default class ChatClient {
    * @param message - Message to send to chat
    */
   public async sendMessage(message: string) {
-    if (keytar) {
-      const authUserLogin = await keytar.getPassword(
-        KeytarKeys.service,
-        KeytarKeys.userLogin
-      );
+      const authUserLogin = this._state.get(
+        ExtensionKeys.userLogin
+      ) as string | null;
 
       if (this.isConnected() && authUserLogin) {
         ComfyJS.Say(message, authUserLogin);
       }
-    }
   }
 
   private async onCommandHandler(

@@ -1,24 +1,23 @@
-import fetch from 'node-fetch';
-import { keytar } from '../Common';
-import { KeytarKeys, ThemeNotAvailableReasons } from '../Enum';
+import * as vscode from 'vscode';
+import axios from 'axios';
+import { ExtensionKeys, ThemeNotAvailableReasons } from '../Enum';
 import { Logger } from '../Logger';
 
 export class API {
 
-  public static async isTwitchUserFollowing(twitchUserId: string | undefined, logger: Logger) {
+  public static async isTwitchUserFollowing(twitchUserId: string | undefined, state: vscode.Memento, logger: Logger) {
     if (twitchUserId) {
-      if (keytar) {
-        const accessToken = await keytar.getPassword(KeytarKeys.service, KeytarKeys.account);
-        const currentUserId = await keytar.getPassword(KeytarKeys.service, KeytarKeys.userId);
-        if (accessToken && currentUserId) {
-          const url = `https://api.twitch.tv/helix/users/follows?from_id=${twitchUserId}&to_id=${currentUserId}`;
-          const res = await fetch(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
-          const json = await res.json();
-          return (json.data.length > 0) ? true : false;
-        } else {
-          logger.debug('failed to retrieve Twitch credentials from the user store');
-          return false;
-        }
+      const accessToken = state.get(ExtensionKeys.account);
+      const currentUserId = state.get(ExtensionKeys.userId);
+
+      if (accessToken && currentUserId) {
+        const url = `https://api.twitch.tv/helix/users/follows?from_id=${twitchUserId}&to_id=${currentUserId}`;
+        const res = await axios.post(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
+        const json: any = res.data;
+        return (json.data.length > 0) ? true : false;
+      } else {
+        logger.debug('failed to retrieve Twitch credentials from the user store');
+        return false;
       }
     }
     logger.debug('no twitchUserId was passed in.');
@@ -27,8 +26,8 @@ export class API {
 
   public static async getUserDetails(token: string | null) {
     const url = 'https://api.twitch.tv/helix/users';
-    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
-    const json = (await res.json());
+    const res = await axios.post(url, { headers: { 'Authorization': `Bearer ${token}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
+    const json: any = res.data;
     return json.data && json.data[0];
   }
 
@@ -43,11 +42,11 @@ export class API {
    */
   public static async isValidExtensionName(extensionName: string): Promise<{ available: boolean; reason?: ThemeNotAvailableReasons; label?: string[] }> {
     const url = `https://marketplace.visualstudio.com/items?itemName=${extensionName}`;
-    let res = await fetch(url, { method: 'GET', headers: { "Accept": "*/*", "User-Agent": "VSCode-Twitch-Themer" } });
+    let res = await axios.get(url, { headers: { "Accept": "*/*", "User-Agent": "VSCode-Twitch-Themer" } });
     if (res.status === 404) {
       return { available: false, reason: ThemeNotAvailableReasons.notFound };
     }
-    let body = await res.text();
+    let body = await res.statusText;
     /**
      * Regex explination:
      * ([--:\w?@%&+~#=]+)
@@ -71,12 +70,12 @@ export class API {
 
     const repoUrl = `https://raw.githubusercontent.com/${repoUrlMatches[1].replace('.git', '')}/master/package.json`;
 
-    res = await fetch(repoUrl);
-    if (!res.ok) {
+    res = await axios.get(repoUrl);
+    if (res.status === 200) {
       return { available: false, reason: ThemeNotAvailableReasons.packageJsonNotDownload };
     }
 
-    const packageFile = await res.text();
+    const packageFile = res.statusText;
     try {
       const packageJson = JSON.parse(packageFile);
 
@@ -91,16 +90,14 @@ export class API {
     }
   }
 
-  public static async getStreamIsActive(): Promise<boolean> {
-    if (keytar) {
-      const accessToken = await keytar.getPassword(KeytarKeys.service, KeytarKeys.account);
-      const currentUserId = await keytar.getPassword(KeytarKeys.service, KeytarKeys.userId);
-      if (accessToken && currentUserId) {
-        const url = `https://api.twitch.tv/helix/streams?user_id=${currentUserId}`;
-        const res = await fetch(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
-        const json = await res.json();
-        return (json.data.length > 0) ? true : false;
-      }
+  public static async getStreamIsActive(_state: vscode.Memento): Promise<boolean> {
+    const accessToken = _state.get(ExtensionKeys.account);
+    const currentUserId = _state.get(ExtensionKeys.userId);
+    if (accessToken && currentUserId) {
+      const url = `https://api.twitch.tv/helix/streams?user_id=${currentUserId}`;
+      const res = await axios.post(url, { headers: { 'Authorization': `Bearer ${accessToken}`, 'client-id': 'ts9wowek7hj9yw0q7gmg27c29i6etn' } });
+      const json: any = res.data;
+      return (json.data.length > 0) ? true : false;
     }
     return false;
   }
