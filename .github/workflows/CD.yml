@@ -32,5 +32,5 @@ jobs:
           npm run package
       - name: Publish VSIX
         run: |
-          npx vsce publish --packagePath ./release.vsix --pat ${{ secrets.VSCE_PAT }}
+          npx @vscode/vsce publish --packagePath ./release.vsix --pat ${{ secrets.VSCE_PAT }}
         
