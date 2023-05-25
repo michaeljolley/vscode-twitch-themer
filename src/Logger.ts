@@ -1,27 +1,17 @@
-import { OutputChannel } from "vscode";
+import * as vscode from "vscode";
+import { LogLevel } from "./constants";
 
-import { LogLevel } from './Enum';
+export abstract class Logger {
+  private static _channel = vscode.window.createOutputChannel("Twitch Themer");
 
-export class Logger {
-  private readonly _channel?: OutputChannel
-
-  constructor (outputChannel?: OutputChannel, thisArgs?: any) {
-    this._channel = outputChannel;
-    this.log = this.log.bind(thisArgs || this);
-  }
-
-  public debug(message: string, ...optionalParams: any[]): void {
-    this.log(message, LogLevel.Debug, ...optionalParams);
-  }
-
-  public error(message: string, ...optionalParams: any[]): void {
-    this.log(message, LogLevel.Error, ...optionalParams);
-  }
-
-  public log(message: string, logLevel?: LogLevel, ...optionalParams: any[]): void {
+  public static log(
+    logLevel: LogLevel,
+    message: string,
+    ...optionalParams: any[]
+  ): void {
     const captains: any = console;
 
-    let level = logLevel || LogLevel.Information;
+    let level = logLevel || LogLevel.info;
 
     const getTime = (): {
       hours: string;
@@ -38,7 +28,7 @@ export class Logger {
       return {
         hours: prefix(hours),
         minutes: prefix(minutes),
-        seconds: prefix(seconds)
+        seconds: prefix(seconds),
       };
     };
 
@@ -47,7 +37,7 @@ export class Logger {
 
     captains[level](log, ...optionalParams);
 
-    if (this._channel && level !== LogLevel.Debug) {
+    if (this._channel && level !== LogLevel.debug) {
       this._channel.appendLine(log);
     }
   }
