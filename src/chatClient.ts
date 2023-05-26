@@ -7,7 +7,6 @@ import {
   OnMessageFlags,
 } from "comfy.js";
 import {
-  ConfigurationChangeEvent,
   EventEmitter,
   Memento,
   workspace,

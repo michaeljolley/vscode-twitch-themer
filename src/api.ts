@@ -18,7 +18,9 @@ export default class API {
           const res = await fetch(url, {
             method: "GET",
             headers: {
+              // eslint-disable-next-line @typescript-eslint/naming-convention
               Authorization: `Bearer ${accessToken}`,
+              // eslint-disable-next-line @typescript-eslint/naming-convention
               "client-id": "ts9wowek7hj9yw0q7gmg27c29i6etn",
             },
           });
@@ -50,7 +52,9 @@ export default class API {
       const res = await fetch(url, {
         method: "GET",
         headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           Authorization: `Bearer ${token}`,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           "client-id": "ts9wowek7hj9yw0q7gmg27c29i6etn",
         },
       });
