@@ -1,4 +1,6 @@
 import * as vscode from "vscode";
+import API from "./api";
+import Logger from "./logger";
 import { ListRecipient } from "./types/listRecipient";
 import { Theme } from "./types/theme";
 import { WhisperMessage } from "./types/whisperMessage";
@@ -8,9 +10,7 @@ import {
   ThemeNotAvailableReasons,
   LogLevel,
 } from "./constants";
-import { API } from "./api";
 import { ChatMessage } from "./types/chatMessage";
-import { Logger } from "./logger";
 import { OnMessageFlags } from "comfy.js";
 import { Command } from "./types/command";
 
@@ -18,7 +18,7 @@ import { Command } from "./types/command";
  * Manages all logic associated with retrieving themes,
  * changing themes, etc.
  */
-export class Themer {
+export default class Themer {
   private _accessState: AccessState = AccessState.viewer;
   private _installState: AccessState = AccessState.follower;
   private _autoInstall: boolean = false;
@@ -539,7 +539,7 @@ export class Themer {
               `The requested theme does not include a public repository.`
             );
             break;
-          case ThemeNotAvailableReasons.packageJsonNotDownload:
+          case ThemeNotAvailableReasons.packageJsonNotDownloaded:
             Logger.log(
               LogLevel.error,
               `The requested theme's package.json could not be downloaded.`

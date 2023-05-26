@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { LogLevel } from "./constants";
 
-export abstract class Logger {
+export default abstract class Logger {
   private static _channel = vscode.window.createOutputChannel("Twitch Themer");
 
   public static log(

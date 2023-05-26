@@ -13,10 +13,11 @@ import {
   workspace,
   WorkspaceConfiguration,
 } from "vscode";
+import Logger from "./logger";
 import { ChatMessage } from "./types/chatMessage";
 import { ExtensionKeys, LogLevel } from "./constants";
 import { WhisperMessage } from "./types/whisperMessage";
-import { Logger } from "./logger";
+import Authentication from "./authentication";
 
 const comfyJS: ComfyJSInstance = require("comfy.js");
 
@@ -41,13 +42,6 @@ export default class ChatClient {
    */
   constructor(private _state: Memento) {
     this.initializeConfiguration();
-
-    // If this extension configuration changes, ensure the command trigger is updated
-    workspace.onDidChangeConfiguration((e: ConfigurationChangeEvent) => {
-      if (e.affectsConfiguration("twitchThemer")) {
-        this.initializeConfiguration();
-      }
-    });
   }
 
   public initializeConfiguration() {
@@ -110,7 +104,29 @@ export default class ChatClient {
   /**
    * Toggles whether the person is connected to Twitch chat
    */
-  public toggleChat() {
+  public async toggleChat(): Promise<void> {
+    const accessToken = this._state.get(ExtensionKeys.account) as string | null;
+    const authUserLogin = this._state.get(ExtensionKeys.userLogin) as
+      | string
+      | null;
+
+    if (!accessToken || !authUserLogin) {
+      let choice = await vscode.window.showInformationMessage(
+        "You must be signed in to Twitch to connect to Twitch chat. Sign in now?",
+        "Sign In",
+        "Cancel"
+      );
+      switch (choice) {
+        case "Sign In":
+          await Authentication.handleSignIn();
+          break;
+        case "Cancel":
+          Logger.log(LogLevel.info, `User decided to not log in to Twitch`);
+          return;
+      }
+      return;
+    }
+
     if (this.isConnected()) {
       this.disconnect();
     } else {

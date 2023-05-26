@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <script type="text/javascript">
+      window.onload = function () {
+        console.log(window.location.pathname);
+        console.log(window.location.href);
+        if (window.location.pathname === "/oauth") {
+          window.close();
+          return;
+        }
+        window.location.href = "oauth?" + window.location.hash.replace("#", "");
+      };
+    </script>
+  </head>
+
+  <body>
+    <h1>You can close the browser</h1>
+  </body>
+</html>

@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { AuthenticationService } from "./Authentication";
-import ChatClient from "./chat/ChatClient";
+import Authentication from "./authentication";
+import ChatClient from "./chatClient";
 import { TwitchClientStatus, Commands, ExtensionKeys } from "./constants";
 
 /**
@@ -11,7 +11,6 @@ import { TwitchClientStatus, Commands, ExtensionKeys } from "./constants";
  */
 export async function createStatusBarItem(
   context: vscode.ExtensionContext,
-  authService: AuthenticationService,
   chatClient: ChatClient
 ) {
   const statusBarItem = vscode.window.createStatusBarItem(
@@ -23,7 +22,7 @@ export async function createStatusBarItem(
 
   context.subscriptions.push(
     statusBarItem,
-    authService.onAuthStatusChanged(processAuthChange),
+    Authentication.onAuthStatusChanged(processAuthChange),
     chatClient.onConnectionChanged(processChatStatusChange)
   );
 

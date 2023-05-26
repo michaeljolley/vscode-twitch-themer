@@ -75,7 +75,7 @@ export enum ThemeNotAvailableReasons {
   /** Occurs if the API failed to match any repository for the extension on Visual Studio Marketplace */
   noRepositoryFound = "no repository found",
   /** Occurs when the API fails to download the package.json from the Github repo for the extension */
-  packageJsonNotDownload = "package.json could not be downloaded",
+  packageJsonNotDownloaded = "package.json could not be downloaded",
   /** Occurs when the API cannot find any theme contributions within the package.json from the Github repository */
   noThemesContributed = "no themes contributed within package.json",
   /** Occurs when the JSON.parse function cannot parse the JSON retrieved from Github repository */
@@ -86,8 +86,8 @@ export enum ThemeNotAvailableReasons {
 
 /** */
 export enum LogLevel {
-  info,
-  warn,
-  error,
-  debug,
+  info = "info",
+  warn = "warn",
+  error = "error",
+  debug = "debug",
 }
