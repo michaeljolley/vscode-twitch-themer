@@ -1,3 +1,10 @@
+## [2.0.10](https://github.com/builders-club/vscode-twitch-themer/compare/v2.0.9...v2.0.10) (2023-05-26)
+
+
+### Bug Fixes
+
+* **ci:** removed test step for release step ([1a069af](https://github.com/builders-club/vscode-twitch-themer/commit/1a069af1cf42b49ef2685fbe27cda08fcf132868))
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
