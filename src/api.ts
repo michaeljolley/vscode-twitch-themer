@@ -75,9 +75,7 @@ export default class API {
    * that it has at least one Theme contribution listed.
    * @param extensionName The unique id for the extension.
    */
-  public static async isValidExtensionName(
-    extensionName: string
-  ): Promise<{
+  public static async isValidExtensionName(extensionName: string): Promise<{
     available: boolean;
     reason?: ThemeNotAvailableReasons;
     label?: string[];
