@@ -26,7 +26,6 @@ suite("Themer Tests", function () {
     [string | undefined, vscode.Memento],
     Promise<boolean>
   >;
-  let fakeLogger: Logger;
   let fakeState: vscode.Memento;
   let fakeWorkspaceConfiguration: vscode.WorkspaceConfiguration;
   let fakeChatClient: ChatClient;
@@ -34,8 +33,6 @@ suite("Themer Tests", function () {
   let isTwitchUserFollowingReturn: boolean = false;
   const baseTheme: string = "Visual Studio Light";
   const testTheme: string = "Visual Studio Dark";
-  const badTheme: string = "HotDog Stand";
-  const testBroadcastUser: string = "BaldBeardedBuilder";
   const broadcaster: OnMessageFlags = {
     broadcaster: true,
     mod: false,
@@ -162,7 +159,6 @@ suite("Themer Tests", function () {
         return Promise.resolve();
       },
     };
-    fakeLogger = Logger;
     fakeState = {
       keys() {
         return Object.keys(stateValues);
