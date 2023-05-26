@@ -3,7 +3,7 @@ import { OnCommandExtra, OnMessageFlags } from "comfy.js";
 /**
  * Object that represents a Twitch chat message
  */
-export interface IChatMessage {
+export type ChatMessage = {
   /** User who sent the message */
   user: string;
   /** Message sent to chat */
@@ -12,4 +12,4 @@ export interface IChatMessage {
   flags: OnMessageFlags;
   /** Extra metadata re: the message */
   extra: OnCommandExtra;
-}
+};

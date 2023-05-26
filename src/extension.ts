@@ -1,141 +1,129 @@
-import * as vscode from 'vscode';
-import { AuthenticationService } from './Authentication';
-import ChatClient from './chat/ChatClient';
-import { Commands, TwitchClientStatus, AccessState } from './Enum';
-import { createStatusBarItem } from './StatusBar';
-import { Themer } from './commands/Themer';
-import { IChatMessage } from './chat/IChatMessage';
-import { IWhisperMessage } from './chat/IWhisperMessage';
-import { autoConnect } from './AutoConnect';
-import { Logger } from './Logger';
+import * as vscode from "vscode";
+import API from "./api";
+import Authentication from "./authentication";
+import ChatClient from "./chatClient";
+import Logger from "./logger";
+import Themer from "./themer";
 
-let activeExtension: Extension;
-let _authenticationService: AuthenticationService;
-let _chatClient: ChatClient;
-let _themer: Themer;
-let _context: vscode.ExtensionContext;
-let _logger: Logger;
+import { WhisperMessage } from "./types/whisperMessage";
+import { ChatMessage } from "./types/chatMessage";
+import { Commands, LogLevel } from "./constants";
+import { createStatusBarItem } from "./statusBar";
 
-export class Extension {
-  /** State of the extension */
-  public static twitchClientStatus: TwitchClientStatus;
+let _authentication: Authentication;
+let _chatClient: ChatClient | undefined;
+let _themer: Themer | undefined;
 
-  constructor(context: vscode.ExtensionContext) {
-    _logger = new Logger(vscode.window.createOutputChannel('Twitch Themer'));
-    _context = context;
-    _authenticationService = new AuthenticationService(_context.globalState, _logger);
-    _chatClient = new ChatClient(_context.globalState, _logger);
-    _themer = new Themer(_context.globalState, _logger);
-  }
-
-  public async initialize() {
-
-    _logger.log('Initializing themer...');
-
-    const statusBarItem = await createStatusBarItem(
-      _context,
-      _authenticationService,
-      _chatClient
-    );
-    const toggleChat = vscode.commands.registerCommand(
-      Commands.toggleChat,
-      _chatClient.toggleChat.bind(_chatClient)
-    );
-    const twitchSignIn = vscode.commands.registerCommand(
-      Commands.twitchSignIn,
-      _authenticationService.handleSignIn.bind(_authenticationService)
-    );
-    const twitchSignOut = vscode.commands.registerCommand(
-      Commands.twitchSignOut,
-      _authenticationService.handleSignOut.bind(_authenticationService)
-    );
-
-    const handleSettingsChange = vscode.workspace.onDidChangeConfiguration(
-      (e: vscode.ConfigurationChangeEvent) => {
-        if (e.affectsConfiguration('twitchThemer.accessState')) {
-          _themer.handleAccessStateChanged(
-            vscode.workspace
-              .getConfiguration()
-              .get('twitchThemer.accessState', AccessState.Viewers)
-          );
-        }
-      }
-    );
-
-    const themerOnSendMessage = _themer.onSendMessage(this.onSendMessage);
-    const themerOnSendWhisper = _themer.onSendWhisper(this.onSendWhisper);
-    const chatOnChatMessageReceived = _chatClient.onChatMessageReceived(this.onChatMessageReceived);
-    const authOnAuthStatusChanged = _authenticationService.onAuthStatusChanged(this.onAuthStatusChanged);
-    const chatOnConnectionChanged = _chatClient.onConnectionChanged(this.onChatConnectionChanged);
-
-    _context.subscriptions.push(
-      themerOnSendMessage,
-      themerOnSendWhisper,
-      chatOnChatMessageReceived,
-      authOnAuthStatusChanged,
-      chatOnConnectionChanged,
-
-      toggleChat,
-      twitchSignIn,
-      twitchSignOut,
-      statusBarItem,
-      handleSettingsChange
-    );
-
-    await _authenticationService.initialize();
-
-    // Auto connect to Twitch Chat if 'twitchThemer.autoConnect' is true (default is false)
-    // and we are currently streaming.
-    await autoConnect(_chatClient, _context.globalState);
-
-    _logger.log('Themer initialized.');
-  }
-
-  private onSendMessage(message: string) {
-    _chatClient.sendMessage(message);
-  }
-
-  private onSendWhisper(whisper: IWhisperMessage) {
-    _chatClient.whisper(whisper);
-  }
-
-  private onChatMessageReceived(chatMessage: IChatMessage) {
-    _themer.handleCommands(chatMessage);
-  }
-
-  private onAuthStatusChanged(signedIn: boolean) {
-    if (!signedIn) {
-      _chatClient.disconnect();
-    }
-    _themer.handleConnectionChanges(signedIn);
-  }
-
-  private async onChatConnectionChanged(connected: boolean) {
-    await _themer.handleConnectionChanges(connected);
-  }
-
-  public deactivate() {
-    _authenticationService.handleSignOut();
-  }
-}
-
-/**
- * Activates the extension in VS Code and registers commands available
- * in the command palette
- * @param context - Context the extension is being run in
- */
 export async function activate(context: vscode.ExtensionContext) {
+  Logger.log(LogLevel.info, "Initializing Twitch Themer...");
 
-  const extension: Extension = new Extension(context);
-  await extension.initialize();
-  activeExtension = extension;
+  _chatClient = new ChatClient(context.globalState);
+  _themer = new Themer(context.globalState);
 
-  _logger.log('Congratulations, Twitch Themer is now active!');
+  const statusBarItem = await createStatusBarItem(context, _chatClient);
+
+  const toggleChat = vscode.commands.registerCommand(
+    Commands.toggleChat,
+    _chatClient?.toggleChat.bind(_chatClient)
+  );
+  const twitchSignIn = vscode.commands.registerCommand(
+    Commands.twitchSignIn,
+    Authentication.handleSignIn.bind(Authentication)
+  );
+  const twitchSignOut = vscode.commands.registerCommand(
+    Commands.twitchSignOut,
+    () => {
+      if (_chatClient?.isConnected()) {
+        _chatClient?.disconnect();
+      }
+      Authentication.handleSignOut.bind(Authentication);
+    }
+  );
+
+  const handleSettingsChange = vscode.workspace.onDidChangeConfiguration(
+    (e: vscode.ConfigurationChangeEvent) => {
+      if (e.affectsConfiguration("twitchThemer")) {
+        _themer?.initializeConfiguration();
+        _chatClient?.initializeConfiguration();
+      }
+    }
+  );
+
+  const themerOnSendMessage = _themer.onSendMessage(onSendMessage);
+  const themerOnSendWhisper = _themer.onSendWhisper(onSendWhisper);
+  const chatOnChatMessageReceived = _chatClient.onChatMessageReceived(
+    onChatMessageReceived
+  );
+  const authOnAuthStatusChanged =
+    Authentication.onAuthStatusChanged(onAuthStatusChanged);
+  const chatOnConnectionChanged = _chatClient.onConnectionChanged(
+    onChatConnectionChanged
+  );
+
+  context.subscriptions.push(
+    themerOnSendMessage,
+    themerOnSendWhisper,
+    chatOnChatMessageReceived,
+    authOnAuthStatusChanged,
+    chatOnConnectionChanged,
+
+    toggleChat,
+    twitchSignIn,
+    twitchSignOut,
+    statusBarItem,
+    handleSettingsChange
+  );
+
+  Authentication.initialize(context.globalState);
+
+  // Auto connect to Twitch Chat if 'twitchThemer.autoConnect' is true (default is false)
+  // and we are currently streaming.
+  await autoConnect(_chatClient, context);
+
+  Logger.log(LogLevel.info, "Congratulations, Twitch Themer is now active!");
 }
 
 /**
- * Deactivates the extension in VS Code
+ * Clean up the extension resources.
  */
-export function deactivate() {
-  activeExtension.deactivate();
+export async function deactivate() {
+  await _chatClient?.disconnect();
+  _chatClient = undefined;
+  _themer = undefined;
+}
+
+async function autoConnect(
+  chatClient: ChatClient,
+  context: vscode.ExtensionContext
+) {
+  const shouldAutoConnect =
+    vscode.workspace
+      .getConfiguration("twitchThemer")
+      .get<boolean>("autoConnect") || false;
+  if (shouldAutoConnect && (await API.getStreamIsActive(context.globalState))) {
+    chatClient?.toggleChat.bind(chatClient)();
+  }
+}
+
+async function onSendMessage(message: string) {
+  await _chatClient?.sendMessage(message);
+}
+
+async function onSendWhisper(whisper: WhisperMessage) {
+  _chatClient?.whisper(whisper);
+}
+
+async function onChatMessageReceived(chatMessage: ChatMessage) {
+  await _themer?.handleCommands(chatMessage);
+}
+
+async function onAuthStatusChanged(signedIn: boolean) {
+  if (!signedIn) {
+    _chatClient?.disconnect();
+  }
+  _themer?.handleConnectionChanges(signedIn);
+}
+
+async function onChatConnectionChanged(connected: boolean) {
+  _themer?.handleConnectionChanges(connected);
 }

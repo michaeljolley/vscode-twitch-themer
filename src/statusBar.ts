@@ -1,7 +1,7 @@
-import * as vscode from 'vscode';
-import { AuthenticationService } from './Authentication';
-import ChatClient from './chat/ChatClient';
-import { TwitchClientStatus, Commands, ExtensionKeys } from './Enum';
+import * as vscode from "vscode";
+import Authentication from "./authentication";
+import ChatClient from "./chatClient";
+import { TwitchClientStatus, Commands, ExtensionKeys } from "./constants";
 
 /**
  * Creates the status bar item to use in updating users of the status of the extension
@@ -11,19 +11,18 @@ import { TwitchClientStatus, Commands, ExtensionKeys } from './Enum';
  */
 export async function createStatusBarItem(
   context: vscode.ExtensionContext,
-  authService: AuthenticationService,
   chatClient: ChatClient
 ) {
   const statusBarItem = vscode.window.createStatusBarItem(
     vscode.StatusBarAlignment.Left
   );
 
-  statusBarItem.tooltip = 'Twitch Themer Extension';
+  statusBarItem.tooltip = "Twitch Themer Extension";
   statusBarItem.command = Commands.toggleChat;
 
   context.subscriptions.push(
     statusBarItem,
-    authService.onAuthStatusChanged(processAuthChange),
+    Authentication.onAuthStatusChanged(processAuthChange),
     chatClient.onConnectionChanged(processChatStatusChange)
   );
 
@@ -57,25 +56,24 @@ async function updateStatusBarItem(
   authStatus: TwitchClientStatus,
   state: vscode.Memento
 ) {
-  const icon = '$(paintcan)'; // The octicon to use for the status bar icon (https://octicons.github.com/)
+  const icon = "$(paintcan)"; // The octicon to use for the status bar icon (https://octicons.github.com/)
   let text = `${icon}`;
   statusBarItem.show();
 
   let user: string | null = null;
   user = state.get(ExtensionKeys.userLogin) as string | null;
-  
 
   switch (authStatus) {
     case TwitchClientStatus.loggingIn:
-      text += ' Logging In...';
-      vscode.window.showInformationMessage('Signing in to Twitch');
+      text += " Logging In...";
+      vscode.window.showInformationMessage("Signing in to Twitch");
       break;
     case TwitchClientStatus.chatConnected:
       text += ` Connected`;
       break;
     case TwitchClientStatus.loggedIn:
     case TwitchClientStatus.loggedOut:
-      text += ' Disconnected';
+      text += " Disconnected";
       break;
   }
 

@@ -2,6 +2,7 @@
 
 [![Marketplace](https://img.shields.io/visual-studio-marketplace/v/MichaelJolley.vscode-twitch-themer)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![Installs](https://img.shields.io/visual-studio-marketplace/i/MichaelJolley.vscode-twitch-themer?color=blue&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![MIT](https://img.shields.io/badge/license-MIT-orange.png?color=blue&style=flat-round)](https://opensource.org/licenses/MIT) ![CI](https://img.shields.io/github/actions/workflow/status/builders-club/vscode-twitch-themer/CI.yml?logo=github)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.png?style=flat-round)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 A Visual Studio Code extension that listens to twitch chat and allows viewers to change the streamers VS Code theme by sending **!theme**
@@ -9,7 +10,6 @@ A Visual Studio Code extension that listens to twitch chat and allows viewers to
 ![](./resources/screenshot-example.gif)
 
 ## Quickstart Guide
-
 
 Install [VS Code](https://code.visualstudio.com/Download) if you don't already have it.
 
@@ -69,7 +69,7 @@ This command will set the theme of the streamers' VS Code workspace to the theme
 
 #### Set Random VS Code theme
 
-This command will set the theme of the streamers' VS Code workspace to a theme that is chosen at random.  If `dark` or `light` is specified it will only select
+This command will set the theme of the streamers' VS Code workspace to a theme that is chosen at random. If `dark` or `light` is specified it will only select
 a random theme from the appropriate option.
 
 ```
@@ -88,7 +88,7 @@ This command will set the theme of the streamers' VS Code workspace back to the 
 
 #### Refresh VS Code themes
 
-This command will refresh the list of available themes in the streamers VS Code instance.  Will also reset everyones ability to request the list of available themes.  Primarily used when themes are added/removed mid-stream.
+This command will refresh the list of available themes in the streamers VS Code instance. Will also reset everyone's ability to request the list of available themes. Primarily used when themes are added/removed mid-stream.
 
 ```
 !theme refresh
@@ -106,7 +106,6 @@ This command will look for the specified theme on the Visual Studio Marketplace.
 
 > **Example**: For the [Linux Themes for VS Code](https://marketplace.visualstudio.com/items?itemName=solarliner.linux-themes) extension, you would send `!theme install solarliner.linux-themes`
 
-
 #### Ban/Unban user from changing themes
 
 These commands will either ban or unban a user from changing the theme via Twitch chat.
@@ -119,14 +118,14 @@ These commands will either ban or unban a user from changing the theme via Twitc
 
 > Note: List of banned users will reset on extension activation/start up.
 
-----
+---
 
 ## Settings
 
 <img width="400px" src="https://user-images.githubusercontent.com/1228996/59153253-bf03f080-8a1a-11e9-9dc3-9fe92b3cb413.png" />
 
 - Twitch Themer: Auto Connect - enables or disables the auto connection feature.
-  *The extension will ensure you are streaming prior to connecting the bot to the Twitch chat service.*
+  _The extension will ensure you are streaming prior to connecting the bot to the Twitch chat service._
 
 #### Access State
 
@@ -148,20 +147,20 @@ You can change the trigger commands for the bot. For example, you can change `!t
 
 ### Available Triggers
 
-Trigger|Example|Description
--|-|-
-theme|!theme|The main trigger for the bot
-ban|!theme ban {username}|This will ban a user from using the command
-current|!theme current|The bot will say the current in chat
-help|!theme help|The bot will give some guidance in chat
-install|!theme install {theme-unique-id}|Installs a theme extension
-random|!theme random|Randomly changes the theme of vscode
-dark|!theme random dark|Randomly chooses a dark theme
-light|!theme random light|Randomly chooses a light theme
-refresh|!theme refresh|Refreshes the currently install themes
-repo|!theme repo|The bot will say the repo location for this extension
+| Trigger | Example                          | Description                                           |
+| ------- | -------------------------------- | ----------------------------------------------------- |
+| theme   | !theme                           | The main trigger for the bot                          |
+| ban     | !theme ban {username}            | This will ban a user from using the command           |
+| current | !theme current                   | The bot will say the current in chat                  |
+| help    | !theme help                      | The bot will give some guidance in chat               |
+| install | !theme install {theme-unique-id} | Installs a theme extension                            |
+| random  | !theme random                    | Randomly changes the theme of vscode                  |
+| dark    | !theme random dark               | Randomly chooses a dark theme                         |
+| light   | !theme random light              | Randomly chooses a light theme                        |
+| refresh | !theme refresh                   | Refreshes the currently install themes                |
+| repo    | !theme repo                      | The bot will say the repo location for this extension |
 
-----
+---
 
 ## Connecting / Disconnecting Twitch Chat
 
@@ -171,7 +170,7 @@ If you are signed in to Twitch you'll see your username next to the Twitch Theme
 
 Click on the icon to toggle between connecting/disconnecting from Twitch chat.
 
-----
+---
 
 ## Command Palette
 
@@ -187,19 +186,20 @@ Removes your Twitch authentication and, if connected, leaves Twitch chat.
 
 ## Attribution & Credits
 
-* Thanks to [Sivamuthu Kumar](https://github.com/ksivamuthu) for the authentication code that we blatantly plagiarized from his [VSCode Peacock Twitch Extension](https://github.com/ksivamuthu/vscode-peacock-twitch-client).
-* Thanks to [Brian Clark](https://github.com/clarkio) for his videos on creating VS Code extensions and his [VSCode Twitch Highlighter](https://github.com/clarkio/vscode-twitch-highlighter) extension that really is what brought about the idea for this extension.
+- Thanks to [Sivamuthu Kumar](https://github.com/ksivamuthu) for the authentication code that we blatantly plagiarized from his [VSCode Peacock Twitch Extension](https://github.com/ksivamuthu/vscode-peacock-twitch-client).
+- Thanks to [Brian Clark](https://github.com/clarkio) for his videos on creating VS Code extensions and his [VSCode Twitch Highlighter](https://github.com/clarkio/vscode-twitch-highlighter) extension that really is what brought about the idea for this extension.
 
-----
+---
+
 ## Release Notes
 
 See [CHANGELOG.md](CHANGELOG.md)
 
-----
+---
 
 ## Contributing
 
-Want to contribute? Check out our [Code of Conduct](CODE_OF_CONDUCT.md) and [Contributing](CONTRIBUTING.md) docs. This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.  Contributions of any kind welcome!
+Want to contribute? Check out our [Code of Conduct](CODE_OF_CONDUCT.md) and [Contributing](CONTRIBUTING.md) docs. This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
@@ -237,4 +237,5 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->

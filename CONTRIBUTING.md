@@ -25,9 +25,7 @@ Fork, then clone the repo:
 
     git clone git@github.com:your-username/vscode-twitch-themer.git
 
-**All changes should be based from the `vNext` branch.**
-
-Push to your fork and [submit a pull request](https://github.com/michaeljolley/vscode-twitch-themer/compare/) against the `vNext` branch.
+Push to your fork and [submit a pull request](https://github.com/builders-club/vscode-twitch-themer/compare/) against the `main` branch.
 
 At this point you're waiting on us. We like to at least comment on pull requests
 within three days (and, typically, one day). We may suggest

@@ -1,7 +1,7 @@
 /**
  * Object that represents an installed theme
  */
-export interface ITheme {
+export type Theme = {
   /** Id of the extension the theme belongs to */
   extensionId: string;
   /** Label of the theme.  Used as a friendly name of the theme */
@@ -15,4 +15,4 @@ export interface ITheme {
    * Whether the theme is considered "dark mode"
    */
   isDark: boolean;
-}
+};
