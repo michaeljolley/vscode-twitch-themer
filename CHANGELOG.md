@@ -1,3 +1,10 @@
+## [2.0.11](https://github.com/builders-club/vscode-twitch-themer/compare/v2.0.10...v2.0.11) (2023-06-06)
+
+
+### Bug Fixes
+
+* Extension now sends list of available themes to chat rather than whisper ([20330bf](https://github.com/builders-club/vscode-twitch-themer/commit/20330bfddb54dcb438c8b25f88db79362e1ed9ab))
+
 ## [2.0.10](https://github.com/builders-club/vscode-twitch-themer/compare/v2.0.9...v2.0.10) (2023-05-26)
 
 
