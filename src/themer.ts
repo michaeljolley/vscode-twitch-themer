@@ -30,11 +30,7 @@ export default class Themer {
   private _redemptionHoldPeriodMinutes: number = 5;
   private _pauseThemer: boolean = false;
 
-  private sendWhisperEventEmitter = new vscode.EventEmitter<WhisperMessage>();
   private sendMessageEventEmitter = new vscode.EventEmitter<string>();
-
-  /** Event that fires when themer needs to send a whisper */
-  public onSendWhisper = this.sendWhisperEventEmitter.event;
 
   /** Event that fires when themer needs to send a message */
   public onSendMessage = this.sendMessageEventEmitter.event;
@@ -348,19 +344,13 @@ export default class Themer {
       } else {
         /** If no more theme names can be added, go ahead and send the first message
          * and start over building the next message */
-        this.sendWhisperEventEmitter.fire({
-          user,
-          message: message.replace(/(^[,\s]+)|([,\s]+$)/g, ""),
-        });
+        this.sendMessageEventEmitter.fire(message.replace(/(^[,\s]+)|([,\s]+$)/g, ""));
         message = `${name}, `;
       }
     }
 
     /** Send the final message */
-    this.sendWhisperEventEmitter.fire({
-      user,
-      message: message.replace(/(^[,\s]+)|([,\s]+$)/g, ""),
-    });
+    this.sendMessageEventEmitter.fire(message.replace(/(^[,\s]+)|([,\s]+$)/g, ""));
   }
 
   /**
@@ -571,9 +561,8 @@ export default class Themer {
     try {
       // Authorize the install of the extension if we do not allow for auto-installed extensions.
       if (!this._autoInstall) {
-        const msg = `${user} wants to install theme(s) ${
-          isValidExtResult.label ? isValidExtResult.label.join(", ") : theme
-        }.`;
+        const msg = `${user} wants to install theme(s) ${isValidExtResult.label ? isValidExtResult.label.join(", ") : theme
+          }.`;
         Logger.log(LogLevel.info, `${msg}`);
         let choice = await vscode.window.showInformationMessage(
           msg,
@@ -736,8 +725,7 @@ export default class Themer {
           // start a "pause" timer
           this.setPauseStatus(true);
           this.sendMessageEventEmitter.fire(
-            `${user} has redeemed pausing the theme on ${themeName} for ${
-              this._redemptionHoldPeriodMinutes
+            `${user} has redeemed pausing the theme on ${themeName} for ${this._redemptionHoldPeriodMinutes
             } minute${this._redemptionHoldPeriodMinutes === 1 ? "" : "s"}.`
           );
           setTimeout(() => {

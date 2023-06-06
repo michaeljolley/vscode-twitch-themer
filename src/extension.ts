@@ -5,12 +5,10 @@ import ChatClient from "./chatClient";
 import Logger from "./logger";
 import Themer from "./themer";
 
-import { WhisperMessage } from "./types/whisperMessage";
 import { ChatMessage } from "./types/chatMessage";
 import { Commands, LogLevel } from "./constants";
 import { createStatusBarItem } from "./statusBar";
 
-let _authentication: Authentication;
 let _chatClient: ChatClient | undefined;
 let _themer: Themer | undefined;
 
@@ -50,7 +48,6 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   const themerOnSendMessage = _themer.onSendMessage(onSendMessage);
-  const themerOnSendWhisper = _themer.onSendWhisper(onSendWhisper);
   const chatOnChatMessageReceived = _chatClient.onChatMessageReceived(
     onChatMessageReceived
   );
@@ -62,7 +59,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     themerOnSendMessage,
-    themerOnSendWhisper,
     chatOnChatMessageReceived,
     authOnAuthStatusChanged,
     chatOnConnectionChanged,
@@ -107,10 +103,6 @@ async function autoConnect(
 
 async function onSendMessage(message: string) {
   await _chatClient?.sendMessage(message);
-}
-
-async function onSendWhisper(whisper: WhisperMessage) {
-  _chatClient?.whisper(whisper);
 }
 
 async function onChatMessageReceived(chatMessage: ChatMessage) {

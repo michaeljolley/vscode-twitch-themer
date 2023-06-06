@@ -128,7 +128,7 @@ export default class API {
       const repoUrl = `https://raw.githubusercontent.com/${repoUrlMatches[1].replace(
         ".git",
         ""
-      )}/main/package.json`;
+      )}/HEAD/package.json`;
       res = await fetch(repoUrl, { method: "GET" });
       if (res.status !== 200) {
         return {

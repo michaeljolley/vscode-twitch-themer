@@ -388,15 +388,14 @@ suite("Themer Tests", function () {
 
   test("Themer should return a comma separated list of themes", function (done) {
     let recipient: string;
-    let whisperedMessage: string;
+    let sentMessage: string;
 
-    const whisperStub = sinon
-      .stub(fakeChatClient, "whisper")
-      .callsFake((whisperMessage: WhisperMessage) => {
-        recipient = whisperMessage.user;
-        whisperedMessage = whisperMessage.message;
+    const sendMessageStub = sinon
+      .stub(fakeChatClient, "sendMessage")
+      .callsFake(async (message: string) => {
+        sentMessage = message;
       });
-    fakeThemer.onSendWhisper(whisperStub);
+    fakeThemer.onSendMessage(sendMessageStub);
 
     const message = "";
     const chatMessage: ChatMessage = {
@@ -407,11 +406,11 @@ suite("Themer Tests", function () {
     };
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        whisperStub.calledOnce.should.be.true;
+        sendMessageStub.calledOnce.should.be.true;
         recipient!.should.exist;
         recipient!.should.equal("test");
-        whisperedMessage.should.exist;
-        whisperedMessage.split(", ").length.should.be.greaterThan(0);
+        sentMessage.should.exist;
+        sentMessage.split(", ").length.should.be.greaterThan(0);
         done();
       } catch (error) {
         done(error);

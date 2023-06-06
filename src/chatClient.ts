@@ -152,17 +152,6 @@ export default class ChatClient {
   }
 
   /**
-   * Sends a whisper to the specified user
-   * @param twitchUser - Username of the recipient of the whisper
-   * @param message - Message to send to the twitchUser
-   */
-  public whisper(whisperMessage: WhisperMessage) {
-    if (this.isConnected() && whisperMessage.user !== undefined) {
-      comfyJS.Whisper(whisperMessage.message, whisperMessage.user);
-    }
-  }
-
-  /**
    * Sends a message to Twitch chat
    * @param message - Message to send to chat
    */
