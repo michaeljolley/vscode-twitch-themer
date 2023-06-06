@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/builders-club/vscode-twitch-themer/compare/v2.0.11...v2.1.0) (2023-06-06)
+
+
+### Features
+
+* Twitch custom point redemptions are now logged in the output ([d027ea9](https://github.com/builders-club/vscode-twitch-themer/commit/d027ea9a80f02814b4603768fddf9dd8de831d0c))
+
 ## [2.0.11](https://github.com/builders-club/vscode-twitch-themer/compare/v2.0.10...v2.0.11) (2023-06-06)
 
 
