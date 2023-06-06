@@ -5,6 +5,7 @@ import {
   OnJoinExtra,
   OnMessageExtra,
   OnMessageFlags,
+  OnRewardExtra,
 } from "comfy.js";
 import {
   EventEmitter,
@@ -15,7 +16,6 @@ import {
 import Logger from "./logger";
 import { ChatMessage } from "./types/chatMessage";
 import { ExtensionKeys, LogLevel } from "./constants";
-import { WhisperMessage } from "./types/whisperMessage";
 import Authentication from "./authentication";
 
 const comfyJS: ComfyJSInstance = require("comfy.js");
@@ -178,6 +178,10 @@ export default class ChatClient {
       return;
     }
 
+    if (extra.customRewardId) {
+      Logger.log(LogLevel.info, `Received custom reward ${extra.customRewardId} from ${user}`);
+    }
+
     message = message.toLocaleLowerCase().trim();
     this.chatClientMessageEventEmitter.fire({
       user,
@@ -197,6 +201,10 @@ export default class ChatClient {
     Logger.log(LogLevel.info, `Received ${message} from ${user}`);
     if (!message || this._redemptionHoldId.length === 0) {
       return;
+    }
+
+    if (extra.customRewardId) {
+      Logger.log(LogLevel.info, `Received custom reward ${extra.customRewardId} from ${user}`);
     }
 
     // Ensure this message is a point redemption and matches
@@ -222,7 +230,7 @@ export default class ChatClient {
 
     this.chatClientMessageEventEmitter.fire({
       user,
-      message: message,
+      message: message.toLowerCase().replace("!theme ", ""),
       flags,
       extra: onCommandExtra,
     });

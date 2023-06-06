@@ -3,7 +3,6 @@ import API from "./api";
 import Logger from "./logger";
 import { ListRecipient } from "./types/listRecipient";
 import { Theme } from "./types/theme";
-import { WhisperMessage } from "./types/whisperMessage";
 import {
   ExtensionKeys,
   AccessState,
@@ -27,6 +26,7 @@ export default class Themer {
   private _listRecipients: Array<ListRecipient> = [];
   private _followers: Array<ListRecipient> = [];
   private _commands: Command = {};
+  private _redemptionHoldId: string = "";
   private _redemptionHoldPeriodMinutes: number = 5;
   private _pauseThemer: boolean = false;
 
@@ -105,6 +105,9 @@ export default class Themer {
     this._commands["ban"] = configuration.get<string>("banCommand") || "ban";
     this._redemptionHoldPeriodMinutes =
       configuration.get<number>("redemptionHoldPeriodMinutes") || 5;
+    this._redemptionHoldId = vscode.workspace
+      .getConfiguration()
+      .get("twitchThemer.redemptionHoldId", "");
 
     /**
      * Get the configuration to auto-install or not
@@ -233,7 +236,8 @@ export default class Themer {
           chatMessage.user,
           chatMessage.extra.userId,
           chatMessage.flags,
-          message
+          message,
+          chatMessage.extra.customRewardId
         );
         break;
     }
@@ -675,7 +679,8 @@ export default class Themer {
     user: string,
     userId: string,
     onMessageFlags: OnMessageFlags,
-    themeName: string
+    themeName: string,
+    customRewardId?: string
   ) {
     let userAccessState = AccessState.viewer;
     const userLevel = this.getUserLevel(onMessageFlags);
@@ -716,16 +721,17 @@ export default class Themer {
     if (theme) {
       if (this._pauseThemer) {
         this.sendMessageEventEmitter.fire(
-          `${user}, theme changes are paused. Please try again in a few minutes.`
+          ` @${user}, theme changes are paused. Please try again in a few minutes.`
         );
       } else {
         await this.setTheme(user, theme);
 
-        if (onMessageFlags.customReward) {
+        if (onMessageFlags.customReward &&
+          customRewardId === this._redemptionHoldId) {
           // start a "pause" timer
           this.setPauseStatus(true);
           this.sendMessageEventEmitter.fire(
-            `${user} has redeemed pausing the theme on ${themeName} for ${this._redemptionHoldPeriodMinutes
+            ` @${user} has redeemed pausing the theme on ${themeName} for ${this._redemptionHoldPeriodMinutes
             } minute${this._redemptionHoldPeriodMinutes === 1 ? "" : "s"}.`
           );
           setTimeout(() => {

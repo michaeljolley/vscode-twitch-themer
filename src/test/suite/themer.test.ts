@@ -5,10 +5,8 @@ import * as sinon from "sinon";
 
 import API from "../../api";
 import ChatClient from "../../chatClient";
-import Logger from "../../logger";
 import Themer from "../../themer";
 import { ChatMessage } from "../../types/chatMessage";
-import { WhisperMessage } from "../../types/whisperMessage";
 import { AccessState } from "../../constants";
 import { OnCommandExtra, OnMessageFlags } from "comfy.js";
 
