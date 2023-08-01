@@ -1,19 +1,21 @@
 import * as vscode from "vscode";
 import fetch from "node-fetch";
 import Logger from "./logger";
-import { ExtensionKeys, LogLevel, ThemeNotAvailableReasons } from "./constants";
+import { LogLevel, ThemeNotAvailableReasons } from "./constants";
+import Authentication from "./authentication";
 
 export default class API {
   public static async isTwitchUserFollowing(
-    twitchUserId: string | undefined,
-    state: vscode.Memento
+    twitchUserId: string | undefined
   ) {
     if (twitchUserId) {
-      const accessToken = state.get(ExtensionKeys.account);
-      const currentUserId = state.get(ExtensionKeys.userId);
 
-      if (accessToken && currentUserId) {
-        const url = `https://api.twitch.tv/helix/channels/followers?user_id=${twitchUserId}&broadcaster_id=${currentUserId}`;
+      const currentSession = await Authentication.getSession();
+      const accessToken = currentSession?.accessToken;
+      const login = currentSession?.account?.label;
+
+      if (accessToken && login) {
+        const url = `https://api.twitch.tv/helix/channels/followers?user_id=${twitchUserId}&broadcaster_id=${login}`;
         try {
           const res = await fetch(url, {
             method: "GET",
@@ -25,7 +27,7 @@ export default class API {
             },
           });
           const { data } = (await res.json()) as { data: any[] };
-          return data.length > 0 ? true : false;
+          return data && data.length > 0 ? true : false;
         } catch (err: any) {
           Logger.log(
             LogLevel.debug,
@@ -60,7 +62,7 @@ export default class API {
       });
 
       const { data } = (await res.json()) as { data: any[] };
-      return data[0];
+      return data && data.length > 0 ? data[0] : undefined;
     } catch (err: any) {
       Logger.log(
         LogLevel.error,
@@ -173,8 +175,11 @@ export default class API {
   public static async getStreamIsActive(
     _state: vscode.Memento
   ): Promise<boolean> {
-    const accessToken = _state.get(ExtensionKeys.account);
-    const currentUserId = _state.get(ExtensionKeys.userId);
+
+    const currentSession = await Authentication.getSession();
+    const accessToken = currentSession?.accessToken;
+    const currentUserId = currentSession?.account?.label;
+
     if (accessToken && currentUserId) {
       const url = `https://api.twitch.tv/helix/streams?user_id=${currentUserId}`;
       const res = await fetch(url, {
@@ -186,7 +191,7 @@ export default class API {
       });
       const { data }: any = await res.json();
 
-      return data.length > 0 ? true : false;
+      return data && data.length > 0 ? true : false;
     }
     return false;
   }

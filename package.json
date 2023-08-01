@@ -25,6 +25,9 @@
     "color",
     "chat"
   ],
+  "extensionDependencies": [
+    "clarkio.vscode-twitch-authprovider"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/builders-club/vscode-twitch-themer"
@@ -44,11 +47,6 @@
       {
         "command": "twitchThemer.signIn",
         "title": "Sign In",
-        "category": "Twitch Themer"
-      },
-      {
-        "command": "twitchThemer.signOut",
-        "title": "Sign Out",
         "category": "Twitch Themer"
       },
       {

@@ -10,8 +10,7 @@
       "type": "extensionHost",
       "request": "launch",
       "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}",
-        "--disable-extensions"
+        "--extensionDevelopmentPath=${workspaceFolder}"
       ],
       "preLaunchTask": "npm: compile"
     },
@@ -22,10 +21,8 @@
       "runtimeExecutable": "${execPath}",
       "args": [
         "--extensionDevelopmentPath=${workspaceFolder}",
-        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index",
-        "--disable-extensions"
+        "--extensionTestsPath=${workspaceFolder}/out/test/suite/index"
       ],
-      "outFiles": ["${workspaceFolder}/out/test/**/*.js"],
       "preLaunchTask": "npm: compile-tests"
     }
   ]

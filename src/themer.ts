@@ -461,7 +461,7 @@ export default class Themer {
         this._followers.find((x) => x.username === user.toLocaleLowerCase())
       ) {
         break following;
-      } else if (await API.isTwitchUserFollowing(userId, this._state)) {
+      } else if (await API.isTwitchUserFollowing(userId)) {
         this._followers.push({
           username: user.toLocaleLowerCase(),
         });
@@ -697,7 +697,7 @@ export default class Themer {
       this._followers.find((x) => x.username === user.toLocaleLowerCase())
     ) {
       userAccessState = AccessState.follower;
-    } else if (await API.isTwitchUserFollowing(userId, this._state)) {
+    } else if (await API.isTwitchUserFollowing(userId)) {
       this._followers.push({ username: user.toLocaleLowerCase() });
       userAccessState = AccessState.follower;
     }

@@ -28,15 +28,6 @@ export async function activate(context: vscode.ExtensionContext) {
     Commands.twitchSignIn,
     Authentication.handleSignIn.bind(Authentication)
   );
-  const twitchSignOut = vscode.commands.registerCommand(
-    Commands.twitchSignOut,
-    () => {
-      if (_chatClient?.isConnected()) {
-        _chatClient?.disconnect();
-      }
-      Authentication.handleSignOut.bind(Authentication);
-    }
-  );
 
   const handleSettingsChange = vscode.workspace.onDidChangeConfiguration(
     (e: vscode.ConfigurationChangeEvent) => {
@@ -65,7 +56,6 @@ export async function activate(context: vscode.ExtensionContext) {
 
     toggleChat,
     twitchSignIn,
-    twitchSignOut,
     statusBarItem,
     handleSettingsChange
   );
