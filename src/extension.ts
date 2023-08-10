@@ -30,7 +30,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
   const twitchSignOut = vscode.commands.registerCommand(
     Commands.twitchSignOut,
-    () => {
+    function () {
       if (_chatClient?.isConnected()) {
         _chatClient?.disconnect();
       }

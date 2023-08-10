@@ -25,7 +25,7 @@ export default class API {
             },
           });
           const { data } = (await res.json()) as { data: any[] };
-          return data.length > 0 ? true : false;
+          return data && data.length > 0 ? true : false;
         } catch (err: any) {
           Logger.log(
             LogLevel.debug,
@@ -60,7 +60,7 @@ export default class API {
       });
 
       const { data } = (await res.json()) as { data: any[] };
-      return data[0];
+      return data && data.length > 0 ? data[0] : undefined;
     } catch (err: any) {
       Logger.log(
         LogLevel.error,
@@ -90,6 +90,7 @@ export default class API {
         method: "GET",
         headers: { Accept: "*/*", "User-Agent": "VSCode-Twitch-Themer" },
       });
+
       if (res.status === 404) {
         return { available: false, reason: ThemeNotAvailableReasons.notFound };
       }
@@ -186,7 +187,7 @@ export default class API {
       });
       const { data }: any = await res.json();
 
-      return data.length > 0 ? true : false;
+      return data && data.length > 0 ? true : false;
     }
     return false;
   }
