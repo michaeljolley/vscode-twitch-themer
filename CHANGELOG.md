@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/builders-club/vscode-twitch-themer/compare/v2.1.0...v2.1.1) (2023-08-10)
+
+
+### Bug Fixes
+
+* twitch api failures no longer crash the extension ([f6d3ace](https://github.com/builders-club/vscode-twitch-themer/commit/f6d3acea1534c469f2864bf2f948cfba5a35ea88))
+
 # [2.1.0](https://github.com/builders-club/vscode-twitch-themer/compare/v2.0.11...v2.1.0) (2023-06-06)
 
 
