@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import fetch from "node-fetch";
+import axios from 'axios';
 import Logger from "./logger";
 import { LogLevel, ThemeNotAvailableReasons, twitchAPIClientId } from "./constants";
 import Authentication from "./authentication";
@@ -17,8 +17,7 @@ export default class API {
       if (accessToken && login) {
         const url = `https://api.twitch.tv/helix/channels/followers?user_id=${twitchUserId}&broadcaster_id=${login}`;
         try {
-          const res = await fetch(url, {
-            method: "GET",
+          const res = await axios.get(url, {
             headers: {
               // eslint-disable-next-line @typescript-eslint/naming-convention
               Authorization: `Bearer ${accessToken}`,
@@ -26,8 +25,10 @@ export default class API {
               "client-id": twitchAPIClientId,
             },
           });
-          const { data } = (await res.json()) as { data: any[] };
-          return data && data.length > 0 ? true : false;
+          if (res.status === 200) {
+            const { data } = res;
+            return data && data.length > 0 ? true : false;
+          }
         } catch (err: any) {
           Logger.log(
             LogLevel.debug,
@@ -51,8 +52,7 @@ export default class API {
     const url = "https://api.twitch.tv/helix/users";
 
     try {
-      const res = await fetch(url, {
-        method: "GET",
+      const res = await axios.get(url, {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           Authorization: `Bearer ${token}`,
@@ -61,8 +61,10 @@ export default class API {
         },
       });
 
-      const { data } = (await res.json()) as { data: any[] };
-      return data && data.length > 0 ? data[0] : undefined;
+      if (res.status === 200) {
+        const { data } = res;
+        return data && data.length > 0 ? data[0] : undefined;
+      }
     } catch (err: any) {
       Logger.log(
         LogLevel.error,
@@ -88,15 +90,14 @@ export default class API {
   }> {
     const url = `https://marketplace.visualstudio.com/items?itemName=${extensionName}`;
     try {
-      let res = await fetch(url, {
-        method: "GET",
+      let res = await axios.get(url, {
         headers: { Accept: "*/*", "User-Agent": "VSCode-Twitch-Themer" },
       });
       if (res.status === 404) {
         return { available: false, reason: ThemeNotAvailableReasons.notFound };
       }
 
-      const body = await res.text();
+      const body = res.data;
       if (!body) {
         return { available: false, reason: ThemeNotAvailableReasons.notFound };
       }
@@ -131,7 +132,7 @@ export default class API {
         ".git",
         ""
       )}/HEAD/package.json`;
-      res = await fetch(repoUrl, { method: "GET" });
+      res = await axios.get(repoUrl);
       if (res.status !== 200) {
         return {
           available: false,
@@ -140,7 +141,7 @@ export default class API {
       }
 
       try {
-        const packageJson: any = await res.json();
+        const packageJson: any = res.data;
 
         if (
           !packageJson.contributes.themes ||
@@ -182,16 +183,16 @@ export default class API {
 
     if (accessToken && currentUserId) {
       const url = `https://api.twitch.tv/helix/streams?user_id=${currentUserId}`;
-      const res = await fetch(url, {
-        method: "GET",
+      const res = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "client-id": twitchAPIClientId,
         },
       });
-      const { data }: any = await res.json();
-
-      return data && data.length > 0 ? true : false;
+      if (res.status === 200) {
+        const { data }: any = res;
+        return data && data.length > 0 ? true : false;
+      }
     }
     return false;
   }
