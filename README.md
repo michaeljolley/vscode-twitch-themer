@@ -123,7 +123,8 @@ This will send a message to Twitch chat letting everyone know where to access th
 
 ### Access State
 
-On the settings UI, you can specify whether the extension should only react to all viewers, only followers or only subscribers.
+On the settings UI, you can specify whether the extension should only react to 
+all viewers, followers, VIPs, subscribers, moderators, or only the broadcaster.
 
 ### Auto Connect
 
