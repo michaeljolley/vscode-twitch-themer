@@ -1,102 +1,64 @@
 # Twitch Themer
 
-[![Marketplace](https://img.shields.io/visual-studio-marketplace/v/MichaelJolley.vscode-twitch-themer)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![Installs](https://img.shields.io/visual-studio-marketplace/i/MichaelJolley.vscode-twitch-themer?color=blue&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![MIT](https://img.shields.io/badge/license-MIT-orange.png?color=blue&style=flat-round)](https://opensource.org/licenses/MIT) ![CI](https://img.shields.io/github/actions/workflow/status/builders-club/vscode-twitch-themer/CI.yml?logo=github)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![Marketplace](https://img.shields.io/visual-studio-marketplace/v/MichaelJolley.vscode-twitch-themer)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![Installs](https://img.shields.io/visual-studio-marketplace/i/MichaelJolley.vscode-twitch-themer?color=blue&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![MIT](https://img.shields.io/badge/license-MIT-orange.png?color=blue&style=flat-round)](https://opensource.org/licenses/MIT)
+
+![CI](https://img.shields.io/github/actions/workflow/status/builders-club/vscode-twitch-themer/CI.yml?logo=github)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.png?style=flat-round)](#contributors-)
 
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-A Visual Studio Code extension that listens to twitch chat and allows viewers to change the streamers VS Code theme by sending **!theme**
+A Visual Studio Code extension that listens to twitch chat and allows viewers to change the streamers VS Code theme by using the **!theme** command.
 
 ![](./resources/screenshot-example.gif)
 
 ## Quickstart Guide
 
-Install [VS Code](https://code.visualstudio.com/Download) if you don't already have it.
+To connect to your Twitch channel, click the Accounts button and click 
+"Sign in with Twitch to use Twitch Themer".
 
-Install [Twitch Themer](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) from the Visual Studio Marketplace
+![VS Code Accounts tab opened](https://github.com/builders-club/vscode-twitch-themer/assets/1228996/655088ba-6408-4170-9dbc-017ed97a34ba)
 
-Connect Twitch Themer to Twitch from the Command Palette (Ctrl + Shift + P)
+This will open a browser to authorize Twitch Themer to access your Twitch
+chat.
 
-This opens the Twitch Authentication page. Login to your Twitch account
+Once you've authorized Twitch Themer, you can join Twitch chat by using the 
+command palette (Ctrl+Shift+P) and searching for "Twitch Themer: Toggle Chat".
 
-Done!
+Once you've used Twitch Themer, an icon will display in the status bar allowing
+you to toggle the connection to Twitch chat.
+
+![Twitch Themer icon in the VS Code status bar](https://github.com/builders-club/vscode-twitch-themer/assets/1228996/b9433092-b999-4af4-a04e-7dc776c6bbe0)
+
+Then you're done. Now viewers can use the `!theme` command to change your
+VS Code theme.
 
 ## Twitch Chat Commands
 
-#### Receive a list of available theme names
-
-This will send a list of installed VS Code themes to the requestor via whisper.
-
-```
-!theme
-```
-
-> Note: Only 1 whisper per user will be sent per day.
-
-#### Send response to chat of current theme
-
-This will send the currently active theme to Twitch chat.
-
-```
-!theme current
-```
-
-#### Send info about this GitHub repo to chat
-
-This will send a message to Twitch chat letting everyone know where to access the source for this extension.
-
-```
-!theme repo
-```
-
-#### Explain how to use the extensions commands
-
-This will send a message to Twitch chat explaining the available commands.
-
-```
-!theme help
-```
-
-#### Set VS Code theme
+### !theme {theme name}
 
 This command will set the theme of the streamers' VS Code workspace to the theme specified.
 
 ```
-!theme {theme name}
+!theme Dracula
 ```
 
 > Note: The theme must be previously installed and available within VS Code.
 
-#### Set Random VS Code theme
+
+### !theme random
 
 This command will set the theme of the streamers' VS Code workspace to a theme that is chosen at random. If `dark` or `light` is specified it will only select
 a random theme from the appropriate option.
 
 ```
-!theme random {dark || light}
+!theme random
+
+!theme random dark
+
+!theme random light
 ```
 
-#### Reset VS Code theme
-
-This command will set the theme of the streamers' VS Code workspace back to the theme that was used at the time the extension connected to chat.
-
-```
-!theme reset
-```
-
-> Note: Everytime the extension disconnects from chat, the theme will be reset.
-
-#### Refresh VS Code themes
-
-This command will refresh the list of available themes in the streamers VS Code instance. Will also reset everyone's ability to request the list of available themes. Primarily used when themes are added/removed mid-stream.
-
-```
-!theme refresh
-```
-
-> Note: List of themes and request timers will only be reset if the command is sent from the broadcaster.
-
-#### Install VS Code themes
+#### !theme install
 
 This command will look for the specified theme on the Visual Studio Marketplace. If found, it will attempt to pull the package.json for the theme from its repository. If that package.json includes themes, the streamer will be prompted to install, not install and/or preview the theme.
 
@@ -105,10 +67,37 @@ This command will look for the specified theme on the Visual Studio Marketplace.
 ```
 
 > **Example**: For the [Linux Themes for VS Code](https://marketplace.visualstudio.com/items?itemName=solarliner.linux-themes) extension, you would send `!theme install solarliner.linux-themes`
+ 
+### !theme reset
 
-#### Ban/Unban user from changing themes
+This command will set the theme of the streamers' VS Code workspace back to the theme that was used at the time the extension connected to chat.
 
-These commands will either ban or unban a user from changing the theme via Twitch chat.
+```
+!theme reset
+```
+
+> Note: Every time the extension disconnects from chat, the theme will be reset.
+
+### !theme current
+
+This will send the currently active theme to Twitch chat.
+
+```
+!theme current
+```
+
+### !theme help
+
+This will send a message to Twitch chat explaining the available commands.
+
+```
+!theme help
+```
+
+### !theme ban or !ban
+
+These commands will either ban or unban a user from changing the theme via 
+Twitch chat.
 
 ```
 !theme ban {username}
@@ -118,76 +107,53 @@ These commands will either ban or unban a user from changing the theme via Twitc
 
 > Note: List of banned users will reset on extension activation/start up.
 
+#### !theme repo
+
+This will send a message to Twitch chat letting everyone know where to access the source for this extension.
+
+```
+!theme repo
+```
+
 ---
 
 ## Settings
 
 <img width="400px" src="https://user-images.githubusercontent.com/1228996/59153253-bf03f080-8a1a-11e9-9dc3-9fe92b3cb413.png" />
 
-- Twitch Themer: Auto Connect - enables or disables the auto connection feature.
-  _The extension will ensure you are streaming prior to connecting the bot to the Twitch chat service._
-
-#### Access State
+### Access State
 
 On the settings UI, you can specify whether the extension should only react to all viewers, only followers or only subscribers.
 
-#### Auto Connect
+### Auto Connect
 
 This setting will toggle whether the extension will automatically connect to Twitch when you launch Visual Studio Code.
 
-#### Auto Install
+_The extension will ensure you are streaming prior to connecting the bot to the Twitch chat service._
+
+### Auto Install
 
 This setting will toggle whether the extension will automatically install requested themes or show a prompt.
 
-#### Command Triggers
+### Command Triggers
 
 You can change the trigger commands for the bot. For example, you can change `!theme` to `!colour` by changing the **Theme Command** setting.
 
 ---
 
-### Available Triggers
+#### Available Triggers
 
 | Trigger | Example                          | Description                                           |
 | ------- | -------------------------------- | ----------------------------------------------------- |
 | theme   | !theme                           | The main trigger for the bot                          |
-| ban     | !theme ban {username}            | This will ban a user from using the command           |
-| current | !theme current                   | The bot will say the current in chat                  |
-| help    | !theme help                      | The bot will give some guidance in chat               |
-| install | !theme install {theme-unique-id} | Installs a theme extension                            |
 | random  | !theme random                    | Randomly changes the theme of vscode                  |
 | dark    | !theme random dark               | Randomly chooses a dark theme                         |
 | light   | !theme random light              | Randomly chooses a light theme                        |
-| refresh | !theme refresh                   | Refreshes the currently install themes                |
+| current | !theme current                   | The bot will say the current in chat                  |
+| install | !theme install {theme-unique-id} | Installs a theme extension                            |
+| help    | !theme help                      | The bot will give some guidance in chat               |
+| ban     | !theme ban {username}            | This will ban a user from using the command           |
 | repo    | !theme repo                      | The bot will say the repo location for this extension |
-
----
-
-## Connecting / Disconnecting Twitch Chat
-
-<img width="250px" src="https://user-images.githubusercontent.com/1228996/59153329-338b5f00-8a1c-11e9-8086-07619ea691d3.png" />
-
-If you are signed in to Twitch you'll see your username next to the Twitch Themer paint bucket icon.
-
-Click on the icon to toggle between connecting/disconnecting from Twitch chat.
-
----
-
-## Command Palette
-
-#### Twitch Themer: Sign In
-
-Opens the Twitch Authentication page. Login to your Twitch account to access chat.
-
-#### Twitch Themer: Sign Out
-
-Removes your Twitch authentication and, if connected, leaves Twitch chat.
-
----
-
-## Attribution & Credits
-
-- Thanks to [Sivamuthu Kumar](https://github.com/ksivamuthu) for the authentication code that we blatantly plagiarized from his [VSCode Peacock Twitch Extension](https://github.com/ksivamuthu/vscode-peacock-twitch-client).
-- Thanks to [Brian Clark](https://github.com/clarkio) for his videos on creating VS Code extensions and his [VSCode Twitch Highlighter](https://github.com/clarkio/vscode-twitch-highlighter) extension that really is what brought about the idea for this extension.
 
 ---
 
