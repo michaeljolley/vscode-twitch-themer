@@ -736,7 +736,7 @@ export default class Themer {
           f.themeId.toLocaleLowerCase() === currentThemeName.toLocaleLowerCase())
     )[0];
 
-    this.sendMessageEventEmitter.fire(messageCurrent(theme.label, theme.extensionId));
+    this.sendMessageEventEmitter.fire(messageCurrent(currentThemeName, theme.extensionId));
   }
 
   /**
