@@ -1,3 +1,5 @@
+import { Theme } from "./types/theme";
+
 /**
  * Access level for viewers
  */
@@ -101,3 +103,30 @@ export const twitchAPIClientId = "ts9wowek7hj9yw0q7gmg27c29i6etn";
  * Twitch scopes required for the extension to function 
 */
 export const twitchScopes = [`TWITCH_CLIENT_ID:${twitchAPIClientId}`, "chat:read", "chat:edit"];
+
+export const messageHelp = "Available !theme commands are: random, random \
+dark, random light, current, and repo. \
+You can also use !theme <theme name> to choose a specific theme. Or install \
+a theme using !theme install <id of the theme>";
+
+export const messageRepo = "You can find the source code for this VS \
+Code extension at https://github.com/builders-club/vscode-twitch-themer . \
+Feel free to fork & contribute.";
+
+export const messagePaused = (user: string) => `@${user}, theme changes are paused. Please try again in a few minutes.`;
+
+export const messageCurrent = (theme: string) => `The current theme is ${theme}`;
+
+export const messageInvalidTheme = (user: string, theme: string) =>  `${user}, ${theme} is not a valid theme name or \
+isn't installed.  You can use !theme to get a list of available themes.`;
+
+export const messageOnPaused = (user:string, theme: string, minutes: number) => `@${user} has redeemed pausing the theme on ${theme} for ${minutes} \
+minute${minutes === 1 ? "" : "s"}.`;
+
+export const messageInstalled = (user: string, labels: string[]) => `@${user}, the theme(s) '${labels.join(
+  ", "
+)}' were installed successfully.`;
+
+export const messageThemeExists = (user: string, theme: string, labels: string[]) => `@${user}, '${theme}' is already installed. To switch to it, send: !theme ${labels.join(
+  " -or- !theme "
+)}`;

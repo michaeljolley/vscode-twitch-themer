@@ -8,7 +8,6 @@ import Themer from "./themer";
 import { ChatMessage } from "./types/chatMessage";
 import { Commands, LogLevel } from "./constants";
 import { createStatusBarItem } from "./statusBar";
-import { Whisper } from "./types/whisper";
 
 let _chatClient: ChatClient | undefined;
 let _themer: Themer | undefined;

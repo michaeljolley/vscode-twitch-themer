@@ -8,10 +8,17 @@ import {
   AccessState,
   ThemeNotAvailableReasons,
   LogLevel,
+  messageHelp,
+  messageRepo,
+  messageCurrent,
+  messageInvalidTheme,
+  messageOnPaused,
+  messagePaused,
+  messageInstalled,
+  messageThemeExists,
 } from "./constants";
 import { ChatMessage } from "./types/chatMessage";
 import { Command } from "./types/command";
-import { Whisper } from "./types/whisper";
 
 /**
  * Manages all logic associated with retrieving themes,
@@ -460,10 +467,7 @@ export default class Themer {
     );
     if (themes.length > 0) {
       const uniqueThemeLabels = Array.from(new Set(themes.map((t) => t.label)));
-      const msg = `@${user}, '${theme}' is already installed. To switch to it, send: !theme ${uniqueThemeLabels.join(
-        " -or- !theme "
-      )}`;
-      this.sendMessageEventEmitter.fire(msg);
+      this.sendMessageEventEmitter.fire(messageThemeExists(user, theme, uniqueThemeLabels));
       return;
     }
 
@@ -558,10 +562,8 @@ export default class Themer {
       );
       Logger.log(LogLevel.info, "Theme extension install request complete.");
 
-      const msg = `@${user}, the theme(s) '${isValidExtResult.label!.join(
-        ", "
-      )}' were installed successfully.`;
-      this.sendMessageEventEmitter.fire(msg);
+     
+      this.sendMessageEventEmitter.fire(messageInstalled(user, isValidExtResult.label || []));
     } catch (err: any) {
       // Handle the error
       Logger.log(LogLevel.error, err);
@@ -673,7 +675,7 @@ export default class Themer {
     if (theme) {
       if (this._pauseThemer) {
         this.sendMessageEventEmitter.fire(
-          ` @${user}, theme changes are paused. Please try again in a few minutes.`
+          messagePaused(user)
         );
       } else {
         await this.setTheme(user, theme);
@@ -683,8 +685,7 @@ export default class Themer {
           // start a "pause" timer
           this.setPauseStatus(true);
           this.sendMessageEventEmitter.fire(
-            ` @${user} has redeemed pausing the theme on ${themeName} for ${this._redemptionHoldPeriodMinutes
-            } minute${this._redemptionHoldPeriodMinutes === 1 ? "" : "s"}.`
+            messageOnPaused(user, theme.label, this._redemptionHoldPeriodMinutes)
           );
           setTimeout(() => {
             this.setPauseStatus(false);
@@ -696,8 +697,7 @@ export default class Themer {
       }
     } else {
       this.sendMessageEventEmitter.fire(
-        `${user}, ${themeName} is not a valid theme name or \
-        isn't installed.  You can use !theme to get a list of available themes.`
+       messageInvalidTheme(user, themeName)
       );
     }
   }
@@ -727,29 +727,21 @@ export default class Themer {
     const currentTheme = vscode.workspace
       .getConfiguration()
       .get("workbench.colorTheme");
-    this.sendMessageEventEmitter.fire(`The current theme is ${currentTheme}`);
+    this.sendMessageEventEmitter.fire(messageCurrent(currentTheme as string));
   }
 
   /**
    * Announces to chat info about the extensions GitHub repository
    */
   private async repo() {
-    const repoMessage =
-      "You can find the source code for this VS \
-        Code extension at https://github.com/builders-club/vscode-twitch-themer . \
-        Feel free to fork & contribute.";
-    this.sendMessageEventEmitter.fire(repoMessage);
+    this.sendMessageEventEmitter.fire(messageRepo);
   }
 
   /**
    * Announces to chat a message with a brief explanation of how to use the commands
    */
   private async help() {
-    const helpMessage: string = `Available !theme commands are: random, random \
-      dark, random light, current, and repo. \
-      You can also use !theme <theme name> to choose a specific theme. Or install
-      a theme using !theme install <id of the theme> `;
-    this.sendMessageEventEmitter.fire(helpMessage);
+    this.sendMessageEventEmitter.fire(messageHelp);
   }
 
   /**

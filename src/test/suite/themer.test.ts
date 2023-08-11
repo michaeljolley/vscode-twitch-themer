@@ -7,9 +7,8 @@ import API from "../../api";
 import ChatClient from "../../chatClient";
 import Themer from "../../themer";
 import { ChatMessage } from "../../types/chatMessage";
-import { AccessState } from "../../constants";
+import { AccessState, messageCurrent, messageHelp, messagePaused, messageRepo } from "../../constants";
 import { OnCommandExtra, OnMessageFlags } from "comfy.js";
-import { Whisper } from "../../types/whisper";
 
 chai.should();
 
@@ -217,15 +216,10 @@ suite("Themer Tests", function () {
       extra: standardExtra,
     };
 
-    const helpMessage: string =  `Available !theme commands are: random, random \
-    dark, random light, current, and repo. \
-    You can also use !theme <theme name> to choose a specific theme. Or install
-    a theme using !theme install <id of the theme> `;
-    
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         sendMessageStub.calledOnce.should.be.true;
-        sentMessage.should.equal(helpMessage);
+        sentMessage.should.equal(messageHelp);
         done();
       } catch (error) {
         done(error);
@@ -254,7 +248,7 @@ suite("Themer Tests", function () {
       try {
         getConfigurationStub.calledOnce.should.be.true;
         sendMessageStub.calledOnce.should.be.true;
-        sentMessage.should.equal(`The current theme is ${baseTheme}`);
+        sentMessage.should.equal(messageCurrent(baseTheme));
         done();
       } catch (error) {
         done(error);
@@ -282,11 +276,7 @@ suite("Themer Tests", function () {
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         sendMessageStub.calledOnce.should.be.true;
-        sentMessage.should.equal(
-          "You can find the source code for this VS \
-        Code extension at https://github.com/builders-club/vscode-twitch-themer . \
-        Feel free to fork & contribute."
-        );
+        sentMessage.should.equal(messageRepo);
         done();
       } catch (error) {
         done(error);
@@ -330,7 +320,7 @@ suite("Themer Tests", function () {
       try {
         sendMessageStub.calledOnce.should.be.true;
         sentMessage.should.equal(
-          ` @${chatMessage.user}, theme changes are paused. Please try again in a few minutes.`
+          messagePaused(chatMessage.user)
         );
         fakeWorkspaceConfiguration
           .get<string>("workbench.colorTheme")!
