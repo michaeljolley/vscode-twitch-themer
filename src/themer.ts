@@ -1,16 +1,15 @@
 import * as vscode from "vscode";
+import { OnMessageFlags } from "comfy.js";
 import API from "./api";
 import Logger from "./logger";
 import { ListRecipient } from "./types/listRecipient";
 import { Theme } from "./types/theme";
 import {
-  ExtensionKeys,
   AccessState,
   ThemeNotAvailableReasons,
   LogLevel,
 } from "./constants";
 import { ChatMessage } from "./types/chatMessage";
-import { OnMessageFlags } from "comfy.js";
 import { Command } from "./types/command";
 
 /**
@@ -461,7 +460,7 @@ export default class Themer {
         this._followers.find((x) => x.username === user.toLocaleLowerCase())
       ) {
         break following;
-      } else if (await API.isTwitchUserFollowing(userId, this._state)) {
+      } else if (await API.isTwitchUserFollowing(userId)) {
         this._followers.push({
           username: user.toLocaleLowerCase(),
         });
@@ -697,7 +696,7 @@ export default class Themer {
       this._followers.find((x) => x.username === user.toLocaleLowerCase())
     ) {
       userAccessState = AccessState.follower;
-    } else if (await API.isTwitchUserFollowing(userId, this._state)) {
+    } else if (await API.isTwitchUserFollowing(userId)) {
       this._followers.push({ username: user.toLocaleLowerCase() });
       userAccessState = AccessState.follower;
     }

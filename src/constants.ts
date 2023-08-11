@@ -91,3 +91,5 @@ export enum LogLevel {
   error = "error",
   debug = "debug",
 }
+
+export const twitchScopes = ["chat:read", "chat:edit"];

@@ -1,12 +1,6 @@
 import * as vscode from "vscode";
-import { readFileSync } from "fs";
-import * as http from "http";
-import * as path from "path";
-import * as url from "url";
-import { v4 } from "uuid";
-import API from "./api";
 import Logger from "./logger";
-import { ExtensionKeys, LogLevel } from "./constants";
+import { ExtensionKeys, LogLevel, twitchScopes } from "./constants";
 
 /**
  * Manages state of current user & authenticating user with Twitch
@@ -26,102 +20,34 @@ export default abstract class Authentication {
     this._state = state;
     Logger.log(LogLevel.info, "Initializing authentication...");
 
-    const accessToken = this._state.get(ExtensionKeys.account);
-    const userId = this._state.get(ExtensionKeys.userId);
-    const userLogin = this._state.get(ExtensionKeys.userLogin);
-    if (accessToken && userId && userLogin) {
+    const twitchSession = await this.getSession();
+    if (twitchSession) {
       this.authStatusEventEmitter.fire(true);
-      Logger.log(
-        LogLevel.info,
-        `Twitch access token found. Successfully logged in.`
-      );
-      return;
-    }
-
-    this.authStatusEventEmitter.fire(false);
-    Logger.log(LogLevel.error, "Authentication failed.");
-  }
-
-  /**
-   * Attempts to read the users OAuth token to authenticate.  If an
-   * OAuth token doesn't exist then we'll open a browser to allow
-   * the user to authenticate with Twitch and return an OAuth token
-   * to the extension.
-   */
-  public static async handleSignIn() {
-    const accessToken = this._state.get(ExtensionKeys.account) as string | null;
-    if (!accessToken) {
-      const state = v4();
-      this.createServer(state);
-      vscode.env.openExternal(
-        vscode.Uri.parse(
-          `https://id.twitch.tv/oauth2/authorize?client_id=ts9wowek7hj9yw0q7gmg27c29i6etn` +
-            `&redirect_uri=http://localhost:5544` +
-            `&response_type=token&scope=chat:edit chat:read whispers:edit user:read:email moderator:read:followers` +
-            `&state=${state}`
-        )
-      );
-      Logger.log(LogLevel.info, `Attempting to authenticate with Twitch.`);
+      Logger.log(LogLevel.info, "Authenticated with Twitch.");
     } else {
-      this.authStatusEventEmitter.fire(true);
-      Logger.log(
-        LogLevel.info,
-        `Twitch access token found. Successfully logged in.`
-      );
+      this.authStatusEventEmitter.fire(false);
+      Logger.log(LogLevel.info, "Not authenticated with Twitch.");
     }
   }
 
-  /**
-   * Removes any OAuth tokens stored for the user
-   */
-  public static handleSignOut() {
-    this._state.update(ExtensionKeys.account, null);
-    this._state.update(ExtensionKeys.userId, null);
-    this._state.update(ExtensionKeys.userLogin, null);
-
-    vscode.window.showInformationMessage("Signing out of Twitch");
-    Logger.log(LogLevel.info, `Signed out of Twitch`);
-    this.authStatusEventEmitter.fire(false);
+  public static async getSession() {
+    try {
+      return await vscode.authentication.getSession("twitch", twitchScopes, { createIfNone: false });
+    } catch (error: any) {
+      Logger.log(LogLevel.error, error.message);
+      throw new Error('awe snap');
+    }
   }
 
-  private static createServer(state: string) {
-    const file = readFileSync(path.join(__dirname, "/login/index.html"));
-
-    const server = http.createServer(async (req, res) => {
-      const mReq = url.parse(req.url!, true);
-      var mReqPath = mReq.pathname;
-
-      if (mReqPath === "/") {
-        res.writeHead(200, { "Content-Type": "text/html" });
-        res.end(file);
-      } else if (mReqPath === "/oauth") {
-        const q: any = mReq.query;
-
-        if (q.state === state) {
-          this._state.update(ExtensionKeys.account, q.access_token);
-          const authUser = await API.getUserDetails(q.access_token);
-          this._state.update(ExtensionKeys.userId, authUser.id);
-          this._state.update(ExtensionKeys.userLogin, authUser.login);
-          this.authStatusEventEmitter.fire(true);
-        } else {
-          vscode.window.showErrorMessage(
-            "Error while logging in. State mismatch error"
-          );
-          this.authStatusEventEmitter.fire(false);
-        }
-
-        setTimeout(() => {
-          server.close();
-        }, 3000);
-
-        res.writeHead(200);
-        res.end(file);
-      } else if (mReqPath === "/favicon.ico") {
-        res.writeHead(204);
-        res.end();
+  public static async handleSignIn() {
+      const result = await this.getSession();
+    try {
+      if (result) {
+        this.authStatusEventEmitter.fire(true);
       }
-    });
-
-    server.listen("5544");
+    } catch (error: any) {
+      Logger.log(LogLevel.error, error.message);
+      throw new Error('There was an issue signing in to Twitch');
+    }
   }
 }
