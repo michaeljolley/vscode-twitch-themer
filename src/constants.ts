@@ -115,7 +115,7 @@ Feel free to fork & contribute.";
 
 export const messagePaused = (user: string) => `@${user}, theme changes are paused. Please try again in a few minutes.`;
 
-export const messageCurrent = (theme: string) => `The current theme is ${theme}`;
+export const messageCurrent = (theme: string, themeId: string) => `The current theme is ${theme}. You can find it on the VS Code Marketplace at https://marketplace.visualstudio.com/items?itemName=${themeId}`;
 
 export const messageInvalidTheme = (user: string, theme: string) =>  `${user}, ${theme} is not a valid theme name or \
 isn't installed.  You can use !theme to get a list of available themes.`;

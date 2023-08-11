@@ -31,6 +31,7 @@ suite("Themer Tests", function () {
   let isTwitchUserFollowingReturn: boolean = false;
   const baseTheme: string = "Visual Studio Light";
   const testTheme: string = "Visual Studio Dark";
+  const baseThemeId: string = "vscode.theme-defaults";
   const broadcaster: OnMessageFlags = {
     broadcaster: true,
     mod: false,
@@ -248,7 +249,7 @@ suite("Themer Tests", function () {
       try {
         getConfigurationStub.calledOnce.should.be.true;
         sendMessageStub.calledOnce.should.be.true;
-        sentMessage.should.equal(messageCurrent(baseTheme));
+        sentMessage.should.equal(messageCurrent(baseTheme, baseThemeId));
         done();
       } catch (error) {
         done(error);
