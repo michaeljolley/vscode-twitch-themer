@@ -221,7 +221,7 @@ suite("Themer Tests", function () {
     dark, random light, current, and repo. \
     You can also use !theme <theme name> to choose a specific theme. Or install
     a theme using !theme install <id of the theme> `;
-
+    
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         sendMessageStub.calledOnce.should.be.true;
