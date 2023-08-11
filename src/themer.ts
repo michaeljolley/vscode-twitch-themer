@@ -724,10 +724,19 @@ export default class Themer {
    * Announces to chat the currently active theme
    */
   private async currentTheme() {
-    const currentTheme = vscode.workspace
+    const currentThemeName = vscode.workspace
       .getConfiguration()
-      .get("workbench.colorTheme");
-    this.sendMessageEventEmitter.fire(messageCurrent(currentTheme as string));
+      .get("workbench.colorTheme") as string;
+
+    /** Find theme based on themeName*/
+    const theme = this._availableThemes.filter(
+      (f) =>
+        f.label.toLocaleLowerCase() === currentThemeName.toLocaleLowerCase() ||
+        (f.themeId &&
+          f.themeId.toLocaleLowerCase() === currentThemeName.toLocaleLowerCase())
+    )[0];
+
+    this.sendMessageEventEmitter.fire(messageCurrent(theme.label, theme.extensionId));
   }
 
   /**
