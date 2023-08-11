@@ -1,17 +1,17 @@
 import * as vscode from "vscode";
+import { OnMessageFlags } from "comfy.js";
 import API from "./api";
 import Logger from "./logger";
 import { ListRecipient } from "./types/listRecipient";
 import { Theme } from "./types/theme";
 import {
-  ExtensionKeys,
   AccessState,
   ThemeNotAvailableReasons,
   LogLevel,
 } from "./constants";
 import { ChatMessage } from "./types/chatMessage";
-import { OnMessageFlags } from "comfy.js";
 import { Command } from "./types/command";
+import { Whisper } from "./types/whisper";
 
 /**
  * Manages all logic associated with retrieving themes,
@@ -31,9 +31,11 @@ export default class Themer {
   private _pauseThemer: boolean = false;
 
   private sendMessageEventEmitter = new vscode.EventEmitter<string>();
+  private whisperEventEmitter = new vscode.EventEmitter<Whisper>();
 
   /** Event that fires when themer needs to send a message */
   public onSendMessage = this.sendMessageEventEmitter.event;
+  public onWhisper = this.whisperEventEmitter.event;
 
   /**
    * constructor
@@ -348,13 +350,19 @@ export default class Themer {
       } else {
         /** If no more theme names can be added, go ahead and send the first message
          * and start over building the next message */
-        this.sendMessageEventEmitter.fire(message.replace(/(^[,\s]+)|([,\s]+$)/g, ""));
+        this.whisperEventEmitter.fire({
+          message: message.replace(/(^[,\s]+)|([,\s]+$)/g, ""), 
+          user
+        });
         message = `${name}, `;
       }
     }
 
     /** Send the final message */
-    this.sendMessageEventEmitter.fire(message.replace(/(^[,\s]+)|([,\s]+$)/g, ""));
+    this.whisperEventEmitter.fire({
+      message: message.replace(/(^[,\s]+)|([,\s]+$)/g, ""), 
+      user
+    });
   }
 
   /**
@@ -461,7 +469,7 @@ export default class Themer {
         this._followers.find((x) => x.username === user.toLocaleLowerCase())
       ) {
         break following;
-      } else if (await API.isTwitchUserFollowing(userId, this._state)) {
+      } else if (await API.isTwitchUserFollowing(userId)) {
         this._followers.push({
           username: user.toLocaleLowerCase(),
         });
@@ -697,7 +705,7 @@ export default class Themer {
       this._followers.find((x) => x.username === user.toLocaleLowerCase())
     ) {
       userAccessState = AccessState.follower;
-    } else if (await API.isTwitchUserFollowing(userId, this._state)) {
+    } else if (await API.isTwitchUserFollowing(userId)) {
       this._followers.push({ username: user.toLocaleLowerCase() });
       userAccessState = AccessState.follower;
     }

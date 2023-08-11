@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import {
+import ComfyJS, {
   ComfyJSInstance,
   OnCommandExtra,
   OnJoinExtra,
@@ -15,8 +15,9 @@ import {
 } from "vscode";
 import Logger from "./logger";
 import { ChatMessage } from "./types/chatMessage";
-import { ExtensionKeys, LogLevel } from "./constants";
+import { ExtensionKeys, LogLevel, twitchScopes } from "./constants";
 import Authentication from "./authentication";
+import { Whisper } from "./types/whisper";
 
 const comfyJS: ComfyJSInstance = require("comfy.js");
 
@@ -62,14 +63,12 @@ export default class ChatClient {
   private async connect() {
     Logger.log(LogLevel.info, "Connecting to Twitch...");
     if (!this.isConnected()) {
-      const accessToken = this._state.get(ExtensionKeys.account) as
-        | string
-        | null;
-      const authUserLogin = this._state.get(ExtensionKeys.userLogin) as
-        | string
-        | null;
+     
+      const currentSession = await Authentication.getSession();
+      const accessToken = currentSession?.accessToken;
+      const login = currentSession?.account?.label;
 
-      if (authUserLogin && accessToken) {
+      if (login && accessToken) {
         comfyJS.onError = (err: string) => {
           Logger.log(LogLevel.error, err);
         };
@@ -79,7 +78,7 @@ export default class ChatClient {
         comfyJS.onJoin = this.onJoinHandler.bind(this);
         comfyJS.onConnected = this.onConnectedHandler.bind(this);
 
-        comfyJS.Init(authUserLogin, accessToken, authUserLogin);
+        comfyJS.Init(login, accessToken, login);
 
         this.chatClientConnectionEventEmitter.fire(true);
         return true;
@@ -104,32 +103,34 @@ export default class ChatClient {
    * Toggles whether the person is connected to Twitch chat
    */
   public async toggleChat(): Promise<void> {
-    const accessToken = this._state.get(ExtensionKeys.account) as string | null;
-    const authUserLogin = this._state.get(ExtensionKeys.userLogin) as
-      | string
-      | null;
-
-    if (!accessToken || !authUserLogin) {
-      let choice = await vscode.window.showInformationMessage(
-        "You must be signed in to Twitch to connect to Twitch chat. Sign in now?",
-        "Sign In",
-        "Cancel"
-      );
-      switch (choice) {
-        case "Sign In":
-          await Authentication.handleSignIn();
-          break;
-        case "Cancel":
-          Logger.log(LogLevel.info, `User decided to not log in to Twitch`);
-          return;
+    
+    const currentSession = await Authentication.getSession();
+    if (currentSession) {
+      const accessToken = currentSession?.accessToken;
+      const authUserLogin = currentSession?.account?.label;
+  
+      if (!accessToken || !authUserLogin) {
+        let choice = await vscode.window.showInformationMessage(
+          "You must be signed in to Twitch to connect to Twitch chat. Sign in now?",
+          "Sign In",
+          "Cancel"
+        );
+        switch (choice) {
+          case "Sign In":
+            await Authentication.handleSignIn();
+            break;
+          case "Cancel":
+            Logger.log(LogLevel.info, `User decided to not log in to Twitch`);
+            return;
+        }
+        return;
       }
-      return;
-    }
-
-    if (this.isConnected()) {
-      this.disconnect();
-    } else {
-      this.connect();
+  
+      if (this.isConnected()) {
+        this.disconnect();
+      } else {
+        this.connect();
+      }
     }
   }
 
@@ -156,12 +157,24 @@ export default class ChatClient {
    * @param message - Message to send to chat
    */
   public async sendMessage(message: string) {
-    const authUserLogin = this._state.get(ExtensionKeys.userLogin) as
-      | string
-      | null;
+    const session = await Authentication.getSession();
+    const login = session?.account?.label;
 
-    if (this.isConnected() && authUserLogin) {
-      comfyJS.Say(message, authUserLogin);
+    if (this.isConnected() && login) {
+      comfyJS.Say(message, login);
+    }
+  }
+  
+  /**
+   * Sends a whisper to the specified user
+   * @param whisper - Details of message to send and recipient
+   */
+  public whisper(whisper: Whisper) {
+    if (
+      this.isConnected() &&
+      whisper.user
+    ) {
+      ComfyJS.Whisper(whisper.message, whisper.user);
     }
   }
 

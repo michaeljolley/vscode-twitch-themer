@@ -9,6 +9,7 @@ import Themer from "../../themer";
 import { ChatMessage } from "../../types/chatMessage";
 import { AccessState } from "../../constants";
 import { OnCommandExtra, OnMessageFlags } from "comfy.js";
+import { Whisper } from "../../types/whisper";
 
 chai.should();
 
@@ -21,7 +22,7 @@ suite("Themer Tests", function () {
     vscode.WorkspaceConfiguration
   >;
   let isTwitchUserFollowingStub: sinon.SinonStub<
-    [string | undefined, vscode.Memento],
+    [string | undefined],
     Promise<boolean>
   >;
   let fakeState: vscode.Memento;
@@ -176,8 +177,7 @@ suite("Themer Tests", function () {
       .stub(API, "isTwitchUserFollowing")
       .callsFake(
         async (
-          twitchUserId: string | undefined,
-          state: vscode.Memento
+          twitchUserId: string | undefined
         ): Promise<boolean> => {
           return isTwitchUserFollowingReturn;
         }
@@ -330,7 +330,7 @@ suite("Themer Tests", function () {
       try {
         sendMessageStub.calledOnce.should.be.true;
         sentMessage.should.equal(
-          `test, theme changes are paused. Please try again in a few minutes.`
+          ` @${chatMessage.user}, theme changes are paused. Please try again in a few minutes.`
         );
         fakeWorkspaceConfiguration
           .get<string>("workbench.colorTheme")!
@@ -388,12 +388,13 @@ suite("Themer Tests", function () {
     let recipient: string;
     let sentMessage: string;
 
-    const sendMessageStub = sinon
-      .stub(fakeChatClient, "sendMessage")
-      .callsFake(async (message: string) => {
-        sentMessage = message;
+    const sendWhisperStub = sinon
+      .stub(fakeChatClient, "whisper")
+      .callsFake(async (whisper: Whisper) => {
+        sentMessage = whisper.message;
+        recipient = whisper.user;
       });
-    fakeThemer.onSendMessage(sendMessageStub);
+    fakeThemer.onWhisper(sendWhisperStub);
 
     const message = "";
     const chatMessage: ChatMessage = {
@@ -404,9 +405,9 @@ suite("Themer Tests", function () {
     };
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        sendMessageStub.calledOnce.should.be.true;
+        sendWhisperStub.calledOnce.should.be.true;
         recipient!.should.exist;
-        recipient!.should.equal("test");
+        recipient!.should.equal(chatMessage.user);
         sentMessage.should.exist;
         sentMessage.split(", ").length.should.be.greaterThan(0);
         done();

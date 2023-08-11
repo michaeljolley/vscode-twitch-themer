@@ -11,30 +11,30 @@ on:
     - cron: 0 0 * * 0
 
 jobs:
-  # test:
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       os: [macos-latest, ubuntu-latest, windows-latest]
-  #       vscode-version: ["1.78.0", stable]
-  #   runs-on: ${{ matrix.os }}
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-  #     - name: Install Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 18.x
-  #     - name: Install dependencies
-  #       run: npm ci
-  #       env:
-  #         npm_config_arch: x64
-  #     - name: Test with VS Code ${{ matrix.vscode-version }}
-  #       uses: coactions/setup-xvfb@v1
-  #       env:
-  #         VSCODE_TEST_VERSION: ${{ matrix.vscode-version }}
-  #       with:
-  #         run: npm test
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+        vscode-version: ["1.81.0", stable]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - name: Install dependencies
+        run: npm ci
+        env:
+          npm_config_arch: x64
+      - name: Test with VS Code ${{ matrix.vscode-version }}
+        uses: coactions/setup-xvfb@v1
+        env:
+          VSCODE_TEST_VERSION: ${{ matrix.vscode-version }}
+        with:
+          run: npm test
 
   build:
     permissions:
