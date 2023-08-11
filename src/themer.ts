@@ -31,11 +31,9 @@ export default class Themer {
   private _pauseThemer: boolean = false;
 
   private sendMessageEventEmitter = new vscode.EventEmitter<string>();
-  private whisperEventEmitter = new vscode.EventEmitter<Whisper>();
 
   /** Event that fires when themer needs to send a message */
   public onSendMessage = this.sendMessageEventEmitter.event;
-  public onWhisper = this.whisperEventEmitter.event;
 
   /**
    * constructor
@@ -181,12 +179,12 @@ export default class Themer {
 
     Logger.log(
       LogLevel.info,
-      `Executing command: '${command === "" ? "sendThemes" : command}'`
+      `Executing command: '${command === "" ? "help" : command}'`
     );
 
     switch (command) {
       case "":
-        await this.sendThemes(chatMessage.user);
+        await this.help();
         break;
       case this._commands["current"]:
         await this.currentTheme();
@@ -309,60 +307,6 @@ export default class Themer {
         this.updateState();
       }
     }
-  }
-
-  /**
-   * Send a whisper to the requesting user with a list of available themes
-   * @param user - User that will receive whisper of available themes
-   */
-  private async sendThemes(user: string) {
-    /** Ensure that we haven't sent them the list recently. */
-    const lastSent = this.getRecipient(user);
-
-    if (lastSent && lastSent.banned && lastSent.banned === true) {
-      return;
-    }
-
-    if (lastSent && lastSent.lastSent) {
-      if (lastSent.lastSent.getDate() > new Date().getDate() + -1) {
-        return;
-      } else {
-        lastSent.lastSent = new Date();
-      }
-    } else {
-      this._listRecipients.push({
-        username: user,
-        lastSent: new Date(),
-      });
-    }
-
-    /** Get list of available themes and whisper them to user */
-    const themeNames = this._availableThemes.map((m) => m.label);
-
-    let message = "Available themes are: ";
-    /** Iterate over the theme names and add to the message
-     *  checking if the length is still under 499. If so, check if the
-     *  next theme name can fit and stay under 499 characters
-     */
-    for (var name of themeNames) {
-      if (message.length < 499 && name.length <= 499 - message.length) {
-        message += `${name}, `;
-      } else {
-        /** If no more theme names can be added, go ahead and send the first message
-         * and start over building the next message */
-        this.whisperEventEmitter.fire({
-          message: message.replace(/(^[,\s]+)|([,\s]+$)/g, ""), 
-          user
-        });
-        message = `${name}, `;
-      }
-    }
-
-    /** Send the final message */
-    this.whisperEventEmitter.fire({
-      message: message.replace(/(^[,\s]+)|([,\s]+$)/g, ""), 
-      user
-    });
   }
 
   /**
@@ -775,7 +719,7 @@ export default class Themer {
       });
     }
   }
-
+  
   /**
    * Announces to chat the currently active theme
    */
@@ -801,10 +745,10 @@ export default class Themer {
    * Announces to chat a message with a brief explanation of how to use the commands
    */
   private async help() {
-    const helpMessage: string = `You can change the theme of the stream's VS\
-              Code by sending '!theme random'. You can also choose a theme\
-              specifically. Send '!theme' to be whispered a list of available\
-              themes.`;
+    const helpMessage: string = `Available !theme commands are: random, random \
+      dark, random light, current, and repo. \
+      You can also use !theme <theme name> to choose a specific theme. Or install
+      a theme using !theme install <id of the theme> `;
     this.sendMessageEventEmitter.fire(helpMessage);
   }
 

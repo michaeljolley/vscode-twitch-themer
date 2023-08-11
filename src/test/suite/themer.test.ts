@@ -217,10 +217,10 @@ suite("Themer Tests", function () {
       extra: standardExtra,
     };
 
-    const helpMessage: string = `You can change the theme of the stream's VS\
-              Code by sending '!theme random'. You can also choose a theme\
-              specifically. Send '!theme' to be whispered a list of available\
-              themes.`;
+    const helpMessage: string =  `Available !theme commands are: random, random \
+    dark, random light, current, and repo. \
+    You can also use !theme <theme name> to choose a specific theme. Or install
+    a theme using !theme install <id of the theme> `;
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
@@ -377,39 +377,6 @@ suite("Themer Tests", function () {
         fakeWorkspaceConfiguration
           .get<string>("workbench.colorTheme")!
           .should.equal(testTheme);
-        done();
-      } catch (error) {
-        done(error);
-      }
-    });
-  });
-
-  test("Themer should return a comma separated list of themes", function (done) {
-    let recipient: string;
-    let sentMessage: string;
-
-    const sendWhisperStub = sinon
-      .stub(fakeChatClient, "whisper")
-      .callsFake(async (whisper: Whisper) => {
-        sentMessage = whisper.message;
-        recipient = whisper.user;
-      });
-    fakeThemer.onWhisper(sendWhisperStub);
-
-    const message = "";
-    const chatMessage: ChatMessage = {
-      message,
-      flags: user,
-      user: "test",
-      extra: standardExtra,
-    };
-    fakeThemer.handleCommands(chatMessage).then(() => {
-      try {
-        sendWhisperStub.calledOnce.should.be.true;
-        recipient!.should.exist;
-        recipient!.should.equal(chatMessage.user);
-        sentMessage.should.exist;
-        sentMessage.split(", ").length.should.be.greaterThan(0);
         done();
       } catch (error) {
         done(error);

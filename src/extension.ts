@@ -41,7 +41,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	);
   
 	const themerOnSendMessage = _themer.onSendMessage(onSendMessage);
-	const themerOnWhisper = _themer.onWhisper(onWhisper);
 	const chatOnChatMessageReceived = _chatClient.onChatMessageReceived(
 	  onChatMessageReceived
 	);
@@ -96,10 +95,6 @@ export async function activate(context: vscode.ExtensionContext) {
   
   async function onSendMessage(message: string) {
 	await _chatClient?.sendMessage(message);
-  }
-  
-  async function onWhisper(whisper: Whisper) {
-	await _chatClient?.whisper(whisper);
   }
   
   async function onChatMessageReceived(chatMessage: ChatMessage) {
