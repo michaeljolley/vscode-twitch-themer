@@ -1,3 +1,16 @@
+## [3.0.1](https://github.com/builders-club/vscode-twitch-themer/compare/v3.0.0...v3.0.1) (2023-08-11)
+
+
+### Bug Fixes
+
+* Fixing broken test ([491917e](https://github.com/builders-club/vscode-twitch-themer/commit/491917e813e1b47c40827ec25e529ab2528ecbe9))
+
+
+### Performance Improvements
+
+* Refactoring messages to be more DRY ([12f727e](https://github.com/builders-club/vscode-twitch-themer/commit/12f727ec584524455acb869042561da9b43074d9))
+* Removing whispers from extension ([ab4d215](https://github.com/builders-club/vscode-twitch-themer/commit/ab4d215a6625d58154c937f9b0ca5e5f9b7e2101))
+
 # [3.0.0](https://github.com/builders-club/vscode-twitch-themer/compare/v2.1.1...v3.0.0) (2023-08-11)
 
 
