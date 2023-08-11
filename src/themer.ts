@@ -8,10 +8,17 @@ import {
   AccessState,
   ThemeNotAvailableReasons,
   LogLevel,
+  messageHelp,
+  messageRepo,
+  messageCurrent,
+  messageInvalidTheme,
+  messageOnPaused,
+  messagePaused,
+  messageInstalled,
+  messageThemeExists,
 } from "./constants";
 import { ChatMessage } from "./types/chatMessage";
 import { Command } from "./types/command";
-import { Whisper } from "./types/whisper";
 
 /**
  * Manages all logic associated with retrieving themes,
@@ -31,11 +38,9 @@ export default class Themer {
   private _pauseThemer: boolean = false;
 
   private sendMessageEventEmitter = new vscode.EventEmitter<string>();
-  private whisperEventEmitter = new vscode.EventEmitter<Whisper>();
 
   /** Event that fires when themer needs to send a message */
   public onSendMessage = this.sendMessageEventEmitter.event;
-  public onWhisper = this.whisperEventEmitter.event;
 
   /**
    * constructor
@@ -181,12 +186,12 @@ export default class Themer {
 
     Logger.log(
       LogLevel.info,
-      `Executing command: '${command === "" ? "sendThemes" : command}'`
+      `Executing command: '${command === "" ? "help" : command}'`
     );
 
     switch (command) {
       case "":
-        await this.sendThemes(chatMessage.user);
+        await this.help();
         break;
       case this._commands["current"]:
         await this.currentTheme();
@@ -309,60 +314,6 @@ export default class Themer {
         this.updateState();
       }
     }
-  }
-
-  /**
-   * Send a whisper to the requesting user with a list of available themes
-   * @param user - User that will receive whisper of available themes
-   */
-  private async sendThemes(user: string) {
-    /** Ensure that we haven't sent them the list recently. */
-    const lastSent = this.getRecipient(user);
-
-    if (lastSent && lastSent.banned && lastSent.banned === true) {
-      return;
-    }
-
-    if (lastSent && lastSent.lastSent) {
-      if (lastSent.lastSent.getDate() > new Date().getDate() + -1) {
-        return;
-      } else {
-        lastSent.lastSent = new Date();
-      }
-    } else {
-      this._listRecipients.push({
-        username: user,
-        lastSent: new Date(),
-      });
-    }
-
-    /** Get list of available themes and whisper them to user */
-    const themeNames = this._availableThemes.map((m) => m.label);
-
-    let message = "Available themes are: ";
-    /** Iterate over the theme names and add to the message
-     *  checking if the length is still under 499. If so, check if the
-     *  next theme name can fit and stay under 499 characters
-     */
-    for (var name of themeNames) {
-      if (message.length < 499 && name.length <= 499 - message.length) {
-        message += `${name}, `;
-      } else {
-        /** If no more theme names can be added, go ahead and send the first message
-         * and start over building the next message */
-        this.whisperEventEmitter.fire({
-          message: message.replace(/(^[,\s]+)|([,\s]+$)/g, ""), 
-          user
-        });
-        message = `${name}, `;
-      }
-    }
-
-    /** Send the final message */
-    this.whisperEventEmitter.fire({
-      message: message.replace(/(^[,\s]+)|([,\s]+$)/g, ""), 
-      user
-    });
   }
 
   /**
@@ -516,10 +467,7 @@ export default class Themer {
     );
     if (themes.length > 0) {
       const uniqueThemeLabels = Array.from(new Set(themes.map((t) => t.label)));
-      const msg = `@${user}, '${theme}' is already installed. To switch to it, send: !theme ${uniqueThemeLabels.join(
-        " -or- !theme "
-      )}`;
-      this.sendMessageEventEmitter.fire(msg);
+      this.sendMessageEventEmitter.fire(messageThemeExists(user, theme, uniqueThemeLabels));
       return;
     }
 
@@ -614,10 +562,8 @@ export default class Themer {
       );
       Logger.log(LogLevel.info, "Theme extension install request complete.");
 
-      const msg = `@${user}, the theme(s) '${isValidExtResult.label!.join(
-        ", "
-      )}' were installed successfully.`;
-      this.sendMessageEventEmitter.fire(msg);
+     
+      this.sendMessageEventEmitter.fire(messageInstalled(user, isValidExtResult.label || []));
     } catch (err: any) {
       // Handle the error
       Logger.log(LogLevel.error, err);
@@ -729,7 +675,7 @@ export default class Themer {
     if (theme) {
       if (this._pauseThemer) {
         this.sendMessageEventEmitter.fire(
-          ` @${user}, theme changes are paused. Please try again in a few minutes.`
+          messagePaused(user)
         );
       } else {
         await this.setTheme(user, theme);
@@ -739,8 +685,7 @@ export default class Themer {
           // start a "pause" timer
           this.setPauseStatus(true);
           this.sendMessageEventEmitter.fire(
-            ` @${user} has redeemed pausing the theme on ${themeName} for ${this._redemptionHoldPeriodMinutes
-            } minute${this._redemptionHoldPeriodMinutes === 1 ? "" : "s"}.`
+            messageOnPaused(user, theme.label, this._redemptionHoldPeriodMinutes)
           );
           setTimeout(() => {
             this.setPauseStatus(false);
@@ -752,8 +697,7 @@ export default class Themer {
       }
     } else {
       this.sendMessageEventEmitter.fire(
-        `${user}, ${themeName} is not a valid theme name or \
-        isn't installed.  You can use !theme to get a list of available themes.`
+       messageInvalidTheme(user, themeName)
       );
     }
   }
@@ -775,7 +719,7 @@ export default class Themer {
       });
     }
   }
-
+  
   /**
    * Announces to chat the currently active theme
    */
@@ -783,29 +727,21 @@ export default class Themer {
     const currentTheme = vscode.workspace
       .getConfiguration()
       .get("workbench.colorTheme");
-    this.sendMessageEventEmitter.fire(`The current theme is ${currentTheme}`);
+    this.sendMessageEventEmitter.fire(messageCurrent(currentTheme as string));
   }
 
   /**
    * Announces to chat info about the extensions GitHub repository
    */
   private async repo() {
-    const repoMessage =
-      "You can find the source code for this VS \
-        Code extension at https://github.com/builders-club/vscode-twitch-themer . \
-        Feel free to fork & contribute.";
-    this.sendMessageEventEmitter.fire(repoMessage);
+    this.sendMessageEventEmitter.fire(messageRepo);
   }
 
   /**
    * Announces to chat a message with a brief explanation of how to use the commands
    */
   private async help() {
-    const helpMessage: string = `You can change the theme of the stream's VS\
-              Code by sending '!theme random'. You can also choose a theme\
-              specifically. Send '!theme' to be whispered a list of available\
-              themes.`;
-    this.sendMessageEventEmitter.fire(helpMessage);
+    this.sendMessageEventEmitter.fire(messageHelp);
   }
 
   /**
