@@ -34,7 +34,7 @@
     "color": "#373436",
     "theme": "dark"
   },
-  "icon": "resources/logo.png",
+  "icon": "resources/vscode-twitch-themer.png",
   "extensionDependencies": [
     "clarkio.vscode-twitch-authprovider"
   ],

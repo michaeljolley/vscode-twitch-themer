@@ -10,7 +10,6 @@ vsc-extension-quickstart.md
 out/test/**
 .github/**
 
-resources/logo.ai
 .all-contributorsrc
 CHANGELOG.md
 package.release.config.js
