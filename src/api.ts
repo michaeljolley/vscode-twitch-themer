@@ -4,18 +4,19 @@ import Logger from "./logger";
 import { LogLevel, ThemeNotAvailableReasons, twitchAPIClientId } from "./constants";
 import Authentication from "./authentication";
 
-export default class API {
+export default abstract class API {
+
   public static async isTwitchUserFollowing(
-    twitchUserId: string | undefined
+    twitchUserId: string | undefined,
+    twitchChannelId: string | undefined
   ) {
     if (twitchUserId) {
 
       const currentSession = await Authentication.getSession();
       const accessToken = currentSession?.accessToken;
-      const login = currentSession?.account?.label;
 
-      if (accessToken && login) {
-        const url = `https://api.twitch.tv/helix/channels/followers?user_id=${twitchUserId}&broadcaster_id=${login}`;
+      if (accessToken && twitchChannelId) {
+        const url = `https://api.twitch.tv/helix/channels/followers?user_id=${twitchUserId}&broadcaster_id=${twitchChannelId}`;
         try {
           const res = await axios.get(url, {
             headers: {
@@ -48,14 +49,19 @@ export default class API {
     return false;
   }
 
-  public static async getUserDetails(token: string | null) {
-    const url = "https://api.twitch.tv/helix/users";
+  public static async getUserDetails(channelToJoin?: string) {
+    try { 
+      const currentSession = await Authentication.getSession();
+      const accessToken = currentSession?.accessToken;
+      const login = currentSession?.account?.label;
 
-    try {
+      const channelLogin = channelToJoin || login;
+      
+      const url = `https://api.twitch.tv/helix/users?login=${channelLogin}}`;
       const res = await axios.get(url, {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
           // eslint-disable-next-line @typescript-eslint/naming-convention
           "client-id": twitchAPIClientId,
         },
@@ -63,7 +69,7 @@ export default class API {
 
       if (res.status === 200) {
         const { data } = res;
-        return data && data.length > 0 ? data[0] : undefined;
+        return data && data.length > 0 ? data[0].id : undefined;
       }
     } catch (err: any) {
       Logger.log(
@@ -91,7 +97,11 @@ export default class API {
     const url = `https://marketplace.visualstudio.com/items?itemName=${extensionName}`;
     try {
       let res = await axios.get(url, {
-        headers: { Accept: "*/*", "User-Agent": "VSCode-Twitch-Themer" },
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention 
+          Accept: "*/*", 
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          "User-Agent": "VSCode-Twitch-Themer" },
       });
       if (res.status === 404) {
         return { available: false, reason: ThemeNotAvailableReasons.notFound };
@@ -185,7 +195,9 @@ export default class API {
       const url = `https://api.twitch.tv/helix/streams?user_id=${currentUserId}`;
       const res = await axios.get(url, {
         headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           Authorization: `Bearer ${accessToken}`,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           "client-id": twitchAPIClientId,
         },
       });

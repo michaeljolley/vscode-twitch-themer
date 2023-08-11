@@ -15,7 +15,7 @@ import {
 } from "vscode";
 import Logger from "./logger";
 import { ChatMessage } from "./types/chatMessage";
-import { ExtensionKeys, LogLevel, twitchScopes } from "./constants";
+import { LogLevel } from "./constants";
 import Authentication from "./authentication";
 
 const comfyJS: ComfyJSInstance = require("comfy.js");
@@ -28,6 +28,7 @@ export default class ChatClient {
   private chatClientConnectionEventEmitter = new EventEmitter<boolean>();
   private _commandTrigger: string = "theme";
   private _redemptionHoldId: string = "";
+  private _channelId: string = "";
 
   /** Event that fires when an appropriate message is received */
   public onChatMessageReceived = this.chatClientMessageEventEmitter.event;
@@ -59,7 +60,7 @@ export default class ChatClient {
   /**
    * Connects to Twitch chat
    */
-  private async connect() {
+  public async connect() {
     Logger.log(LogLevel.info, "Connecting to Twitch...");
     if (!this.isConnected()) {
      
@@ -77,7 +78,17 @@ export default class ChatClient {
         comfyJS.onJoin = this.onJoinHandler.bind(this);
         comfyJS.onConnected = this.onConnectedHandler.bind(this);
 
-        comfyJS.Init(login, accessToken, login);
+        const twitchChannelNameSetting =
+            vscode.workspace
+            .getConfiguration("twitchThemer")
+            .get<string>("twitchChannelName") || undefined;
+
+        const channelToJoin = twitchChannelNameSetting && 
+          twitchChannelNameSetting.length > 0 ? twitchChannelNameSetting : login;
+
+        comfyJS.Init(login, accessToken, [channelToJoin]);
+        
+        Logger.log(LogLevel.info, `Joined ${channelToJoin} chat.`);
 
         this.chatClientConnectionEventEmitter.fire(true);
         return true;
@@ -130,6 +141,8 @@ export default class ChatClient {
       } else {
         this.connect();
       }
+    } else {
+      vscode.window.showInformationMessage('Sign in to Twitch from Accounts to use Twitch Themer.',);
     }
   }
 
@@ -156,11 +169,20 @@ export default class ChatClient {
    * @param message - Message to send to chat
    */
   public async sendMessage(message: string) {
-    const session = await Authentication.getSession();
-    const login = session?.account?.label;
 
-    if (this.isConnected() && login) {
-      comfyJS.Say(message, login);
+    const currentSession = await Authentication.getSession();
+    const login = currentSession?.account?.label;
+
+    const twitchChannelNameSetting =
+      vscode.workspace
+      .getConfiguration("twitchThemer")
+      .get<string>("twitchChannelName") || undefined;
+
+    const channelToSendTo = twitchChannelNameSetting && 
+      twitchChannelNameSetting.length > 0 ? twitchChannelNameSetting : login;
+
+    if (this.isConnected() && channelToSendTo) {
+      comfyJS.Say(message, channelToSendTo);
     }
   }
 

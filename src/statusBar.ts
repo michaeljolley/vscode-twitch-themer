@@ -14,7 +14,7 @@ export async function createStatusBarItem(
   chatClient: ChatClient
 ) {
   const statusBarItem = vscode.window.createStatusBarItem(
-    vscode.StatusBarAlignment.Left
+    vscode.StatusBarAlignment.Left 
   );
 
   statusBarItem.tooltip = "Twitch Themer Extension";
@@ -31,16 +31,14 @@ export async function createStatusBarItem(
   async function processAuthChange(status: boolean) {
     await updateStatusBarItem(
       statusBarItem,
-      status ? TwitchClientStatus.loggedIn : TwitchClientStatus.loggedOut,
-      context.globalState
+      status ? TwitchClientStatus.loggedIn : TwitchClientStatus.loggedOut
     );
   }
 
   async function processChatStatusChange(status: boolean) {
     await updateStatusBarItem(
       statusBarItem,
-      status ? TwitchClientStatus.chatConnected : TwitchClientStatus.loggedOut,
-      context.globalState
+      status ? TwitchClientStatus.chatConnected : TwitchClientStatus.loggedOut
     );
   }
 }
@@ -53,29 +51,39 @@ export async function createStatusBarItem(
  */
 async function updateStatusBarItem(
   statusBarItem: vscode.StatusBarItem,
-  authStatus: TwitchClientStatus,
-  state: vscode.Memento
+  authStatus: TwitchClientStatus
 ) {
   const icon = "$(paintcan)"; // The octicon to use for the status bar icon (https://octicons.github.com/)
   let text = `${icon}`;
+  let tooltip = "Twitch Themer Extension";
   statusBarItem.show();
+  
+  const currentSession = await Authentication.getSession();
+  const login = currentSession?.account?.label;
+  
+  const twitchChannelNameSetting =
+    vscode.workspace
+    .getConfiguration("twitchThemer")
+    .get<string>("twitchChannelName") || undefined;
 
-  let user: string | null = null;
-  user = state.get(ExtensionKeys.userLogin) as string | null;
+  const channelToJoin = twitchChannelNameSetting && 
+    twitchChannelNameSetting.length > 0 ? twitchChannelNameSetting : login;
 
   switch (authStatus) {
     case TwitchClientStatus.loggingIn:
       text += " Logging In...";
-      vscode.window.showInformationMessage("Signing in to Twitch");
       break;
     case TwitchClientStatus.chatConnected:
-      text += ` Connected`;
+      text += ` Connected (${channelToJoin})`;
+      tooltip = "Click to disconnect from Twitch chat";
       break;
     case TwitchClientStatus.loggedIn:
     case TwitchClientStatus.loggedOut:
       text += " Disconnected";
+      tooltip = "Click to connect to Twitch chat";
       break;
   }
 
   statusBarItem.text = text;
+  statusBarItem.tooltip = tooltip;
 }

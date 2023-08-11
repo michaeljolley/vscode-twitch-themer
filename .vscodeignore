@@ -8,3 +8,10 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 out/test/**
+.github/**
+
+resources/logo.ai
+.all-contributorsrc
+CHANGELOG.md
+package.release.config.js
+publish.release.config.js

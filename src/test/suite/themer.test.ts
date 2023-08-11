@@ -21,7 +21,7 @@ suite("Themer Tests", function () {
     vscode.WorkspaceConfiguration
   >;
   let isTwitchUserFollowingStub: sinon.SinonStub<
-    [string | undefined],
+    [string | undefined, string | undefined],
     Promise<boolean>
   >;
   let fakeState: vscode.Memento;
@@ -177,7 +177,8 @@ suite("Themer Tests", function () {
       .stub(API, "isTwitchUserFollowing")
       .callsFake(
         async (
-          twitchUserId: string | undefined
+          twitchUserId: string | undefined,
+          twitchChannelId: string | undefined
         ): Promise<boolean> => {
           return isTwitchUserFollowingReturn;
         }

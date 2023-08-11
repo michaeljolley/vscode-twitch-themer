@@ -18,6 +18,8 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	_chatClient = new ChatClient(context.globalState);
 	_themer = new Themer(context.globalState);
+
+	await _themer.initializeConfiguration();
   
 	const statusBarItem = await createStatusBarItem(context, _chatClient);
   
@@ -25,16 +27,19 @@ export async function activate(context: vscode.ExtensionContext) {
 	  Commands.toggleChat,
 	  _chatClient?.toggleChat.bind(_chatClient)
 	);
-	const twitchSignIn = vscode.commands.registerCommand(
-	  Commands.twitchSignIn,
-	  Authentication.handleSignIn.bind(Authentication)
-	);
   
 	const handleSettingsChange = vscode.workspace.onDidChangeConfiguration(
-	  (e: vscode.ConfigurationChangeEvent) => {
+	  async (e: vscode.ConfigurationChangeEvent) => {
 		if (e.affectsConfiguration("twitchThemer")) {
-		  _themer?.initializeConfiguration();
-		  _chatClient?.initializeConfiguration();
+		  await _themer?.initializeConfiguration();
+		  await _chatClient?.initializeConfiguration();
+
+		  if (e.affectsConfiguration("twitchThemer.twitchChannelName") &&
+			_chatClient &&
+		  	_chatClient.isConnected()) {
+			await _chatClient?.disconnect();
+			await _chatClient.connect();
+		}
 		}
 	  }
 	);
@@ -56,7 +61,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	  chatOnConnectionChanged,
   
 	  toggleChat,
-	  twitchSignIn,
 	  statusBarItem,
 	  handleSettingsChange
 	);

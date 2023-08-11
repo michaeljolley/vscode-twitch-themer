@@ -19,6 +19,7 @@ import {
 } from "./constants";
 import { ChatMessage } from "./types/chatMessage";
 import { Command } from "./types/command";
+import Authentication from "./authentication";
 
 /**
  * Manages all logic associated with retrieving themes,
@@ -36,6 +37,7 @@ export default class Themer {
   private _redemptionHoldId: string = "";
   private _redemptionHoldPeriodMinutes: number = 5;
   private _pauseThemer: boolean = false;
+  private _twitchChannelId: string | undefined;
 
   private sendMessageEventEmitter = new vscode.EventEmitter<string>();
 
@@ -48,12 +50,7 @@ export default class Themer {
    * @param logger - The logger used when logging events
    */
   constructor(private _state: vscode.Memento) {
-    /**
-     * Gather command names from the extension settings
-     */
-    this.initializeConfiguration();
-
-    /**
+     /**
      * Initialize the list of available themes for users
      */
     this.loadThemes();
@@ -94,7 +91,7 @@ export default class Themer {
     });
   }
 
-  public initializeConfiguration() {
+  public async initializeConfiguration() {
     const configuration = vscode.workspace.getConfiguration("twitchThemer");
     this._commands["install"] =
       configuration.get<string>("installCommand") || "install";
@@ -130,6 +127,22 @@ export default class Themer {
     this._accessState = vscode.workspace
       .getConfiguration()
       .get("twitchThemer.accessState", AccessState.viewer);
+      
+    const twitchChannelNameSetting =
+      vscode.workspace
+      .getConfiguration("twitchThemer")
+      .get<string>("twitchChannelName") || undefined;
+
+    if (twitchChannelNameSetting && 
+      twitchChannelNameSetting.length > 0) {
+        const channelId = await API.getUserDetails(twitchChannelNameSetting);
+        this._twitchChannelId = channelId;
+    } else {
+      const currentSession = await Authentication.getSession();
+      if (currentSession) {
+        this._twitchChannelId = currentSession.account?.id;
+      }
+    }
   }
 
   public handleConnectionChanges(signedIn: boolean) {
@@ -420,7 +433,7 @@ export default class Themer {
         this._followers.find((x) => x.username === user.toLocaleLowerCase())
       ) {
         break following;
-      } else if (await API.isTwitchUserFollowing(userId)) {
+      } else if (await API.isTwitchUserFollowing(userId, this._twitchChannelId)) {
         this._followers.push({
           username: user.toLocaleLowerCase(),
         });
@@ -651,7 +664,7 @@ export default class Themer {
       this._followers.find((x) => x.username === user.toLocaleLowerCase())
     ) {
       userAccessState = AccessState.follower;
-    } else if (await API.isTwitchUserFollowing(userId)) {
+    } else if (await API.isTwitchUserFollowing(userId, this._twitchChannelId)) {
       this._followers.push({ username: user.toLocaleLowerCase() });
       userAccessState = AccessState.follower;
     }
