@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import {
+import ComfyJS, {
   ComfyJSInstance,
   OnCommandExtra,
   OnJoinExtra,
@@ -17,6 +17,7 @@ import Logger from "./logger";
 import { ChatMessage } from "./types/chatMessage";
 import { ExtensionKeys, LogLevel, twitchScopes } from "./constants";
 import Authentication from "./authentication";
+import { Whisper } from "./types/whisper";
 
 const comfyJS: ComfyJSInstance = require("comfy.js");
 
@@ -156,12 +157,24 @@ export default class ChatClient {
    * @param message - Message to send to chat
    */
   public async sendMessage(message: string) {
-    const authUserLogin = this._state.get(ExtensionKeys.userLogin) as
-      | string
-      | null;
+    const session = await Authentication.getSession();
+    const login = session?.account?.label;
 
-    if (this.isConnected() && authUserLogin) {
-      comfyJS.Say(message, authUserLogin);
+    if (this.isConnected() && login) {
+      comfyJS.Say(message, login);
+    }
+  }
+  
+  /**
+   * Sends a whisper to the specified user
+   * @param whisper - Details of message to send and recipient
+   */
+  public whisper(whisper: Whisper) {
+    if (
+      this.isConnected() &&
+      whisper.user
+    ) {
+      ComfyJS.Whisper(whisper.message, whisper.user);
     }
   }
 

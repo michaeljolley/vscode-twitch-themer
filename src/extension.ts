@@ -8,6 +8,7 @@ import Themer from "./themer";
 import { ChatMessage } from "./types/chatMessage";
 import { Commands, LogLevel } from "./constants";
 import { createStatusBarItem } from "./statusBar";
+import { Whisper } from "./types/whisper";
 
 let _chatClient: ChatClient | undefined;
 let _themer: Themer | undefined;
@@ -40,6 +41,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	);
   
 	const themerOnSendMessage = _themer.onSendMessage(onSendMessage);
+	const themerOnWhisper = _themer.onWhisper(onWhisper);
 	const chatOnChatMessageReceived = _chatClient.onChatMessageReceived(
 	  onChatMessageReceived
 	);
@@ -94,6 +96,10 @@ export async function activate(context: vscode.ExtensionContext) {
   
   async function onSendMessage(message: string) {
 	await _chatClient?.sendMessage(message);
+  }
+  
+  async function onWhisper(whisper: Whisper) {
+	await _chatClient?.whisper(whisper);
   }
   
   async function onChatMessageReceived(chatMessage: ChatMessage) {

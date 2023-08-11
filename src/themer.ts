@@ -11,6 +11,7 @@ import {
 } from "./constants";
 import { ChatMessage } from "./types/chatMessage";
 import { Command } from "./types/command";
+import { Whisper } from "./types/whisper";
 
 /**
  * Manages all logic associated with retrieving themes,
@@ -30,9 +31,11 @@ export default class Themer {
   private _pauseThemer: boolean = false;
 
   private sendMessageEventEmitter = new vscode.EventEmitter<string>();
+  private whisperEventEmitter = new vscode.EventEmitter<Whisper>();
 
   /** Event that fires when themer needs to send a message */
   public onSendMessage = this.sendMessageEventEmitter.event;
+  public onWhisper = this.whisperEventEmitter.event;
 
   /**
    * constructor
@@ -347,13 +350,19 @@ export default class Themer {
       } else {
         /** If no more theme names can be added, go ahead and send the first message
          * and start over building the next message */
-        this.sendMessageEventEmitter.fire(message.replace(/(^[,\s]+)|([,\s]+$)/g, ""));
+        this.whisperEventEmitter.fire({
+          message: message.replace(/(^[,\s]+)|([,\s]+$)/g, ""), 
+          user
+        });
         message = `${name}, `;
       }
     }
 
     /** Send the final message */
-    this.sendMessageEventEmitter.fire(message.replace(/(^[,\s]+)|([,\s]+$)/g, ""));
+    this.whisperEventEmitter.fire({
+      message: message.replace(/(^[,\s]+)|([,\s]+$)/g, ""), 
+      user
+    });
   }
 
   /**
