@@ -57,7 +57,7 @@ export default abstract class API {
 
       const channelLogin = channelToJoin || login;
       
-      const url = `https://api.twitch.tv/helix/users?login=${channelLogin}}`;
+      const url = `https://api.twitch.tv/helix/users?login=${channelLogin}`;
       const res = await axios.get(url, {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
