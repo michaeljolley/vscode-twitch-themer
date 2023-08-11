@@ -1,3 +1,23 @@
+# [3.0.0](https://github.com/builders-club/vscode-twitch-themer/compare/v2.1.1...v3.0.0) (2023-08-11)
+
+
+### Bug Fixes
+
+* Adding tests to CI process GitHub Action ([5719689](https://github.com/builders-club/vscode-twitch-themer/commit/571968990439fdb60f75c440b130b6fab2aed824))
+* Replacing node-fetch with axios ([c0563d3](https://github.com/builders-club/vscode-twitch-themer/commit/c0563d33fd887c57ec68c0e830e038cc6fc69eb6))
+
+
+### Features
+
+* Adding scopes for whispers and extension specific Twitch API client id ([8e53f82](https://github.com/builders-club/vscode-twitch-themer/commit/8e53f8206a5d38b4b05d31e746df7ca1632044bb))
+* Requests for list of themes now whispers the list to user ([75b4b39](https://github.com/builders-club/vscode-twitch-themer/commit/75b4b39cc9ac0a6ac8b5fed76f71349a2b41c0f7))
+* Updating auth to use twitch-auth-provider extension ([dfaa8c4](https://github.com/builders-club/vscode-twitch-themer/commit/dfaa8c4fdfcf063208eb77e030b44b03a6cfaa14))
+
+
+### BREAKING CHANGES
+
+* The existing Twitch authentication has been replaced by @Clarkio's twitch-auth-provider extension.
+
 ## [2.1.1](https://github.com/builders-club/vscode-twitch-themer/compare/v2.1.0...v2.1.1) (2023-08-10)
 
 
