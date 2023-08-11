@@ -92,4 +92,12 @@ export enum LogLevel {
   debug = "debug",
 }
 
-export const twitchScopes = ["chat:read", "chat:edit"];
+/**
+ * Twitch API Client ID for the extension
+ */
+export const twitchAPIClientId = "ts9wowek7hj9yw0q7gmg27c29i6etn";
+
+/** 
+ * Twitch scopes required for the extension to function 
+*/
+export const twitchScopes = [`TWITCH_CLIENT_ID:${twitchAPIClientId}`, "chat:read", "chat:edit", "whispers:edit"];

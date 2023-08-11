@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import fetch from "node-fetch";
 import Logger from "./logger";
-import { LogLevel, ThemeNotAvailableReasons } from "./constants";
+import { LogLevel, ThemeNotAvailableReasons, twitchAPIClientId } from "./constants";
 import Authentication from "./authentication";
 
 export default class API {
@@ -23,7 +23,7 @@ export default class API {
               // eslint-disable-next-line @typescript-eslint/naming-convention
               Authorization: `Bearer ${accessToken}`,
               // eslint-disable-next-line @typescript-eslint/naming-convention
-              "client-id": "ts9wowek7hj9yw0q7gmg27c29i6etn",
+              "client-id": twitchAPIClientId,
             },
           });
           const { data } = (await res.json()) as { data: any[] };
@@ -57,7 +57,7 @@ export default class API {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           Authorization: `Bearer ${token}`,
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          "client-id": "ts9wowek7hj9yw0q7gmg27c29i6etn",
+          "client-id": twitchAPIClientId,
         },
       });
 
@@ -186,7 +186,7 @@ export default class API {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          "client-id": "ts9wowek7hj9yw0q7gmg27c29i6etn",
+          "client-id": twitchAPIClientId,
         },
       });
       const { data }: any = await res.json();
