@@ -1,3 +1,15 @@
+# [3.1.0](https://github.com/builders-club/vscode-twitch-themer/compare/v3.0.1...v3.1.0) (2023-08-11)
+
+
+### Bug Fixes
+
+* Corrected issue in theme name of the current command ([f6c5967](https://github.com/builders-club/vscode-twitch-themer/commit/f6c59677117691707195048d2a597716a97a3cec))
+
+
+### Features
+
+* !theme current command now returns a link to the current theme on the VSC marketplace ([6060494](https://github.com/builders-club/vscode-twitch-themer/commit/6060494ea60a6e6ede6d94f12b416ba3dbc84fad))
+
 ## [3.0.1](https://github.com/builders-club/vscode-twitch-themer/compare/v3.0.0...v3.0.1) (2023-08-11)
 
 
