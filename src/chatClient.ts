@@ -1,18 +1,12 @@
 import * as vscode from "vscode";
-import ComfyJS, {
+import {
   ComfyJSInstance,
   OnCommandExtra,
   OnJoinExtra,
   OnMessageExtra,
   OnMessageFlags,
-  OnRewardExtra,
 } from "comfy.js";
-import {
-  EventEmitter,
-  Memento,
-  workspace,
-  WorkspaceConfiguration,
-} from "vscode";
+import { EventEmitter, workspace, WorkspaceConfiguration } from "vscode";
 import Logger from "./logger";
 import { ChatMessage } from "./types/chatMessage";
 import { LogLevel } from "./constants";
@@ -28,7 +22,6 @@ export default class ChatClient {
   private chatClientConnectionEventEmitter = new EventEmitter<boolean>();
   private _commandTrigger: string = "theme";
   private _redemptionHoldId: string = "";
-  private _channelId: string = "";
 
   /** Event that fires when an appropriate message is received */
   public onChatMessageReceived = this.chatClientMessageEventEmitter.event;
@@ -40,7 +33,7 @@ export default class ChatClient {
    * constructor
    * @param _state - The global state of the extension
    */
-  constructor(private _state: Memento) {
+  constructor() {
     this.initializeConfiguration();
   }
 
@@ -63,7 +56,6 @@ export default class ChatClient {
   public async connect() {
     Logger.log(LogLevel.info, "Connecting to Twitch...");
     if (!this.isConnected()) {
-     
       const currentSession = await Authentication.getSession();
       const accessToken = currentSession?.accessToken;
       const login = currentSession?.account?.label;
@@ -79,15 +71,17 @@ export default class ChatClient {
         comfyJS.onConnected = this.onConnectedHandler.bind(this);
 
         const twitchChannelNameSetting =
-            vscode.workspace
+          vscode.workspace
             .getConfiguration("twitchThemer")
             .get<string>("twitchChannelName") || undefined;
 
-        const channelToJoin = twitchChannelNameSetting && 
-          twitchChannelNameSetting.length > 0 ? twitchChannelNameSetting : login;
+        const channelToJoin =
+          twitchChannelNameSetting && twitchChannelNameSetting.length > 0
+            ? twitchChannelNameSetting
+            : login;
 
         comfyJS.Init(login, accessToken, [channelToJoin]);
-        
+
         Logger.log(LogLevel.info, `Joined ${channelToJoin} chat.`);
 
         this.chatClientConnectionEventEmitter.fire(true);
@@ -113,17 +107,16 @@ export default class ChatClient {
    * Toggles whether the person is connected to Twitch chat
    */
   public async toggleChat(): Promise<void> {
-    
     const currentSession = await Authentication.getSession();
     if (currentSession) {
       const accessToken = currentSession?.accessToken;
       const authUserLogin = currentSession?.account?.label;
-  
+
       if (!accessToken || !authUserLogin) {
         let choice = await vscode.window.showInformationMessage(
           "You must be signed in to Twitch to connect to Twitch chat. Sign in now?",
           "Sign In",
-          "Cancel"
+          "Cancel",
         );
         switch (choice) {
           case "Sign In":
@@ -135,14 +128,16 @@ export default class ChatClient {
         }
         return;
       }
-  
+
       if (this.isConnected()) {
         this.disconnect();
       } else {
         this.connect();
       }
     } else {
-      vscode.window.showInformationMessage('Sign in to Twitch from Accounts to use Twitch Themer.',);
+      vscode.window.showInformationMessage(
+        "Sign in to Twitch from Accounts to use Twitch Themer.",
+      );
     }
   }
 
@@ -159,7 +154,7 @@ export default class ChatClient {
   private onJoinHandler(user: string, self: boolean, extra: OnJoinExtra) {
     if (self) {
       this.sendMessage(
-        `Twitch Themer is ready to go. Listening for commands beginning with !${this._commandTrigger}`
+        `Twitch Themer is ready to go. Listening for commands beginning with !${this._commandTrigger}`,
       );
     }
   }
@@ -169,17 +164,18 @@ export default class ChatClient {
    * @param message - Message to send to chat
    */
   public async sendMessage(message: string) {
-
     const currentSession = await Authentication.getSession();
     const login = currentSession?.account?.label;
 
     const twitchChannelNameSetting =
       vscode.workspace
-      .getConfiguration("twitchThemer")
-      .get<string>("twitchChannelName") || undefined;
+        .getConfiguration("twitchThemer")
+        .get<string>("twitchChannelName") || undefined;
 
-    const channelToSendTo = twitchChannelNameSetting && 
-      twitchChannelNameSetting.length > 0 ? twitchChannelNameSetting : login;
+    const channelToSendTo =
+      twitchChannelNameSetting && twitchChannelNameSetting.length > 0
+        ? twitchChannelNameSetting
+        : login;
 
     if (this.isConnected() && channelToSendTo) {
       comfyJS.Say(message, channelToSendTo);
@@ -191,7 +187,7 @@ export default class ChatClient {
     command: string,
     message: string,
     flags: OnMessageFlags,
-    extra: OnCommandExtra
+    extra: OnCommandExtra,
   ) {
     Logger.log(LogLevel.info, `Received ${message} from ${user}`);
 
@@ -200,7 +196,10 @@ export default class ChatClient {
     }
 
     if (extra.customRewardId) {
-      Logger.log(LogLevel.info, `Received custom reward ${extra.customRewardId} from ${user}`);
+      Logger.log(
+        LogLevel.info,
+        `Received custom reward ${extra.customRewardId} from ${user}`,
+      );
     }
 
     message = message.toLocaleLowerCase().trim();
@@ -217,7 +216,7 @@ export default class ChatClient {
     message: string,
     flags: OnMessageFlags,
     self: boolean,
-    extra: OnMessageExtra
+    extra: OnMessageExtra,
   ) {
     Logger.log(LogLevel.info, `Received ${message} from ${user}`);
     if (!message || this._redemptionHoldId.length === 0) {
@@ -225,7 +224,10 @@ export default class ChatClient {
     }
 
     if (extra.customRewardId) {
-      Logger.log(LogLevel.info, `Received custom reward ${extra.customRewardId} from ${user}`);
+      Logger.log(
+        LogLevel.info,
+        `Received custom reward ${extra.customRewardId} from ${user}`,
+      );
     }
 
     // Ensure this message is a point redemption and matches

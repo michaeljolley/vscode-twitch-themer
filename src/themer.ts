@@ -19,7 +19,6 @@ import {
 } from "./constants";
 import { ChatMessage } from "./types/chatMessage";
 import { Command } from "./types/command";
-import Authentication from "./authentication";
 
 /**
  * Manages all logic associated with retrieving themes,
@@ -37,7 +36,6 @@ export default class Themer {
   private _redemptionHoldId: string = "";
   private _redemptionHoldPeriodMinutes: number = 5;
   private _pauseThemer: boolean = false;
-  private _twitchChannelId: string | undefined;
 
   private sendMessageEventEmitter = new vscode.EventEmitter<string>();
 
@@ -50,7 +48,9 @@ export default class Themer {
    * @param logger - The logger used when logging events
    */
   constructor(private _state: vscode.Memento) {
-     /**
+    this.initializeConfiguration();
+
+    /**
      * Initialize the list of available themes for users
      */
     this.loadThemes();
@@ -67,7 +67,7 @@ export default class Themer {
       (f) =>
         f.label.toLocaleLowerCase() === theme.toLocaleLowerCase() ||
         (f.themeId &&
-          f.themeId.toLocaleLowerCase() === theme.toLocaleLowerCase())
+          f.themeId.toLocaleLowerCase() === theme.toLocaleLowerCase()),
     )[0];
 
     /**
@@ -76,7 +76,7 @@ export default class Themer {
     this._state
       .get("bannedUsers", [])
       .forEach((username) =>
-        this._listRecipients.push({ username, banned: true })
+        this._listRecipients.push({ username, banned: true }),
       );
 
     /**
@@ -91,7 +91,7 @@ export default class Themer {
     });
   }
 
-  public async initializeConfiguration() {
+  public initializeConfiguration() {
     const configuration = vscode.workspace.getConfiguration("twitchThemer");
     this._commands["install"] =
       configuration.get<string>("installCommand") || "install";
@@ -127,22 +127,6 @@ export default class Themer {
     this._accessState = vscode.workspace
       .getConfiguration()
       .get("twitchThemer.accessState", AccessState.viewer);
-      
-    const twitchChannelNameSetting =
-      vscode.workspace
-      .getConfiguration("twitchThemer")
-      .get<string>("twitchChannelName") || undefined;
-
-    if (twitchChannelNameSetting && 
-      twitchChannelNameSetting.length > 0) {
-        const channelId = await API.getUserDetails(twitchChannelNameSetting);
-        this._twitchChannelId = channelId;
-    } else {
-      const currentSession = await Authentication.getSession();
-      if (currentSession) {
-        this._twitchChannelId = currentSession.account?.id;
-      }
-    }
   }
 
   public handleConnectionChanges(signedIn: boolean) {
@@ -199,7 +183,9 @@ export default class Themer {
 
     Logger.log(
       LogLevel.info,
-      `Executing command: '${command === "" ? "help" : command}'`
+      `Executing command: '${
+        command === "" ? this._commands["help"] : command
+      }'`,
     );
 
     switch (command) {
@@ -213,7 +199,7 @@ export default class Themer {
         await this.resetTheme(
           chatMessage.user,
           chatMessage.extra.userId,
-          chatMessage.flags
+          chatMessage.flags,
         );
         break;
       case this._commands["random"]:
@@ -221,7 +207,7 @@ export default class Themer {
           chatMessage.user,
           chatMessage.extra.userId,
           chatMessage.flags,
-          chatMessage.message
+          chatMessage.message,
         );
         break;
       case this._commands["help"]:
@@ -238,7 +224,7 @@ export default class Themer {
           chatMessage.user,
           chatMessage.extra.userId,
           chatMessage.flags,
-          chatMessage.message
+          chatMessage.message,
         );
         break;
       case this._commands["ban"]:
@@ -257,7 +243,7 @@ export default class Themer {
           chatMessage.extra.userId,
           chatMessage.flags,
           message,
-          chatMessage.extra.customRewardId
+          chatMessage.extra.customRewardId,
         );
         break;
     }
@@ -270,12 +256,12 @@ export default class Themer {
    */
   private getRecipient(
     twitchUser: string,
-    banned?: boolean
+    banned?: boolean,
   ): ListRecipient | undefined {
     return this._listRecipients.filter(
       (f) =>
         f.username.toLocaleLowerCase() === twitchUser.toLocaleLowerCase() &&
-        f.banned === banned
+        f.banned === banned,
     )[0];
   }
 
@@ -336,14 +322,14 @@ export default class Themer {
   public async resetTheme(
     user: string,
     userId: string,
-    onMessageFlags: OnMessageFlags
+    onMessageFlags: OnMessageFlags,
   ) {
     if (this._originalTheme) {
       await this.changeTheme(
         user,
         userId,
         onMessageFlags,
-        this._originalTheme.label
+        this._originalTheme.label,
       );
     }
   }
@@ -367,7 +353,7 @@ export default class Themer {
         (f) =>
           f.packageJSON.contributes &&
           f.packageJSON.contributes.themes &&
-          f.packageJSON.contributes.themes.length > 0
+          f.packageJSON.contributes.themes.length > 0,
       )
       .forEach((fe: any) => {
         const iThemes = fe.packageJSON.contributes.themes.map((m: any) => {
@@ -401,7 +387,7 @@ export default class Themer {
     if (twitchUserName) {
       const recipient = this.getRecipient(
         twitchUserName.toLocaleLowerCase(),
-        true
+        true,
       );
       if (recipient && recipient.banned && recipient.banned === true) {
         return true;
@@ -419,7 +405,7 @@ export default class Themer {
     user: string,
     userId: string,
     onMessageFlags: OnMessageFlags,
-    message: string
+    message: string,
   ): Promise<void> {
     /** Ensure the user hasn't been banned before installing the theme */
     if (this.isBanned(user)) {
@@ -433,7 +419,7 @@ export default class Themer {
         this._followers.find((x) => x.username === user.toLocaleLowerCase())
       ) {
         break following;
-      } else if (await API.isTwitchUserFollowing(userId, this._twitchChannelId)) {
+      } else if (await API.isTwitchUserFollowing(userId)) {
         this._followers.push({
           username: user.toLocaleLowerCase(),
         });
@@ -476,11 +462,13 @@ export default class Themer {
     // and return.
     const themes = this._availableThemes.filter(
       (value: Theme) =>
-        value.extensionId.toLocaleLowerCase() === theme.toLocaleLowerCase()
+        value.extensionId.toLocaleLowerCase() === theme.toLocaleLowerCase(),
     );
     if (themes.length > 0) {
       const uniqueThemeLabels = Array.from(new Set(themes.map((t) => t.label)));
-      this.sendMessageEventEmitter.fire(messageThemeExists(user, theme, uniqueThemeLabels));
+      this.sendMessageEventEmitter.fire(
+        messageThemeExists(user, theme, uniqueThemeLabels),
+      );
       return;
     }
 
@@ -493,37 +481,37 @@ export default class Themer {
           case ThemeNotAvailableReasons.notFound:
             Logger.log(
               LogLevel.error,
-              `The requested theme could not be found in the marketplace.`
+              `The requested theme could not be found in the marketplace.`,
             );
             break;
           case ThemeNotAvailableReasons.noRepositoryFound:
             Logger.log(
               LogLevel.error,
-              `The requested theme does not include a public repository.`
+              `The requested theme does not include a public repository.`,
             );
             break;
           case ThemeNotAvailableReasons.packageJsonNotDownloaded:
             Logger.log(
               LogLevel.error,
-              `The requested theme's package.json could not be downloaded.`
+              `The requested theme's package.json could not be downloaded.`,
             );
             break;
           case ThemeNotAvailableReasons.packageJsonMalformed:
             Logger.log(
               LogLevel.error,
-              `The requested theme's package.json could not be parsed.`
+              `The requested theme's package.json could not be parsed.`,
             );
             break;
           case ThemeNotAvailableReasons.noThemesContributed:
             Logger.log(
               LogLevel.error,
-              `The requested theme extension does not contribute any themes.`
+              `The requested theme extension does not contribute any themes.`,
             );
             break;
           default:
             Logger.log(
               LogLevel.error,
-              `The requested theme could not be downloaded. Unknown reason.`
+              `The requested theme could not be downloaded. Unknown reason.`,
             );
             break;
         }
@@ -534,27 +522,28 @@ export default class Themer {
     try {
       // Authorize the install of the extension if we do not allow for auto-installed extensions.
       if (!this._autoInstall) {
-        const msg = `${user} wants to install theme(s) ${isValidExtResult.label ? isValidExtResult.label.join(", ") : theme
-          }.`;
+        const msg = `${user} wants to install theme(s) ${
+          isValidExtResult.label ? isValidExtResult.label.join(", ") : theme
+        }.`;
         Logger.log(LogLevel.info, `${msg}`);
         let choice = await vscode.window.showInformationMessage(
           msg,
           "Accept",
           "Deny",
-          "Preview"
+          "Preview",
         );
         switch (choice) {
           case "Preview":
             // Open marketplace
             vscode.env.openExternal(
               vscode.Uri.parse(
-                `https://marketplace.visualstudio.com/items?itemName=${theme}`
-              )
+                `https://marketplace.visualstudio.com/items?itemName=${theme}`,
+              ),
             );
             choice = await vscode.window.showInformationMessage(
               msg,
               "Accept",
-              "Deny"
+              "Deny",
             );
             if (choice === "Deny") {
               Logger.log(LogLevel.info, `User denied installing theme(s).`);
@@ -571,12 +560,13 @@ export default class Themer {
       Logger.log(LogLevel.info, "Installing theme...");
       await vscode.commands.executeCommand(
         "workbench.extensions.installExtension",
-        theme
+        theme,
       );
       Logger.log(LogLevel.info, "Theme extension install request complete.");
 
-     
-      this.sendMessageEventEmitter.fire(messageInstalled(user, isValidExtResult.label || []));
+      this.sendMessageEventEmitter.fire(
+        messageInstalled(user, isValidExtResult.label || []),
+      );
     } catch (err: any) {
       // Handle the error
       Logger.log(LogLevel.error, err);
@@ -593,7 +583,7 @@ export default class Themer {
     user: string,
     userId: string,
     onMessageFlags: OnMessageFlags,
-    message: string
+    message: string,
   ) {
     const currentTheme = vscode.workspace
       .getConfiguration()
@@ -647,7 +637,7 @@ export default class Themer {
     userId: string,
     onMessageFlags: OnMessageFlags,
     themeName: string,
-    customRewardId?: string
+    customRewardId?: string,
   ) {
     let userAccessState = AccessState.viewer;
     const userLevel = this.getUserLevel(onMessageFlags);
@@ -664,7 +654,7 @@ export default class Themer {
       this._followers.find((x) => x.username === user.toLocaleLowerCase())
     ) {
       userAccessState = AccessState.follower;
-    } else if (await API.isTwitchUserFollowing(userId, this._twitchChannelId)) {
+    } else if (await API.isTwitchUserFollowing(userId)) {
       this._followers.push({ username: user.toLocaleLowerCase() });
       userAccessState = AccessState.follower;
     }
@@ -682,36 +672,38 @@ export default class Themer {
       (f) =>
         f.label.toLocaleLowerCase() === themeName.toLocaleLowerCase() ||
         (f.themeId &&
-          f.themeId.toLocaleLowerCase() === themeName.toLocaleLowerCase())
+          f.themeId.toLocaleLowerCase() === themeName.toLocaleLowerCase()),
     )[0];
 
     if (theme) {
       if (this._pauseThemer) {
-        this.sendMessageEventEmitter.fire(
-          messagePaused(user)
-        );
+        this.sendMessageEventEmitter.fire(messagePaused(user));
       } else {
         await this.setTheme(user, theme);
 
-        if (onMessageFlags.customReward &&
-          customRewardId === this._redemptionHoldId) {
+        if (
+          onMessageFlags.customReward &&
+          customRewardId === this._redemptionHoldId
+        ) {
           // start a "pause" timer
           this.setPauseStatus(true);
           this.sendMessageEventEmitter.fire(
-            messageOnPaused(user, theme.label, this._redemptionHoldPeriodMinutes)
+            messageOnPaused(
+              user,
+              theme.label,
+              this._redemptionHoldPeriodMinutes,
+            ),
           );
           setTimeout(() => {
             this.setPauseStatus(false);
             this.sendMessageEventEmitter.fire(
-              `Twitch Themer has resumed listening for requests.`
+              `Twitch Themer has resumed listening for requests.`,
             );
           }, this._redemptionHoldPeriodMinutes * 60000);
         }
       }
     } else {
-      this.sendMessageEventEmitter.fire(
-       messageInvalidTheme(user, themeName)
-      );
+      this.sendMessageEventEmitter.fire(messageInvalidTheme(user, themeName));
     }
   }
 
@@ -724,15 +716,15 @@ export default class Themer {
         await conf.update(
           "workbench.colorTheme",
           theme.themeId || theme.label,
-          vscode.ConfigurationTarget.Global
+          vscode.ConfigurationTarget.Global,
         );
         vscode.window.showInformationMessage(
-          `Theme changed to ${theme.label} by ${user}`
+          `Theme changed to ${theme.label} by ${user}`,
         );
       });
     }
   }
-  
+
   /**
    * Announces to chat the currently active theme
    */
@@ -746,10 +738,13 @@ export default class Themer {
       (f) =>
         f.label.toLocaleLowerCase() === currentThemeName.toLocaleLowerCase() ||
         (f.themeId &&
-          f.themeId.toLocaleLowerCase() === currentThemeName.toLocaleLowerCase())
+          f.themeId.toLocaleLowerCase() ===
+            currentThemeName.toLocaleLowerCase()),
     )[0];
 
-    this.sendMessageEventEmitter.fire(messageCurrent(currentThemeName, theme.extensionId));
+    this.sendMessageEventEmitter.fire(
+      messageCurrent(currentThemeName, theme.extensionId),
+    );
   }
 
   /**

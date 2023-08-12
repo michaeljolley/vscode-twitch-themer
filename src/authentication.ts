@@ -32,22 +32,24 @@ export default abstract class Authentication {
 
   public static async getSession() {
     try {
-      return await vscode.authentication.getSession("twitch", twitchScopes, { createIfNone: false });
+      return await vscode.authentication.getSession("twitch", twitchScopes, {
+        createIfNone: false,
+      });
     } catch (error: any) {
       Logger.log(LogLevel.error, error.message);
-      throw new Error('awe snap');
+      throw new Error("awe snap");
     }
   }
 
   public static async handleSignIn() {
-      const result = await this.getSession();
+    const result = await this.getSession();
     try {
       if (result) {
         this.authStatusEventEmitter.fire(true);
       }
     } catch (error: any) {
       Logger.log(LogLevel.error, error.message);
-      throw new Error('There was an issue signing in to Twitch');
+      throw new Error("There was an issue signing in to Twitch");
     }
   }
 }

@@ -11,10 +11,10 @@ import { TwitchClientStatus, Commands, ExtensionKeys } from "./constants";
  */
 export async function createStatusBarItem(
   context: vscode.ExtensionContext,
-  chatClient: ChatClient
+  chatClient: ChatClient,
 ) {
   const statusBarItem = vscode.window.createStatusBarItem(
-    vscode.StatusBarAlignment.Left 
+    vscode.StatusBarAlignment.Left,
   );
 
   statusBarItem.tooltip = "Twitch Themer Extension";
@@ -23,7 +23,7 @@ export async function createStatusBarItem(
   context.subscriptions.push(
     statusBarItem,
     Authentication.onAuthStatusChanged(processAuthChange),
-    chatClient.onConnectionChanged(processChatStatusChange)
+    chatClient.onConnectionChanged(processChatStatusChange),
   );
 
   return statusBarItem;
@@ -31,14 +31,14 @@ export async function createStatusBarItem(
   async function processAuthChange(status: boolean) {
     await updateStatusBarItem(
       statusBarItem,
-      status ? TwitchClientStatus.loggedIn : TwitchClientStatus.loggedOut
+      status ? TwitchClientStatus.loggedIn : TwitchClientStatus.loggedOut,
     );
   }
 
   async function processChatStatusChange(status: boolean) {
     await updateStatusBarItem(
       statusBarItem,
-      status ? TwitchClientStatus.chatConnected : TwitchClientStatus.loggedOut
+      status ? TwitchClientStatus.chatConnected : TwitchClientStatus.loggedOut,
     );
   }
 }
@@ -51,23 +51,25 @@ export async function createStatusBarItem(
  */
 async function updateStatusBarItem(
   statusBarItem: vscode.StatusBarItem,
-  authStatus: TwitchClientStatus
+  authStatus: TwitchClientStatus,
 ) {
   const icon = "$(paintcan)"; // The octicon to use for the status bar icon (https://octicons.github.com/)
   let text = `${icon}`;
   let tooltip = "Twitch Themer Extension";
   statusBarItem.show();
-  
+
   const currentSession = await Authentication.getSession();
   const login = currentSession?.account?.label;
-  
+
   const twitchChannelNameSetting =
     vscode.workspace
-    .getConfiguration("twitchThemer")
-    .get<string>("twitchChannelName") || undefined;
+      .getConfiguration("twitchThemer")
+      .get<string>("twitchChannelName") || undefined;
 
-  const channelToJoin = twitchChannelNameSetting && 
-    twitchChannelNameSetting.length > 0 ? twitchChannelNameSetting : login;
+  const channelToJoin =
+    twitchChannelNameSetting && twitchChannelNameSetting.length > 0
+      ? twitchChannelNameSetting
+      : login;
 
   switch (authStatus) {
     case TwitchClientStatus.loggingIn:
