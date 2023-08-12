@@ -116,7 +116,7 @@ a theme using !theme install <id of the theme>";
 
 export const messageRepo =
   "You can find the source code for this VS \
-Code extension at https://github.com/builders-club/vscode-twitch-themer . \
+Code extension at https://github.com/build-with-me/vscode-twitch-themer . \
 Feel free to fork & contribute.";
 
 export const messagePaused = (user: string) =>
