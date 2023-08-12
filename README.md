@@ -9,7 +9,7 @@
 
 A Visual Studio Code extension that listens to twitch chat and allows viewers to change the streamers VS Code theme by using the **!theme** command.
 
-![Screenshot of the extension in action]([./resources/screenshot-example.gif](https://github.com/build-with-me/vscode-twitch-themer/assets/1228996/7a8c1ca1-4648-49b7-a3e9-a47c46cff635))
+![Screenshot of the extension in action](https://github-production-user-asset-6210df.s3.amazonaws.com/1228996/260170623-7a8c1ca1-4648-49b7-a3e9-a47c46cff635.png)
 
 ## Quickstart Guide
 
