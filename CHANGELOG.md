@@ -1,3 +1,17 @@
+# [3.2.0](https://github.com/build-with-me/vscode-twitch-themer/compare/v3.1.0...v3.2.0) (2023-08-12)
+
+
+### Bug Fixes
+
+* Corrected incorrect repo location ([65f0d3d](https://github.com/build-with-me/vscode-twitch-themer/commit/65f0d3d4e42d076c2383b32bfa7ece48b341d0a2))
+* Corrected problem with retrieving optional other channel details ([bf91433](https://github.com/build-with-me/vscode-twitch-themer/commit/bf914331575db447342b19e860012328d83f7175))
+* Simplified logic to retrieve secondary account ([f41b913](https://github.com/build-with-me/vscode-twitch-themer/commit/f41b913a635e7ebb2c9299437c8d029b5ebae4af))
+
+
+### Features
+
+* Users can now specify a different channel to listen on ([4c81306](https://github.com/build-with-me/vscode-twitch-themer/commit/4c813061a534227a0928265edf4342adbd9edf66))
+
 # [3.1.0](https://github.com/builders-club/vscode-twitch-themer/compare/v3.0.1...v3.1.0) (2023-08-11)
 
 
