@@ -34,7 +34,7 @@
     "color": "#373436",
     "theme": "dark"
   },
-  "icon": "resources/logo.png",
+  "icon": "resources/vscode-twitch-themer.png",
   "extensionDependencies": [
     "clarkio.vscode-twitch-authprovider"
   ],
@@ -45,11 +45,6 @@
   "contributes": {
     "commands": [
       {
-        "command": "twitchThemer.signIn",
-        "title": "Sign In",
-        "category": "Twitch Themer"
-      },
-      {
         "command": "twitchThemer.toggleChat",
         "title": "Toggle Chat",
         "category": "Twitch Themer"
@@ -58,6 +53,12 @@
     "configuration": {
       "title": "Twitch Themer",
       "properties": {
+        "twitchThemer.twitchChannelName": {
+          "title": "Twitch Channel to Join",
+          "type": "string",
+          "default": "",
+          "description": "The name of the Twitch channel to connect to."
+        },
         "twitchThemer.accessState": {
           "title": "View Access",
           "type": "string",

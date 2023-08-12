@@ -1,21 +1,38 @@
 import * as vscode from "vscode";
-import axios from 'axios';
+import axios from "axios";
 import Logger from "./logger";
-import { LogLevel, ThemeNotAvailableReasons, twitchAPIClientId } from "./constants";
+import {
+  LogLevel,
+  ThemeNotAvailableReasons,
+  twitchAPIClientId,
+} from "./constants";
 import Authentication from "./authentication";
 
-export default class API {
-  public static async isTwitchUserFollowing(
-    twitchUserId: string | undefined
-  ) {
-    if (twitchUserId) {
+export default abstract class API {
+  public static _twitchUserId: string | undefined;
 
+  public static async isTwitchUserFollowing(twitchUserId: string | undefined) {
+    if (twitchUserId) {
       const currentSession = await Authentication.getSession();
       const accessToken = currentSession?.accessToken;
-      const login = currentSession?.account?.label;
 
-      if (accessToken && login) {
-        const url = `https://api.twitch.tv/helix/channels/followers?user_id=${twitchUserId}&broadcaster_id=${login}`;
+      const twitchChannelNameSetting =
+        vscode.workspace
+          .getConfiguration("twitchThemer")
+          .get<string>("twitchChannelName") || undefined;
+
+      let twitchChannelId = currentSession?.account?.id;
+
+      if (twitchChannelNameSetting && !this._twitchUserId) {
+        this._twitchUserId = await this.getUserDetails(
+          twitchChannelNameSetting,
+        );
+      }
+
+      twitchChannelId = this._twitchUserId || twitchChannelId;
+
+      if (accessToken && twitchChannelId) {
+        const url = `https://api.twitch.tv/helix/channels/followers?user_id=${twitchUserId}&broadcaster_id=${twitchChannelId}`;
         try {
           const res = await axios.get(url, {
             headers: {
@@ -32,14 +49,14 @@ export default class API {
         } catch (err: any) {
           Logger.log(
             LogLevel.debug,
-            `failed to retrieve Twitch user following status: ${err.message}`
+            `failed to retrieve Twitch user following status: ${err.message}`,
           );
           return false;
         }
       } else {
         Logger.log(
           LogLevel.debug,
-          "Failed to retrieve Twitch credentials from the user store"
+          "Failed to retrieve Twitch credentials from the user store",
         );
         return false;
       }
@@ -48,14 +65,19 @@ export default class API {
     return false;
   }
 
-  public static async getUserDetails(token: string | null) {
-    const url = "https://api.twitch.tv/helix/users";
-
+  public static async getUserDetails(channelToJoin?: string) {
     try {
+      const currentSession = await Authentication.getSession();
+      const accessToken = currentSession?.accessToken;
+      const login = currentSession?.account?.label;
+
+      const channelLogin = channelToJoin || login;
+
+      const url = `https://api.twitch.tv/helix/users?login=${channelLogin}`;
       const res = await axios.get(url, {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
           // eslint-disable-next-line @typescript-eslint/naming-convention
           "client-id": twitchAPIClientId,
         },
@@ -63,12 +85,12 @@ export default class API {
 
       if (res.status === 200) {
         const { data } = res;
-        return data && data.length > 0 ? data[0] : undefined;
+        return data && data.length > 0 ? data[0].id : undefined;
       }
     } catch (err: any) {
       Logger.log(
         LogLevel.error,
-        `Failed to retrieve Twitch user details: ${err.message}`
+        `Failed to retrieve Twitch user details: ${err.message}`,
       );
       return undefined;
     }
@@ -91,7 +113,12 @@ export default class API {
     const url = `https://marketplace.visualstudio.com/items?itemName=${extensionName}`;
     try {
       let res = await axios.get(url, {
-        headers: { Accept: "*/*", "User-Agent": "VSCode-Twitch-Themer" },
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          Accept: "*/*",
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          "User-Agent": "VSCode-Twitch-Themer",
+        },
       });
       if (res.status === 404) {
         return { available: false, reason: ThemeNotAvailableReasons.notFound };
@@ -119,7 +146,7 @@ export default class API {
        * ? = match 0 or 1 of the predicate.
        */
       const repoUrlMatches = body.match(
-        /\"GitHubLink\":\"https:\/\/github.com\/([--:\w?@%&+~#=]+)(?:\.git)?\"/i
+        /\"GitHubLink\":\"https:\/\/github.com\/([--:\w?@%&+~#=]+)(?:\.git)?\"/i,
       );
       if (!repoUrlMatches) {
         return {
@@ -130,7 +157,7 @@ export default class API {
 
       const repoUrl = `https://raw.githubusercontent.com/${repoUrlMatches[1].replace(
         ".git",
-        ""
+        "",
       )}/HEAD/package.json`;
       res = await axios.get(repoUrl);
       if (res.status !== 200) {
@@ -156,7 +183,7 @@ export default class API {
         return {
           available: true,
           label: packageJson.contributes.themes.map(
-            (t: { label: string }) => t.label
+            (t: { label: string }) => t.label,
           ),
         };
       } catch {
@@ -174,9 +201,8 @@ export default class API {
   }
 
   public static async getStreamIsActive(
-    _state: vscode.Memento
+    _state: vscode.Memento,
   ): Promise<boolean> {
-
     const currentSession = await Authentication.getSession();
     const accessToken = currentSession?.accessToken;
     const currentUserId = currentSession?.account?.label;
@@ -185,7 +211,9 @@ export default class API {
       const url = `https://api.twitch.tv/helix/streams?user_id=${currentUserId}`;
       const res = await axios.get(url, {
         headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           Authorization: `Bearer ${accessToken}`,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           "client-id": twitchAPIClientId,
         },
       });

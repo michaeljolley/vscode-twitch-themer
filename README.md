@@ -9,7 +9,7 @@
 
 A Visual Studio Code extension that listens to twitch chat and allows viewers to change the streamers VS Code theme by using the **!theme** command.
 
-![](./resources/screenshot-example.gif)
+![Screenshot of the extension in action]([./resources/screenshot-example.gif](https://github.com/build-with-me/vscode-twitch-themer/assets/1228996/7a8c1ca1-4648-49b7-a3e9-a47c46cff635))
 
 ## Quickstart Guide
 
@@ -43,7 +43,6 @@ This command will set the theme of the streamers' VS Code workspace to the theme
 ```
 
 > Note: The theme must be previously installed and available within VS Code.
-
 
 ### !theme random
 
@@ -131,6 +130,12 @@ all viewers, followers, VIPs, subscribers, moderators, or only the broadcaster.
 This setting will toggle whether the extension will automatically connect to Twitch when you launch Visual Studio Code.
 
 _The extension will ensure you are streaming prior to connecting the bot to the Twitch chat service._
+
+### Twitch Channel to Join
+
+By default, the extension will join the Twitch chat of the authenticated user. However,
+you can specify a different channel to join here. This is useful if you want to use
+a second "bot" account to send messages to chat.
 
 ### Auto Install
 

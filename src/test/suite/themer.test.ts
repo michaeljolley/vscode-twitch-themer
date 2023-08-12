@@ -7,7 +7,13 @@ import API from "../../api";
 import ChatClient from "../../chatClient";
 import Themer from "../../themer";
 import { ChatMessage } from "../../types/chatMessage";
-import { AccessState, messageCurrent, messageHelp, messagePaused, messageRepo } from "../../constants";
+import {
+  AccessState,
+  messageCurrent,
+  messageHelp,
+  messagePaused,
+  messageRepo,
+} from "../../constants";
 import { OnCommandExtra, OnMessageFlags } from "comfy.js";
 
 chai.should();
@@ -16,7 +22,7 @@ suite("Themer Tests", function () {
   let getConfigurationStub: sinon.SinonStub<
     [
       section?: string | undefined,
-      scope?: vscode.ConfigurationScope | null | undefined
+      scope?: vscode.ConfigurationScope | null | undefined,
     ],
     vscode.WorkspaceConfiguration
   >;
@@ -108,27 +114,6 @@ suite("Themer Tests", function () {
     },
   };
 
-  const rewardExtra: OnCommandExtra = {
-    id: "string",
-    channel: "string",
-    roomId: "string",
-    messageType: "chat",
-    messageEmotes: {},
-    isEmoteOnly: false,
-    userId: "string",
-    username: "roberttables",
-    displayName: "roberttables",
-    userColor: "string",
-    userBadges: {},
-    customRewardId: "blahblahblah",
-    flags: {},
-    timestamp: "string",
-    sinceLastCommand: {
-      any: 0,
-      user: 0,
-    },
-  };
-
   suiteSetup(function () {
     const fakeConfig: {
       [key: string]: any;
@@ -152,7 +137,7 @@ suite("Themer Tests", function () {
       update(
         section: string,
         value: any,
-        configurationTarget?: vscode.ConfigurationTarget | boolean
+        configurationTarget?: vscode.ConfigurationTarget | boolean,
       ) {
         fakeConfig[section] = value;
         return Promise.resolve();
@@ -177,10 +162,10 @@ suite("Themer Tests", function () {
       .stub(API, "isTwitchUserFollowing")
       .callsFake(
         async (
-          twitchUserId: string | undefined
+          twitchUserId: string | undefined,
         ): Promise<boolean> => {
           return isTwitchUserFollowingReturn;
-        }
+        },
       );
   });
 
@@ -192,8 +177,9 @@ suite("Themer Tests", function () {
   setup(function () {
     fakeState.update("bannedUsers", []);
     fakeWorkspaceConfiguration.update("workbench.colorTheme", baseTheme);
-    fakeChatClient = new ChatClient(fakeState);
+    fakeChatClient = new ChatClient();
     fakeThemer = new Themer(fakeState);
+    fakeThemer.initializeConfiguration();
     fakeThemer.handleAccessStateChanged(AccessState.viewer);
     getConfigurationStub.resetHistory();
     isTwitchUserFollowingStub.resetHistory();
@@ -320,9 +306,7 @@ suite("Themer Tests", function () {
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         sendMessageStub.calledOnce.should.be.true;
-        sentMessage.should.equal(
-          messagePaused(chatMessage.user)
-        );
+        sentMessage.should.equal(messagePaused(chatMessage.user));
         fakeWorkspaceConfiguration
           .get<string>("workbench.colorTheme")!
           .should.equal(baseTheme);
