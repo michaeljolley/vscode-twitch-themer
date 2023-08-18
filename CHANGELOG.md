@@ -1,3 +1,10 @@
+## [3.2.1](https://github.com/build-with-me/vscode-twitch-themer/compare/v3.2.0...v3.2.1) (2023-08-18)
+
+
+### Bug Fixes
+
+* Improving semantic releases ([1b21ed9](https://github.com/build-with-me/vscode-twitch-themer/commit/1b21ed9c3f96988933ff37db1540a22295ca72b4))
+
 # [3.2.0](https://github.com/build-with-me/vscode-twitch-themer/compare/v3.1.0...v3.2.0) (2023-08-12)
 
 
