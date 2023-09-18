@@ -73,6 +73,20 @@
           "default": "Viewers",
           "description": "Users who are allowed to use the extension via Twitch chat."
         },
+        "twitchThemer.installState": {
+          "title": "Install Access",
+          "type": "string",
+          "enum": [
+            "Viewers",
+            "Followers",
+            "Subscribers",
+            "VIPs",
+            "Moderators",
+            "Broadcaster"
+          ],
+          "default": "Followers",
+          "description": "Users who are allowed to use the install command."
+        },
         "twitchThemer.autoInstall": {
           "title": "Auto-install Theme Install Requests",
           "type": "boolean",

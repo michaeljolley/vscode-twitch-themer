@@ -44,7 +44,7 @@ export default abstract class API {
           });
           if (res.status === 200) {
             const { data } = res;
-            return data && data.length > 0 ? true : false;
+            return data && data.data && data.data.length > 0 ? true : false;
           }
         } catch (err: any) {
           Logger.log(

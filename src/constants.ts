@@ -5,22 +5,22 @@ import { Theme } from "./types/theme";
  */
 export enum AccessState {
   /** All viewers */
-  viewer = 0,
+  Viewers,
 
   /** Followers only */
-  follower = 1,
+  Followers,
 
   /** Subscribers only */
-  subscriber = 2,
+  Subscribers,
 
   /** VIPs only */
-  vip = 3,
+  VIPs,
 
   /** Moderators only */
-  moderator = 4,
+  Moderators,
 
   /** Broadcaster only */
-  broadcaster = 5,
+  Broadcaster,
 }
 
 /**
@@ -106,6 +106,7 @@ export const twitchScopes = [
   `TWITCH_CLIENT_ID:${twitchAPIClientId}`,
   "chat:read",
   "chat:edit",
+  "moderator:read:followers"
 ];
 
 export const messageHelp =
@@ -139,7 +140,7 @@ export const messageOnPaused = (
 minute${minutes === 1 ? "" : "s"}.`;
 
 export const messageInstalled = (user: string, labels: string[]) =>
-  `@${user}, the theme(s) '${labels.join(", ")}' were installed successfully.`;
+  `@${user}, the theme${labels.length > 1 ? "s" : ""} '${labels.join(", ")}' ${labels.length > 1 ? "were" : "was"} installed successfully.`;
 
 export const messageThemeExists = (
   user: string,
@@ -149,3 +150,6 @@ export const messageThemeExists = (
   `@${user}, '${theme}' is already installed. To switch to it, send: !theme ${labels.join(
     " -or- !theme ",
   )}`;
+
+export const messageInstallNotAuthorized = (user: string, installState: string) =>
+  `Sorry @${user}. Only ${installState} are allowed to install new themes.`;
