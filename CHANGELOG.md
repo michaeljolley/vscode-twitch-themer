@@ -1,3 +1,10 @@
+## [3.2.2](https://github.com/build-with-me/vscode-twitch-themer/compare/v3.2.1...v3.2.2) (2023-09-18)
+
+
+### Bug Fixes
+
+* Extension now respects access settings set by broadcaster ([0628028](https://github.com/build-with-me/vscode-twitch-themer/commit/0628028d7abeca5adb459364e74699ea875fe0a8))
+
 ## [3.2.1](https://github.com/build-with-me/vscode-twitch-themer/compare/v3.2.0...v3.2.1) (2023-08-18)
 
 
