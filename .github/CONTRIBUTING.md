@@ -12,9 +12,9 @@ Add an issue. We'll review it, add labels and reply within a few days.
 
 ### Want to work on an issue?
 
-Comment on the issue that you'd like to work on it and we'll add the `claimed` 
-label. If you see the `claimed` label already on the issue you might want to 
-ask the contributor if they'd like some help.
+Comment on the issue that you'd like to work on it and we'll assign it to you. 
+If the issue is assigned to someone else already, you might want to ask the 
+contributor if they'd like some help.
 
 ### Documentation/etc need updating?
 
@@ -23,7 +23,7 @@ Go right ahead! Just submit a pull request when you're done.
 ## Pull Requests
 
 First, make sure you've forked the repository. Push to your fork and 
-[submit a pull request](https://github.com/builders-club/vscode-twitch-themer/compare/) 
+[submit a pull request](https://github.com/michaeljolley/vscode-twitch-themer/compare/) 
 against the `main` branch.
 
 At this point you're waiting on us. We like to at least comment on pull requests
@@ -46,4 +46,4 @@ Some things that will increase the chance that your pull request is accepted:
 - **Write/update tests.**
 - Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 
-[readme]: README.md
+[readme]: https://github.com/MichaelJolley/vscode-twitch-themer/tree/main#readme
