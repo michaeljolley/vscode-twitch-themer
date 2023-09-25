@@ -38,6 +38,8 @@ suite("Themer Tests", function () {
   const baseTheme: string = "Visual Studio Light";
   const testTheme: string = "Visual Studio Dark";
   const baseThemeId: string = "vscode.theme-defaults";
+  const installedTheme: string = "C/C++ Themes";
+  const installedThemeId: string = "ms-vscode.cpptools-themes";
   const broadcaster: OnMessageFlags = {
     broadcaster: true,
     mod: false,
@@ -242,6 +244,36 @@ suite("Themer Tests", function () {
     });
   });
 
+
+  test(`Themer should return info about the built in theme`, function (done) {
+    let sentMessage: string = "";
+
+    fakeState.update("workBen")
+
+    const sendMessageStub = sinon
+      .stub(fakeChatClient, "sendMessage")
+      .callsFake(async (message: string) => {
+        sentMessage = message;
+      });
+    fakeTherm.onSendMessage(sendMessageStub);
+
+    fakeWorkspaceConfiguration.update("workbench.colorTheme", installedTheme);
+
+    const message = "current";
+    const chatMessage: ChatMessage = {
+      message,
+      flags: user,
+      user: "test",
+      extra: standardExtra
+    };
+
+    fakeThemer.handleCommands(chatMessage).then(() => {
+      getConfigurationStub.calledOnce.should.be.true;
+      sendMessageStub.calledOnce.should.be.true;
+      sentMessage.should.equal(messageCurrent(installedTheme, installedThemeId));
+    })
+  })
+
   test(`Themer should return info about the GitHub repo`, function (done) {
     let sentMessage: string = "";
     const sendMessageStub = sinon
@@ -269,6 +301,7 @@ suite("Themer Tests", function () {
       }
     });
   });
+
 
   test("Themer should reset theme to original theme when requested", function (done) {
     fakeWorkspaceConfiguration.update("workbench.colorTheme", testTheme);
