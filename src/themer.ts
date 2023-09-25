@@ -16,17 +16,19 @@ import {
   messagePaused,
   messageInstalled,
   messageThemeExists,
+  messageInstallNotAuthorized,
 } from "./constants";
 import { ChatMessage } from "./types/chatMessage";
 import { Command } from "./types/command";
+import { access } from "fs";
 
 /**
  * Manages all logic associated with retrieving themes,
  * changing themes, etc.
  */
 export default class Themer {
-  private _accessState: AccessState = AccessState.viewer;
-  private _installState: AccessState = AccessState.follower;
+  private _accessState: AccessState = AccessState.Viewers;
+  private _installState: AccessState = AccessState.Followers;
   private _autoInstall: boolean = false;
   private _originalTheme: Theme | undefined;
   private _availableThemes: Array<Theme> = [];
@@ -91,6 +93,14 @@ export default class Themer {
     });
   }
 
+  /**
+     * Updates access state of extension
+     * @param accessState - New access state
+     */
+  public handleAccessStateChanged(accessState: AccessState) {
+    this._accessState = accessState;
+  }
+
   public initializeConfiguration() {
     const configuration = vscode.workspace.getConfiguration("twitchThemer");
     this._commands["install"] =
@@ -124,9 +134,32 @@ export default class Themer {
     /**
      * Gets the access state from the workspace
      */
-    this._accessState = vscode.workspace
+    const accessStateSetting = vscode.workspace
       .getConfiguration()
-      .get("twitchThemer.accessState", AccessState.viewer);
+      .get("twitchThemer.accessState") as (
+        "Viewers" |
+        "Followers" |
+        "Subscribers" |
+        "VIPs" |
+        "Moderators" |
+        "Broadcaster"
+      ) | undefined;
+    this._accessState = accessStateSetting ? AccessState[accessStateSetting] : AccessState.Viewers;
+
+    /**
+     * Gets the access state from the workspace
+     */
+    const installStateSetting = vscode.workspace
+      .getConfiguration()
+      .get("twitchThemer.installState") as (
+        "Viewers" |
+        "Followers" |
+        "Subscribers" |
+        "VIPs" |
+        "Moderators" |
+        "Broadcaster"
+      ) | undefined;
+    this._installState = installStateSetting ? AccessState[installStateSetting] : AccessState.Followers;
   }
 
   public handleConnectionChanges(signedIn: boolean) {
@@ -139,24 +172,16 @@ export default class Themer {
     }
   }
 
-  /**
-   * Updates access state of extension
-   * @param accessState - New access state
-   */
-  public handleAccessStateChanged(accessState: AccessState) {
-    this._accessState = accessState;
-  }
-
   private getUserLevel(onMessageFlags: OnMessageFlags): AccessState {
     // eslint-disable-next-line curly
-    if (onMessageFlags.broadcaster) return AccessState.broadcaster;
+    if (onMessageFlags.broadcaster) return AccessState.Broadcaster;
     // eslint-disable-next-line curly
-    if (onMessageFlags.mod) return AccessState.moderator;
+    if (onMessageFlags.mod) return AccessState.Moderators;
     // eslint-disable-next-line curly
-    if (onMessageFlags.vip) return AccessState.vip;
+    if (onMessageFlags.vip) return AccessState.VIPs;
     // eslint-disable-next-line curly
-    if (onMessageFlags.subscriber) return AccessState.subscriber;
-    return AccessState.viewer;
+    if (onMessageFlags.subscriber) return AccessState.Subscribers;
+    return AccessState.Viewers;
   }
 
   /**
@@ -183,8 +208,7 @@ export default class Themer {
 
     Logger.log(
       LogLevel.info,
-      `Executing command: '${
-        command === "" ? this._commands["help"] : command
+      `Executing command: '${command === "" ? this._commands["help"] : command
       }'`,
     );
 
@@ -282,7 +306,7 @@ export default class Themer {
    * @param username The user to ban
    */
   private async ban(onMessageFlags: OnMessageFlags, username: string) {
-    if (this.getUserLevel(onMessageFlags) > AccessState.viewer) {
+    if (this.getUserLevel(onMessageFlags) > AccessState.Viewers) {
       const recipient = this.getRecipient(username);
       if (recipient === undefined) {
         this._listRecipients.push({
@@ -304,7 +328,7 @@ export default class Themer {
    * @param username The user to unban
    */
   private async unban(onMessageFlags: OnMessageFlags, username: string) {
-    if (this.getUserLevel(onMessageFlags) > AccessState.viewer) {
+    if (this.getUserLevel(onMessageFlags) > AccessState.Viewers) {
       const recipient = this.getRecipient(username, true);
       if (recipient !== undefined) {
         const index = this._listRecipients.indexOf(recipient);
@@ -342,7 +366,7 @@ export default class Themer {
     /** We only refresh the list of themes
      * if the requester was a moderator/broadcaster
      */
-    if (this.getUserLevel(onMessageFlags) > AccessState.viewer) {
+    if (this.getUserLevel(onMessageFlags) > AccessState.Viewers) {
       this.loadThemes();
     }
   }
@@ -412,8 +436,8 @@ export default class Themer {
       return;
     }
 
-    following: if (this._installState === AccessState.follower) {
-      if (this.getUserLevel(onMessageFlags) === AccessState.broadcaster) {
+    following: if (this._installState === AccessState.Followers) {
+      if (this.getUserLevel(onMessageFlags) === AccessState.Broadcaster) {
         break following;
       } else if (
         this._followers.find((x) => x.username === user.toLocaleLowerCase())
@@ -425,34 +449,91 @@ export default class Themer {
         });
         break following;
       } else {
+        this.sendMessageEventEmitter.fire(
+          messageInstallNotAuthorized(user, 'followers')
+        );
+        Logger.log(
+          LogLevel.info,
+          `${user} attempted to use the install command but is not a follower.`,
+        );
         return;
       }
     } else {
       break following;
     }
 
-    subscriber: if (this._installState === AccessState.subscriber) {
-      if (this.getUserLevel(onMessageFlags) === AccessState.broadcaster) {
+    subscriber: if (this._installState === AccessState.Subscribers) {
+      if (this.getUserLevel(onMessageFlags) === AccessState.Broadcaster) {
         break subscriber;
       } else if (onMessageFlags.subscriber) {
         break subscriber;
       } else {
+        this.sendMessageEventEmitter.fire(
+          messageInstallNotAuthorized(user, 'subscribers')
+        );
+        Logger.log(
+          LogLevel.info,
+          `${user} attempted to use the install command but is not a subscriber.`,
+        );
         return;
       }
     } else {
       break subscriber;
     }
 
-    moderator: if (this._installState === AccessState.subscriber) {
-      if (this.getUserLevel(onMessageFlags) === AccessState.broadcaster) {
+    vip: if (this._installState === AccessState.VIPs) {
+      if (this.getUserLevel(onMessageFlags) === AccessState.Broadcaster) {
+        break vip;
+      } else if (onMessageFlags.vip) {
+        break vip;
+      } else {
+        this.sendMessageEventEmitter.fire(
+          messageInstallNotAuthorized(user, 'VIPs')
+        );
+        Logger.log(
+          LogLevel.info,
+          `${user} attempted to use the install command but is not a VIP.`,
+        );
+        return;
+      }
+    } else {
+      break vip;
+    }
+
+    moderator: if (this._installState === AccessState.Moderators) {
+      if (this.getUserLevel(onMessageFlags) === AccessState.Broadcaster) {
         break moderator;
       } else if (onMessageFlags.mod) {
         break moderator;
       } else {
+        this.sendMessageEventEmitter.fire(
+          messageInstallNotAuthorized(user, 'moderators')
+        );
+        Logger.log(
+          LogLevel.info,
+          `${user} attempted to use the install command but is not a moderator.`,
+        );
         return;
       }
     } else {
       break moderator;
+    }
+
+    broadcaster: if (this._installState === AccessState.Broadcaster) {
+      if (this.getUserLevel(onMessageFlags) === AccessState.Broadcaster) {
+        break broadcaster;
+      } else {
+        this.sendMessageEventEmitter.fire(
+          messageInstallNotAuthorized(user, 'streamer')
+        );
+        Logger.log(
+          LogLevel.info,
+          `${user} attempted to use the install command but is not the broadcaster.`,
+        );
+        return;
+      }
+    } else {
+      break broadcaster;
     }
 
     const theme = message.split(" ")[1];
@@ -522,9 +603,8 @@ export default class Themer {
     try {
       // Authorize the install of the extension if we do not allow for auto-installed extensions.
       if (!this._autoInstall) {
-        const msg = `${user} wants to install theme(s) ${
-          isValidExtResult.label ? isValidExtResult.label.join(", ") : theme
-        }.`;
+        const msg = `${user} wants to install theme(s) ${isValidExtResult.label ? isValidExtResult.label.join(", ") : theme
+          }.`;
         Logger.log(LogLevel.info, `${msg}`);
         let choice = await vscode.window.showInformationMessage(
           msg,
@@ -639,24 +719,24 @@ export default class Themer {
     themeName: string,
     customRewardId?: string,
   ) {
-    let userAccessState = AccessState.viewer;
+    let userAccessState = AccessState.Viewers;
     const userLevel = this.getUserLevel(onMessageFlags);
 
-    if (userLevel === AccessState.broadcaster) {
-      userAccessState = AccessState.broadcaster;
-    } else if (userLevel === AccessState.moderator) {
-      userAccessState = AccessState.moderator;
-    } else if (userLevel === AccessState.vip) {
-      userAccessState = AccessState.vip;
+    if (userLevel === AccessState.Broadcaster) {
+      userAccessState = AccessState.Broadcaster;
+    } else if (userLevel === AccessState.Moderators) {
+      userAccessState = AccessState.Moderators;
+    } else if (userLevel === AccessState.VIPs) {
+      userAccessState = AccessState.VIPs;
     } else if (onMessageFlags.subscriber) {
-      userAccessState = AccessState.subscriber;
+      userAccessState = AccessState.Subscribers;
     } else if (
       this._followers.find((x) => x.username === user.toLocaleLowerCase())
     ) {
-      userAccessState = AccessState.follower;
+      userAccessState = AccessState.Followers;
     } else if (await API.isTwitchUserFollowing(userId)) {
       this._followers.push({ username: user.toLocaleLowerCase() });
-      userAccessState = AccessState.follower;
+      userAccessState = AccessState.Followers;
     }
     if (userAccessState < this._accessState) {
       return;
@@ -739,7 +819,7 @@ export default class Themer {
         f.label.toLocaleLowerCase() === currentThemeName.toLocaleLowerCase() ||
         (f.themeId &&
           f.themeId.toLocaleLowerCase() ===
-            currentThemeName.toLocaleLowerCase()),
+          currentThemeName.toLocaleLowerCase()),
     )[0];
 
     this.sendMessageEventEmitter.fire(

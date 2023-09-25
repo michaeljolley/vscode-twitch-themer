@@ -2,7 +2,7 @@
   "name": "vscode-twitch-themer",
   "displayName": "Twitch Themer",
   "description": "Allow viewers to change your VS Code theme via Twitch chat",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "preview": false,
   "publisher": "michaeljolley",
   "license": "MIT",
@@ -27,9 +27,9 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/build-with-me/vscode-twitch-themer"
+    "url": "https://github.com/michaeljolley/vscode-twitch-themer"
   },
-  "homepage": "https://github.com/build-with-me/vscode-twitch-themer#readme",
+  "homepage": "https://github.com/michaeljolley/vscode-twitch-themer#readme",
   "galleryBanner": {
     "color": "#373436",
     "theme": "dark"
@@ -72,6 +72,20 @@
           ],
           "default": "Viewers",
           "description": "Users who are allowed to use the extension via Twitch chat."
+        },
+        "twitchThemer.installState": {
+          "title": "Install Access",
+          "type": "string",
+          "enum": [
+            "Viewers",
+            "Followers",
+            "Subscribers",
+            "VIPs",
+            "Moderators",
+            "Broadcaster"
+          ],
+          "default": "Followers",
+          "description": "Users who are allowed to use the install command."
         },
         "twitchThemer.autoInstall": {
           "title": "Auto-install Theme Install Requests",

@@ -180,7 +180,6 @@ suite("Themer Tests", function () {
     fakeChatClient = new ChatClient();
     fakeThemer = new Themer(fakeState);
     fakeThemer.initializeConfiguration();
-    fakeThemer.handleAccessStateChanged(AccessState.viewer);
     getConfigurationStub.resetHistory();
     isTwitchUserFollowingStub.resetHistory();
     isTwitchUserFollowingReturn = false;
@@ -524,7 +523,7 @@ suite("Themer Tests", function () {
     };
     isTwitchUserFollowingReturn = false;
 
-    fakeThemer.handleAccessStateChanged(AccessState.follower);
+    fakeThemer.handleAccessStateChanged(AccessState.Followers);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeWorkspaceConfiguration
@@ -546,7 +545,7 @@ suite("Themer Tests", function () {
     };
     isTwitchUserFollowingReturn = true;
 
-    fakeThemer.handleAccessStateChanged(AccessState.follower);
+    fakeThemer.handleAccessStateChanged(AccessState.Followers);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeWorkspaceConfiguration
@@ -568,7 +567,7 @@ suite("Themer Tests", function () {
     };
     isTwitchUserFollowingReturn = false;
 
-    fakeThemer.handleAccessStateChanged(AccessState.subscriber);
+    fakeThemer.handleAccessStateChanged(AccessState.Subscribers);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeWorkspaceConfiguration
@@ -589,7 +588,7 @@ suite("Themer Tests", function () {
       extra: standardExtra,
     };
     isTwitchUserFollowingReturn = true;
-    fakeThemer.handleAccessStateChanged(AccessState.subscriber);
+    fakeThemer.handleAccessStateChanged(AccessState.Subscribers);
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
@@ -611,7 +610,7 @@ suite("Themer Tests", function () {
       extra: standardExtra,
     };
 
-    fakeThemer.handleAccessStateChanged(AccessState.subscriber);
+    fakeThemer.handleAccessStateChanged(AccessState.Subscribers);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeWorkspaceConfiguration
@@ -632,7 +631,7 @@ suite("Themer Tests", function () {
       extra: standardExtra,
     };
 
-    fakeThemer.handleAccessStateChanged(AccessState.vip);
+    fakeThemer.handleAccessStateChanged(AccessState.VIPs);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeWorkspaceConfiguration
@@ -654,7 +653,7 @@ suite("Themer Tests", function () {
     };
     isTwitchUserFollowingReturn = true;
 
-    fakeThemer.handleAccessStateChanged(AccessState.vip);
+    fakeThemer.handleAccessStateChanged(AccessState.VIPs);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeWorkspaceConfiguration
@@ -676,7 +675,7 @@ suite("Themer Tests", function () {
     };
     isTwitchUserFollowingReturn = true;
 
-    fakeThemer.handleAccessStateChanged(AccessState.moderator);
+    fakeThemer.handleAccessStateChanged(AccessState.Moderators);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeWorkspaceConfiguration
@@ -698,7 +697,7 @@ suite("Themer Tests", function () {
     };
     isTwitchUserFollowingReturn = true;
 
-    fakeThemer.handleAccessStateChanged(AccessState.moderator);
+    fakeThemer.handleAccessStateChanged(AccessState.Moderators);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeWorkspaceConfiguration
@@ -720,7 +719,7 @@ suite("Themer Tests", function () {
     };
     isTwitchUserFollowingReturn = true;
 
-    fakeThemer.handleAccessStateChanged(AccessState.broadcaster);
+    fakeThemer.handleAccessStateChanged(AccessState.Broadcaster);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeWorkspaceConfiguration
@@ -742,7 +741,7 @@ suite("Themer Tests", function () {
     };
     isTwitchUserFollowingReturn = true;
 
-    fakeThemer.handleAccessStateChanged(AccessState.broadcaster);
+    fakeThemer.handleAccessStateChanged(AccessState.Broadcaster);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
         fakeWorkspaceConfiguration
