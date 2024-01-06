@@ -1,13 +1,12 @@
 import * as vscode from "vscode";
 import Logger from "./logger";
-import { ExtensionKeys, LogLevel, twitchScopes } from "./constants";
+import { LogLevel, twitchScopes } from "./constants";
 
 /**
  * Manages state of current user & authenticating user with Twitch
  */
 export default abstract class Authentication {
   private static authStatusEventEmitter = new vscode.EventEmitter<boolean>();
-  private static _state: vscode.Memento;
 
   /** Event that fires on change of the authentication state of the user */
   public static onAuthStatusChanged = this.authStatusEventEmitter.event;
@@ -17,7 +16,6 @@ export default abstract class Authentication {
    * already authenticated it will immediately fire that it is logged in.
    */
   public static async initialize(state: vscode.Memento) {
-    this._state = state;
     Logger.log(LogLevel.info, "Initializing authentication...");
 
     const twitchSession = await this.getSession();
