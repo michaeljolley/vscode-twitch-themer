@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import Authentication from "./authentication";
 import ChatClient from "./chatClient";
-import { TwitchClientStatus, Commands, ExtensionKeys } from "./constants";
+import { TwitchClientStatus, Commands } from "./constants";
 
 /**
  * Creates the status bar item to use in updating users of the status of the extension

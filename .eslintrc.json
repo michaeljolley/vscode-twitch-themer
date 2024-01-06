@@ -20,5 +20,8 @@
         "out",
         "dist",
         "**/*.d.ts"
+    ],
+    "extends": [
+        "prettier"
     ]
 }
