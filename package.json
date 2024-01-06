@@ -205,6 +205,7 @@
     "semantic-release": "^22.0.12",
     "semantic-release-stop-before-publish": "^1.0.0",
     "semantic-release-vsce": "^5.6.4",
+    "sinon": "^17.0.1",
     "typescript": "^5.3.3"
   },
   "dependencies": {
