@@ -1,3 +1,10 @@
+## [3.3.1](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.3.0...v3.3.1) (2024-01-06)
+
+
+### Bug Fixes
+
+* Improved package with bundling ([03c547f](https://github.com/michaeljolley/vscode-twitch-themer/commit/03c547f7a04fba0c6ac5e68bf11e525529722bc0))
+
 # [3.3.0](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.2.2...v3.3.0) (2024-01-06)
 
 
