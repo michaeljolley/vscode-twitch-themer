@@ -12,7 +12,7 @@ out/**
 
 .gitignore
 .yarnrc
-.pretterignore
+.prettierignore
 .vscode-test.mjs
 CHANGELOG.md
 package.release.config.js
