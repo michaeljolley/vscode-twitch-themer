@@ -124,7 +124,7 @@ export const messagePaused = (user: string) =>
   `@${user}, theme changes are paused. Please try again in a few minutes.`;
 
 export const messageCurrent = (theme: string, themeId: string) => {
-  let [provider] = themeId.split('.');
+  const [provider] = themeId.split('.');
   if (provider === "vscode") {
     return `The current theme is ${theme}. It is included with VS Code.`;
   }
