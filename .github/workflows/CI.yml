@@ -20,13 +20,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 20
       - name: Cache npm dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: "~/.npm"
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -55,13 +55,13 @@ jobs:
     needs: test
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 20
       - name: Cache npm dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: "~/.npm"
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -74,6 +74,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
       - uses: actions/upload-artifact@v3
         with:
           path: "*.vsix"
@@ -86,19 +87,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, build]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
+          node-version: 20
       - name: Cache npm dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: "~/.npm"
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
       - run: npm ci
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
       - run: npx semantic-release --extends ./publish.release.config.js
         if: github.event_name == 'push' || github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         env:
