@@ -239,7 +239,10 @@ suite("Themer Tests", function () {
 
   test(`Themer should return generic message for built-in themes`, function (done) {
     try {
-      assert.equal(`The current theme is ${baseTheme}. It is included with VS Code.`, messageCurrent(baseTheme, baseThemeId));
+      assert.equal(
+        `The current theme is ${baseTheme}. It is included with VS Code.`,
+        messageCurrent(baseTheme, baseThemeId),
+      );
       done();
     } catch (error) {
       done(error);
@@ -248,7 +251,10 @@ suite("Themer Tests", function () {
 
   test(`Themer should return marketplace link in message for themes that aren't built-in`, function (done) {
     try {
-      assert.equal(`The current theme is ${baseTheme}. You can find it on the VS Code Marketplace at https://marketplace.visualstudio.com/items?itemName=${nonBuiltInThemeId}`, messageCurrent(baseTheme, nonBuiltInThemeId));
+      assert.equal(
+        `The current theme is ${baseTheme}. You can find it on the VS Code Marketplace at https://marketplace.visualstudio.com/items?itemName=${nonBuiltInThemeId}`,
+        messageCurrent(baseTheme, nonBuiltInThemeId),
+      );
       done();
     } catch (error) {
       done(error);

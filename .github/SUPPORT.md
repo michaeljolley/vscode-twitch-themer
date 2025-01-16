@@ -1,4 +1,4 @@
 # Extension Support
 
-You can ask questions or provide feedback in the 
-[Build With Me Community Discord](https://discord.gg/kC8HTrs59R).
+You can ask questions or provide feedback in the
+[Bald Bearded Builder Community Discord](https://discord.gg/9vkrHBmnPm).

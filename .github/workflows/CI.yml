@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-        vscode-version: ["1.81.0", stable]
+        vscode-version: ["1.85.0", stable]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -84,7 +84,7 @@ jobs:
       packages: write
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    needs: [build] # needs: [test, build]
+    needs: [test, build]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -104,4 +104,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
-          # OVSX_PAT: ${{ secrets.OVSX_PAT }}
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
