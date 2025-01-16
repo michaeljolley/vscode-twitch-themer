@@ -1,3 +1,17 @@
+## [3.3.1](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.3.0...v3.3.1) (2024-01-06)
+
+
+### Bug Fixes
+
+* Improved package with bundling ([03c547f](https://github.com/michaeljolley/vscode-twitch-themer/commit/03c547f7a04fba0c6ac5e68bf11e525529722bc0))
+
+# [3.3.0](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.2.2...v3.3.0) (2024-01-06)
+
+
+### Features
+
+* Added telemetry ([51f5e70](https://github.com/michaeljolley/vscode-twitch-themer/commit/51f5e70d11779a63b506725768a6c530460da7c7))
+
 ## [3.2.2](https://github.com/build-with-me/vscode-twitch-themer/compare/v3.2.1...v3.2.2) (2023-09-18)
 
 

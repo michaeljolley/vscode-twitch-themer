@@ -4,6 +4,7 @@ import Authentication from "./authentication";
 import ChatClient from "./chatClient";
 import Logger from "./logger";
 import Themer from "./themer";
+import { Telemetry } from "./telemetry";
 
 import { ChatMessage } from "./types/chatMessage";
 import { Commands, LogLevel } from "./constants";
@@ -14,6 +15,9 @@ let _themer: Themer | undefined;
 
 export async function activate(context: vscode.ExtensionContext) {
   Logger.log(LogLevel.info, "Initializing Twitch Themer...");
+
+  // If enabled, initialize telemetry
+  Telemetry.initialize(context);
 
   _chatClient = new ChatClient();
   _themer = new Themer(context.globalState);

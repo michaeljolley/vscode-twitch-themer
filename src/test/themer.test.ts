@@ -1,22 +1,20 @@
-// tslint:disable: no-unused-expression
+import * as assert from "assert";
+
 import * as vscode from "vscode";
-import * as chai from "chai";
+import { OnCommandExtra, OnMessageFlags } from "comfy.js";
 import * as sinon from "sinon";
 
-import API from "../../api";
-import ChatClient from "../../chatClient";
-import Themer from "../../themer";
-import { ChatMessage } from "../../types/chatMessage";
+import API from "../api";
+import ChatClient from "../chatClient";
+import Themer from "../themer";
+import { ChatMessage } from "../types/chatMessage";
 import {
   AccessState,
   messageCurrent,
   messageHelp,
   messagePaused,
   messageRepo,
-} from "../../constants";
-import { OnCommandExtra, OnMessageFlags } from "comfy.js";
-
-chai.should();
+} from "../constants";
 
 suite("Themer Tests", function () {
   let getConfigurationStub: sinon.SinonStub<
@@ -161,13 +159,9 @@ suite("Themer Tests", function () {
       .returns(fakeWorkspaceConfiguration);
     isTwitchUserFollowingStub = sinon
       .stub(API, "isTwitchUserFollowing")
-      .callsFake(
-        async (
-          twitchUserId: string | undefined,
-        ): Promise<boolean> => {
-          return isTwitchUserFollowingReturn;
-        },
-      );
+      .callsFake(async (twitchUserId: string | undefined): Promise<boolean> => {
+        return isTwitchUserFollowingReturn;
+      });
   });
 
   suiteTeardown(function () {
@@ -205,8 +199,8 @@ suite("Themer Tests", function () {
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        sendMessageStub.calledOnce.should.be.true;
-        sentMessage.should.equal(messageHelp);
+        assert.equal(sendMessageStub.calledOnce, true);
+        assert.equal(sentMessage, messageHelp);
         done();
       } catch (error) {
         done(error);
@@ -233,9 +227,9 @@ suite("Themer Tests", function () {
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        getConfigurationStub.calledOnce.should.be.true;
-        sendMessageStub.calledOnce.should.be.true;
-        sentMessage.should.equal(messageCurrent(baseTheme, baseThemeId));
+        assert.equal(getConfigurationStub.calledOnce, true);
+        assert.equal(sendMessageStub.calledOnce, true);
+        assert.equal(sentMessage, messageCurrent(baseTheme, baseThemeId));
         done();
       } catch (error) {
         done(error);
@@ -280,8 +274,8 @@ suite("Themer Tests", function () {
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        sendMessageStub.calledOnce.should.be.true;
-        sentMessage.should.equal(messageRepo);
+        assert.equal(sendMessageStub.calledOnce, true);
+        assert.equal(sentMessage, messageRepo);
         done();
       } catch (error) {
         done(error);
@@ -294,9 +288,10 @@ suite("Themer Tests", function () {
 
     fakeThemer.resetTheme("roberttables", "123", user).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(baseTheme);
+        const theme = fakeWorkspaceConfiguration.get<string>(
+          "workbench.colorTheme",
+        )!;
+        assert.equal(theme, baseTheme);
         done();
       } catch (error) {
         done(error);
@@ -323,11 +318,12 @@ suite("Themer Tests", function () {
     fakeThemer.setPauseStatus(true);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        sendMessageStub.calledOnce.should.be.true;
-        sentMessage.should.equal(messagePaused(chatMessage.user));
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(baseTheme);
+        assert.equal(sendMessageStub.calledOnce, true);
+        assert.equal(sentMessage, messagePaused(chatMessage.user));
+        const theme = fakeWorkspaceConfiguration.get<string>(
+          "workbench.colorTheme",
+        )!;
+        assert.equal(theme, baseTheme);
         done();
       } catch (error) {
         done(error);
@@ -345,10 +341,11 @@ suite("Themer Tests", function () {
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        getConfigurationStub.calledOnce.should.be.true;
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(testTheme);
+        assert.equal(getConfigurationStub.calledOnce, true);
+        assert.equal(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          testTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -366,10 +363,11 @@ suite("Themer Tests", function () {
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        getConfigurationStub.calledOnce.should.be.true;
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(testTheme);
+        assert.equal(getConfigurationStub.calledOnce, true);
+        assert.equal(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          testTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -391,9 +389,10 @@ suite("Themer Tests", function () {
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.not.equal(currentTheme);
+        assert.notEqual(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme")!,
+          currentTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -416,9 +415,10 @@ suite("Themer Tests", function () {
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.not.equal(currentTheme);
+        assert.notEqual(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          currentTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -439,9 +439,10 @@ suite("Themer Tests", function () {
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.not.equal(testTheme);
+        assert.notEqual(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          testTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -460,8 +461,9 @@ suite("Themer Tests", function () {
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeState.get<any[]>("bannedUsers")!.should.not.be.empty;
-        fakeState.get<any[]>("bannedUsers")!.should.contain("mantas159159");
+        const bannedUsers = fakeState.get<any[]>("bannedUsers")!;
+        assert.equal(bannedUsers.length, 1);
+        assert.equal(bannedUsers[0], "mantas159159");
         done();
       } catch (error) {
         done(error);
@@ -478,12 +480,15 @@ suite("Themer Tests", function () {
       extra: standardExtra,
     };
 
-    fakeState.update("bannedUsers", ["test"]);
+    fakeState.update("bannedUsers", ["test", "mantas159159"]);
     fakeThemer = new Themer(fakeState);
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeState.get<any[]>("bannedUsers")!.should.not.contain("mantas159159");
+        const bannedUsers = fakeState.get<any[]>("bannedUsers")!;
+        const user = bannedUsers.find((u) => u === "mantas159159");
+        assert.equal(bannedUsers.length, 1);
+        assert.equal(user, undefined);
         done();
       } catch (error) {
         done(error);
@@ -502,7 +507,8 @@ suite("Themer Tests", function () {
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeState.get<[]>("bannedUsers")!.should.be.empty;
+        const bannedUsers = fakeState.get<any[]>("bannedUsers")!;
+        assert.equal(bannedUsers.length, 0);
         done();
       } catch (error) {
         done(error);
@@ -519,13 +525,15 @@ suite("Themer Tests", function () {
       extra: standardExtra,
     };
 
-    fakeState.update("bannedUsers", ["exegete46"]);
+    fakeState.update("bannedUsers", ["mantas159159", "exegete46"]);
     fakeThemer = new Themer(fakeState);
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeState.get<string>("bannedUsers")!.should.not.be.empty;
-        fakeState.get<string>("bannedUsers")!.should.contain("exegete46");
+        const bannedUsers = fakeState.get<any[]>("bannedUsers")!;
+        const user = bannedUsers.find((u) => u === "exegete46");
+        assert.equal(bannedUsers.length, 2);
+        assert.equal(user, "exegete46");
         done();
       } catch (error) {
         done(error);
@@ -545,9 +553,10 @@ suite("Themer Tests", function () {
     fakeThemer.handleAccessStateChanged(AccessState.Followers);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(baseTheme);
+        assert.equal(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          baseTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -567,9 +576,10 @@ suite("Themer Tests", function () {
     fakeThemer.handleAccessStateChanged(AccessState.Followers);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(testTheme);
+        assert.equal(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          testTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -589,9 +599,10 @@ suite("Themer Tests", function () {
     fakeThemer.handleAccessStateChanged(AccessState.Subscribers);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(baseTheme);
+        assert.equal(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          baseTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -611,9 +622,10 @@ suite("Themer Tests", function () {
 
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(baseTheme);
+        assert.equal(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          baseTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -632,9 +644,10 @@ suite("Themer Tests", function () {
     fakeThemer.handleAccessStateChanged(AccessState.Subscribers);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(testTheme);
+        assert.equal(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          testTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -653,9 +666,10 @@ suite("Themer Tests", function () {
     fakeThemer.handleAccessStateChanged(AccessState.VIPs);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(baseTheme);
+        assert.equal(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          baseTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -675,9 +689,10 @@ suite("Themer Tests", function () {
     fakeThemer.handleAccessStateChanged(AccessState.VIPs);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(testTheme);
+        assert.equal(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          testTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -697,9 +712,10 @@ suite("Themer Tests", function () {
     fakeThemer.handleAccessStateChanged(AccessState.Moderators);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(baseTheme);
+        assert.equal(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          baseTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -719,9 +735,10 @@ suite("Themer Tests", function () {
     fakeThemer.handleAccessStateChanged(AccessState.Moderators);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(testTheme);
+        assert.equal(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          testTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -741,9 +758,10 @@ suite("Themer Tests", function () {
     fakeThemer.handleAccessStateChanged(AccessState.Broadcaster);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(baseTheme);
+        assert.equal(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          baseTheme,
+        );
         done();
       } catch (error) {
         done(error);
@@ -763,9 +781,10 @@ suite("Themer Tests", function () {
     fakeThemer.handleAccessStateChanged(AccessState.Broadcaster);
     fakeThemer.handleCommands(chatMessage).then(() => {
       try {
-        fakeWorkspaceConfiguration
-          .get<string>("workbench.colorTheme")!
-          .should.equal(testTheme);
+        assert.equal(
+          fakeWorkspaceConfiguration.get<string>("workbench.colorTheme"),
+          testTheme,
+        );
         done();
       } catch (error) {
         done(error);

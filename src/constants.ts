@@ -1,25 +1,29 @@
-import { Theme } from "./types/theme";
-
 /**
  * Access level for viewers
  */
 export enum AccessState {
   /** All viewers */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Viewers,
 
   /** Followers only */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Followers,
 
   /** Subscribers only */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Subscribers,
 
   /** VIPs only */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   VIPs,
 
   /** Moderators only */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Moderators,
 
   /** Broadcaster only */
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   Broadcaster,
 }
 
@@ -106,7 +110,7 @@ export const twitchScopes = [
   `TWITCH_CLIENT_ID:${twitchAPIClientId}`,
   "chat:read",
   "chat:edit",
-  "moderator:read:followers"
+  "moderator:read:followers",
 ];
 
 export const messageHelp =
@@ -145,7 +149,9 @@ export const messageOnPaused = (
 minute${minutes === 1 ? "" : "s"}.`;
 
 export const messageInstalled = (user: string, labels: string[]) =>
-  `@${user}, the theme${labels.length > 1 ? "s" : ""} '${labels.join(", ")}' ${labels.length > 1 ? "were" : "was"} installed successfully.`;
+  `@${user}, the theme${labels.length > 1 ? "s" : ""} '${labels.join(", ")}' ${
+    labels.length > 1 ? "were" : "was"
+  } installed successfully.`;
 
 export const messageThemeExists = (
   user: string,
@@ -156,5 +162,7 @@ export const messageThemeExists = (
     " -or- !theme ",
   )}`;
 
-export const messageInstallNotAuthorized = (user: string, installState: string) =>
-  `Sorry @${user}. Only ${installState} are allowed to install new themes.`;
+export const messageInstallNotAuthorized = (
+  user: string,
+  installState: string,
+) => `Sorry @${user}. Only ${installState} are allowed to install new themes.`;

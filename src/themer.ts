@@ -20,7 +20,6 @@ import {
 } from "./constants";
 import { ChatMessage } from "./types/chatMessage";
 import { Command } from "./types/command";
-import { access } from "fs";
 
 /**
  * Manages all logic associated with retrieving themes,
@@ -77,7 +76,7 @@ export default class Themer {
      */
     this._state
       .get("bannedUsers", [])
-      .forEach((username) =>
+      .forEach((username: string) =>
         this._listRecipients.push({ username, banned: true }),
       );
 
@@ -94,9 +93,9 @@ export default class Themer {
   }
 
   /**
-     * Updates access state of extension
-     * @param accessState - New access state
-     */
+   * Updates access state of extension
+   * @param accessState - New access state
+   */
   public handleAccessStateChanged(accessState: AccessState) {
     this._accessState = accessState;
   }
@@ -136,30 +135,38 @@ export default class Themer {
      */
     const accessStateSetting = vscode.workspace
       .getConfiguration()
-      .get("twitchThemer.accessState") as (
-        "Viewers" |
-        "Followers" |
-        "Subscribers" |
-        "VIPs" |
-        "Moderators" |
-        "Broadcaster"
-      ) | undefined;
-    this._accessState = accessStateSetting ? AccessState[accessStateSetting] : AccessState.Viewers;
+      .get("twitchThemer.accessState") as
+      | (
+          | "Viewers"
+          | "Followers"
+          | "Subscribers"
+          | "VIPs"
+          | "Moderators"
+          | "Broadcaster"
+        )
+      | undefined;
+    this._accessState = accessStateSetting
+      ? AccessState[accessStateSetting]
+      : AccessState.Viewers;
 
     /**
      * Gets the access state from the workspace
      */
     const installStateSetting = vscode.workspace
       .getConfiguration()
-      .get("twitchThemer.installState") as (
-        "Viewers" |
-        "Followers" |
-        "Subscribers" |
-        "VIPs" |
-        "Moderators" |
-        "Broadcaster"
-      ) | undefined;
-    this._installState = installStateSetting ? AccessState[installStateSetting] : AccessState.Followers;
+      .get("twitchThemer.installState") as
+      | (
+          | "Viewers"
+          | "Followers"
+          | "Subscribers"
+          | "VIPs"
+          | "Moderators"
+          | "Broadcaster"
+        )
+      | undefined;
+    this._installState = installStateSetting
+      ? AccessState[installStateSetting]
+      : AccessState.Followers;
   }
 
   public handleConnectionChanges(signedIn: boolean) {
@@ -208,7 +215,8 @@ export default class Themer {
 
     Logger.log(
       LogLevel.info,
-      `Executing command: '${command === "" ? this._commands["help"] : command
+      `Executing command: '${
+        command === "" ? this._commands["help"] : command
       }'`,
     );
 
@@ -450,7 +458,7 @@ export default class Themer {
         break following;
       } else {
         this.sendMessageEventEmitter.fire(
-          messageInstallNotAuthorized(user, 'followers')
+          messageInstallNotAuthorized(user, "followers"),
         );
         Logger.log(
           LogLevel.info,
@@ -469,7 +477,7 @@ export default class Themer {
         break subscriber;
       } else {
         this.sendMessageEventEmitter.fire(
-          messageInstallNotAuthorized(user, 'subscribers')
+          messageInstallNotAuthorized(user, "subscribers"),
         );
         Logger.log(
           LogLevel.info,
@@ -488,7 +496,7 @@ export default class Themer {
         break vip;
       } else {
         this.sendMessageEventEmitter.fire(
-          messageInstallNotAuthorized(user, 'VIPs')
+          messageInstallNotAuthorized(user, "VIPs"),
         );
         Logger.log(
           LogLevel.info,
@@ -507,7 +515,7 @@ export default class Themer {
         break moderator;
       } else {
         this.sendMessageEventEmitter.fire(
-          messageInstallNotAuthorized(user, 'moderators')
+          messageInstallNotAuthorized(user, "moderators"),
         );
         Logger.log(
           LogLevel.info,
@@ -524,7 +532,7 @@ export default class Themer {
         break broadcaster;
       } else {
         this.sendMessageEventEmitter.fire(
-          messageInstallNotAuthorized(user, 'streamer')
+          messageInstallNotAuthorized(user, "streamer"),
         );
         Logger.log(
           LogLevel.info,
@@ -603,8 +611,9 @@ export default class Themer {
     try {
       // Authorize the install of the extension if we do not allow for auto-installed extensions.
       if (!this._autoInstall) {
-        const msg = `${user} wants to install theme(s) ${isValidExtResult.label ? isValidExtResult.label.join(", ") : theme
-          }.`;
+        const msg = `${user} wants to install theme(s) ${
+          isValidExtResult.label ? isValidExtResult.label.join(", ") : theme
+        }.`;
         Logger.log(LogLevel.info, `${msg}`);
         let choice = await vscode.window.showInformationMessage(
           msg,
@@ -819,7 +828,7 @@ export default class Themer {
         f.label.toLocaleLowerCase() === currentThemeName.toLocaleLowerCase() ||
         (f.themeId &&
           f.themeId.toLocaleLowerCase() ===
-          currentThemeName.toLocaleLowerCase()),
+            currentThemeName.toLocaleLowerCase()),
     )[0];
 
     this.sendMessageEventEmitter.fire(

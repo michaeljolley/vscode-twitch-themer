@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
-import {
-  ComfyJSInstance,
+import ComfyJS, {
   OnCommandExtra,
   OnJoinExtra,
   OnMessageExtra,
@@ -11,8 +10,7 @@ import Logger from "./logger";
 import { ChatMessage } from "./types/chatMessage";
 import { LogLevel } from "./constants";
 import Authentication from "./authentication";
-
-const comfyJS: ComfyJSInstance = require("comfy.js");
+import { Telemetry } from "./telemetry";
 
 /**
  * Twitch chat client used in communicating via chat/whispers
@@ -61,14 +59,14 @@ export default class ChatClient {
       const login = currentSession?.account?.label;
 
       if (login && accessToken) {
-        comfyJS.onError = (err: string) => {
+        ComfyJS.onError = (err: string) => {
           Logger.log(LogLevel.error, err);
         };
 
-        comfyJS.onChat = this.onChatHandler.bind(this);
-        comfyJS.onCommand = this.onCommandHandler.bind(this);
-        comfyJS.onJoin = this.onJoinHandler.bind(this);
-        comfyJS.onConnected = this.onConnectedHandler.bind(this);
+        ComfyJS.onChat = this.onChatHandler.bind(this);
+        ComfyJS.onCommand = this.onCommandHandler.bind(this);
+        ComfyJS.onJoin = this.onJoinHandler.bind(this);
+        ComfyJS.onConnected = this.onConnectedHandler.bind(this);
 
         const twitchChannelNameSetting =
           vscode.workspace
@@ -80,9 +78,10 @@ export default class ChatClient {
             ? twitchChannelNameSetting
             : login;
 
-        comfyJS.Init(login, accessToken, [channelToJoin]);
+        ComfyJS.Init(login, accessToken, [channelToJoin]);
 
         Logger.log(LogLevel.info, `Joined ${channelToJoin} chat.`);
+        Telemetry.sendTelemetryEvent("twitch-chat-connected");
 
         this.chatClientConnectionEventEmitter.fire(true);
         return true;
@@ -97,8 +96,10 @@ export default class ChatClient {
     if (this.isConnected()) {
       this.sendMessage("Twitch Themer has left the building!");
 
-      comfyJS.Disconnect();
+      ComfyJS.Disconnect();
       Logger.log(LogLevel.info, "Disconnected from chat.");
+      Telemetry.sendTelemetryEvent("twitch-chat-disconnected");
+
       this.chatClientConnectionEventEmitter.fire(false);
     }
   }
@@ -143,7 +144,7 @@ export default class ChatClient {
 
   /** Is the client currently connected to Twitch chat */
   public isConnected(): boolean {
-    const client = comfyJS.GetClient();
+    const client = ComfyJS.GetClient();
     return client ? client.readyState() === "OPEN" : false;
   }
 
@@ -178,7 +179,7 @@ export default class ChatClient {
         : login;
 
     if (this.isConnected() && channelToSendTo) {
-      comfyJS.Say(message, channelToSendTo);
+      ComfyJS.Say(message, channelToSendTo);
     }
   }
 
