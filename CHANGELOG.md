@@ -1,3 +1,16 @@
+## [3.3.2](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.3.1...v3.3.2) (2025-01-16)
+
+
+### Bug Fixes
+
+* don't show link for built in themes ([0cc690f](https://github.com/michaeljolley/vscode-twitch-themer/commit/0cc690f58f241265fe35427d44e45480849d0f87))
+* Updating CI to use 1.96.x of VSC ([d253333](https://github.com/michaeljolley/vscode-twitch-themer/commit/d253333fc61514c4f89d3c140740462789fa314e))
+
+
+### Performance Improvements
+
+* updating package refs ([0916344](https://github.com/michaeljolley/vscode-twitch-themer/commit/0916344525e09a6393543c6012942870b7466393))
+
 ## [3.3.1](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.3.0...v3.3.1) (2024-01-06)
 
 

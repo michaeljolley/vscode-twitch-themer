@@ -2,7 +2,7 @@
   "name": "vscode-twitch-themer",
   "displayName": "Twitch Themer",
   "description": "Allow viewers to change your VS Code theme via Twitch chat",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "preview": false,
   "publisher": "michaeljolley",
   "license": "MIT",
