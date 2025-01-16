@@ -11,7 +11,7 @@
     "email": "mike@baldbeardedbuilder.com"
   },
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.96.0"
   },
   "extensionKind": [
     "ui"
