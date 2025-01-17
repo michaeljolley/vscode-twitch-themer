@@ -71,7 +71,7 @@ jobs:
         run: |
           npm ci
       - run: npx semantic-release --extends ./package.release.config.js
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: "*.vsix"
 
