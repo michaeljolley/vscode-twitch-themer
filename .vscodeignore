@@ -3,17 +3,22 @@
 .github/**
 src/**
 out/**
-
+.github/**
 
 **/tsconfig.json
 **/.eslintrc.json
 **/*.map
 **/*.ts
 
+.editorconfig
 .gitignore
-.yarnrc
+.npmrc
 .prettierignore
+.prettierrc
 .vscode-test.mjs
+.vscodeignore
 CHANGELOG.md
+eslint.config.mjs
+
 package.release.config.js
 publish.release.config.js
