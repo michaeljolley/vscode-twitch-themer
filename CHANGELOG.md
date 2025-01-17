@@ -1,3 +1,10 @@
+## [3.3.3](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.3.2...v3.3.3) (2025-01-17)
+
+
+### Bug Fixes
+
+* generating release ([cbf9e46](https://github.com/michaeljolley/vscode-twitch-themer/commit/cbf9e46d3412a3c6f8441ca0c50d625bb394894f))
+
 ## [3.3.2](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.3.1...v3.3.2) (2025-01-16)
 
 
