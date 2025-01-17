@@ -182,12 +182,11 @@
     "test-compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run test-compile && npm run lint",
-    "lint": "eslint -c eslint.config.js",
+    "lint": "npx eslint -c eslint.config.mjs",
     "format": "npx prettier --write \"src/**/*.ts\"",
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.1",
@@ -205,15 +204,14 @@
     "@vscode/test-electron": "^2.4.1",
     "conventional-changelog-conventionalcommits": "^8.0.0",
     "esbuild": "^0.24.2",
-    "eslint": "^9.18.0",
-    "eslint-config-prettier": "^10.0.1",
     "mocha": "^11.0.1",
     "prettier": "^3.4.2",
     "semantic-release": "^24.2.1",
     "semantic-release-stop-before-publish": "^1.0.0",
     "semantic-release-vsce": "^6.0.6",
     "sinon": "^19.0.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0"
   },
   "dependencies": {
     "@vscode/extension-telemetry": "^0.9.8",
