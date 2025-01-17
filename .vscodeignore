@@ -18,7 +18,7 @@ out/**
 .vscode-test.mjs
 .vscodeignore
 CHANGELOG.md
-eslint.config.mjs
+eslint.config.js
 
 package.release.config.js
 publish.release.config.js

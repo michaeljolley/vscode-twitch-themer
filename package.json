@@ -182,7 +182,7 @@
     "test-compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run test-compile && npm run lint",
-    "lint": "eslint src",
+    "lint": "eslint -c eslint.config.js",
     "format": "npx prettier --write \"src/**/*.ts\"",
     "test": "vscode-test"
   },
