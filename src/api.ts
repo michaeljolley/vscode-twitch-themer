@@ -46,10 +46,10 @@ export default abstract class API {
             const { data } = res;
             return data && data.data && data.data.length > 0 ? true : false;
           }
-        } catch (err: any) {
+        } catch (err: unknown) {
           Logger.log(
             LogLevel.debug,
-            `failed to retrieve Twitch user following status: ${err.message}`,
+            `failed to retrieve Twitch user following status: ${(err as { message: string }).message}`,
           );
           return false;
         }
@@ -87,10 +87,10 @@ export default abstract class API {
         const { data } = res;
         return data && data.length > 0 ? data[0].id : undefined;
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       Logger.log(
         LogLevel.error,
-        `Failed to retrieve Twitch user details: ${err.message}`,
+        `Failed to retrieve Twitch user details: ${(err as { message: string }).message}`,
       );
       return undefined;
     }
@@ -146,7 +146,7 @@ export default abstract class API {
        * ? = match 0 or 1 of the predicate.
        */
       const repoUrlMatches = body.match(
-        /\"GitHubLink\":\"https:\/\/github.com\/([--:\w?@%&+~#=]+)(?:\.git)?\"/i,
+        /"GitHubLink":"https:\/\/github.com\/([--:\w?@%&+~#=]+)(?:\.git)?"/i,
       );
       if (!repoUrlMatches) {
         return {
@@ -168,7 +168,7 @@ export default abstract class API {
       }
 
       try {
-        const packageJson: any = res.data;
+        const packageJson = res.data;
 
         if (
           !packageJson.contributes.themes ||
@@ -192,7 +192,7 @@ export default abstract class API {
           reason: ThemeNotAvailableReasons.packageJsonMalformed,
         };
       }
-    } catch (err: any) {
+    } catch {
       return {
         available: false,
         reason: ThemeNotAvailableReasons.marketplaceRequestFailed,
@@ -200,9 +200,7 @@ export default abstract class API {
     }
   }
 
-  public static async getStreamIsActive(
-    _state: vscode.Memento,
-  ): Promise<boolean> {
+  public static async getStreamIsActive(): Promise<boolean> {
     const currentSession = await Authentication.getSession();
     const accessToken = currentSession?.accessToken;
     const currentUserId = currentSession?.account?.label;
@@ -218,7 +216,7 @@ export default abstract class API {
         },
       });
       if (res.status === 200) {
-        const { data }: any = res;
+        const { data } = res;
         return data && data.length > 0 ? true : false;
       }
     }

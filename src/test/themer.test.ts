@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as assert from "assert";
 
 import * as vscode from "vscode";
@@ -82,15 +83,6 @@ suite("Themer Tests", function () {
     highlighted: false,
     customReward: false,
   };
-  const rewardFlags: OnMessageFlags = {
-    broadcaster: false,
-    mod: false,
-    subscriber: false,
-    vip: false,
-    founder: false,
-    highlighted: false,
-    customReward: true,
-  };
 
   const standardExtra: OnCommandExtra = {
     id: "string",
@@ -130,14 +122,10 @@ suite("Themer Tests", function () {
       has(section: string) {
         return Object.keys(fakeConfig).some((c) => c === section);
       },
-      inspect(section: string) {
+      inspect() {
         return undefined;
       },
-      update(
-        section: string,
-        value: any,
-        configurationTarget?: vscode.ConfigurationTarget | boolean,
-      ) {
+      update(section: string, value: any) {
         fakeConfig[section] = value;
         return Promise.resolve();
       },
@@ -159,7 +147,7 @@ suite("Themer Tests", function () {
       .returns(fakeWorkspaceConfiguration);
     isTwitchUserFollowingStub = sinon
       .stub(API, "isTwitchUserFollowing")
-      .callsFake(async (twitchUserId: string | undefined): Promise<boolean> => {
+      .callsFake(async (): Promise<boolean> => {
         return isTwitchUserFollowingReturn;
       });
   });

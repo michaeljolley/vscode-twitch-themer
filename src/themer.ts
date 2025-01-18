@@ -387,19 +387,19 @@ export default class Themer {
           f.packageJSON.contributes.themes &&
           f.packageJSON.contributes.themes.length > 0,
       )
-      .forEach((fe: any) => {
-        const iThemes = fe.packageJSON.contributes.themes.map((m: any) => {
-          return {
-            extensionId: fe.id,
-            label: m.label,
-            themeId: m.id,
-            isDark: m.uiTheme !== "vs",
-          };
-        });
+      .forEach((fe) => {
+        const iThemes = fe.packageJSON.contributes.themes.map(
+          (m: { id: string; label: string; uiTheme: string }) => {
+            return {
+              extensionId: fe.id,
+              label: m.label,
+              themeId: m.id,
+              isDark: m.uiTheme !== "vs",
+            };
+          },
+        );
 
-        this._availableThemes = this._availableThemes.concat
-          .apply(this._availableThemes, iThemes)
-          .filter(() => true);
+        this._availableThemes.push(...iThemes);
       });
 
     /**
@@ -656,9 +656,9 @@ export default class Themer {
       this.sendMessageEventEmitter.fire(
         messageInstalled(user, isValidExtResult.label || []),
       );
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Handle the error
-      Logger.log(LogLevel.error, err);
+      Logger.log(LogLevel.error, (err as { message: string }).message);
       return;
     }
   }
@@ -704,7 +704,7 @@ export default class Themer {
             !f.isDark && f.label !== currentTheme && f.themeId !== currentTheme
           );
         default:
-          return true && f.label !== currentTheme && f.themeId !== currentTheme;
+          return f.label !== currentTheme && f.themeId !== currentTheme;
       }
     });
 
@@ -801,7 +801,7 @@ export default class Themer {
 
     if (themeExtension !== undefined) {
       const conf = vscode.workspace.getConfiguration();
-      await themeExtension.activate().then(async (f) => {
+      await themeExtension.activate().then(async () => {
         await conf.update(
           "workbench.colorTheme",
           theme.themeId || theme.label,

@@ -8,11 +8,11 @@ export default abstract class Logger {
   public static log(
     logLevel: LogLevel,
     message: string,
-    ...optionalParams: any[]
+    ...optionalParams: unknown[]
   ): void {
-    const captains: any = console;
+    const captains = console;
 
-    let level = logLevel || LogLevel.info;
+    const level = logLevel || LogLevel.info;
 
     const getTime = (): {
       hours: string;

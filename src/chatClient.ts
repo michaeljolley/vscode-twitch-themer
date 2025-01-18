@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
 import ComfyJS, {
   OnCommandExtra,
-  OnJoinExtra,
   OnMessageExtra,
   OnMessageFlags,
 } from "comfy.js";
@@ -114,7 +113,7 @@ export default class ChatClient {
       const authUserLogin = currentSession?.account?.label;
 
       if (!accessToken || !authUserLogin) {
-        let choice = await vscode.window.showInformationMessage(
+        const choice = await vscode.window.showInformationMessage(
           "You must be signed in to Twitch to connect to Twitch chat. Sign in now?",
           "Sign In",
           "Cancel",
@@ -152,7 +151,7 @@ export default class ChatClient {
     Logger.log(LogLevel.info, `Connected chat client ${address} : ${port}`);
   }
 
-  private onJoinHandler(user: string, self: boolean, extra: OnJoinExtra) {
+  private onJoinHandler(user: string, self: boolean) {
     if (self) {
       this.sendMessage(
         `Twitch Themer is ready to go. Listening for commands beginning with !${this._commandTrigger}`,

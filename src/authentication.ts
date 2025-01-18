@@ -15,7 +15,7 @@ export default abstract class Authentication {
    * Initializes the authentication service.  If the user is
    * already authenticated it will immediately fire that it is logged in.
    */
-  public static async initialize(state: vscode.Memento) {
+  public static async initialize() {
     Logger.log(LogLevel.info, "Initializing authentication...");
 
     const twitchSession = await this.getSession();
@@ -33,8 +33,8 @@ export default abstract class Authentication {
       return await vscode.authentication.getSession("twitch", twitchScopes, {
         createIfNone: false,
       });
-    } catch (error: any) {
-      Logger.log(LogLevel.error, error.message);
+    } catch (error: unknown) {
+      Logger.log(LogLevel.error, (error as { message: string }).message);
       throw new Error("awe snap");
     }
   }
@@ -45,8 +45,8 @@ export default abstract class Authentication {
       if (result) {
         this.authStatusEventEmitter.fire(true);
       }
-    } catch (error: any) {
-      Logger.log(LogLevel.error, error.message);
+    } catch (error: unknown) {
+      Logger.log(LogLevel.error, (error as { message: string }).message);
       throw new Error("There was an issue signing in to Twitch");
     }
   }

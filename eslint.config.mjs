@@ -1,23 +1,20 @@
+// @ts-check
+
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
+  eslint.configs.recommended,
   tseslint.configs.recommended,
   {
-    "rules": {
-        "curly": "warn",
-        "eqeqeq": "warn",
-        "no-throw-literal": "warn",
-        "semi": "off"
+    rules: {
+      "@typescript-eslint/naming-convention": "warn",
+      curly: 'warn',
+      eqeqeq: 'warn',
+      "no-throw-literal": 'warn',
+      "semi": 'off'
     },
-    "ignores": [
-        "out/**/*.js",
-        "dist",
-        "**/*.d.ts",
-        "**/*.js"
-    ],
-    "files": [
-        "src/**/*.ts"
-    ],
+    files: ['src/**/*.ts'],
+    ignores: ['node_modules', 'out', '*.js'],
   }
 );
