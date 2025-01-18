@@ -69,7 +69,7 @@ export async function activate(context: vscode.ExtensionContext) {
     handleSettingsChange,
   );
 
-  Authentication.initialize(context.globalState);
+  Authentication.initialize();
 
   // Auto connect to Twitch Chat if 'twitchThemer.autoConnect' is true (default is false)
   // and we are currently streaming.
@@ -87,15 +87,12 @@ export async function deactivate() {
   _themer = undefined;
 }
 
-async function autoConnect(
-  chatClient: ChatClient,
-  context: vscode.ExtensionContext,
-) {
+async function autoConnect(chatClient: ChatClient) {
   const shouldAutoConnect =
     vscode.workspace
       .getConfiguration("twitchThemer")
       .get<boolean>("autoConnect") || false;
-  if (shouldAutoConnect && (await API.getStreamIsActive(context.globalState))) {
+  if (shouldAutoConnect && (await API.getStreamIsActive())) {
     chatClient?.toggleChat.bind(chatClient)();
   }
 }
