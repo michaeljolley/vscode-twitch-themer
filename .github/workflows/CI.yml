@@ -71,6 +71,8 @@ jobs:
         run: |
           npm ci
       - run: npx semantic-release --extends ./package.release.config.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
       - uses: actions/upload-artifact@v4
         with:
           path: "*.vsix"
