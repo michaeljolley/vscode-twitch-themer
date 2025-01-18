@@ -73,7 +73,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Auto connect to Twitch Chat if 'twitchThemer.autoConnect' is true (default is false)
   // and we are currently streaming.
-  await autoConnect(_chatClient, context);
+  await autoConnect(_chatClient);
 
   Logger.log(LogLevel.info, "Congratulations, Twitch Themer is now active!");
 }
