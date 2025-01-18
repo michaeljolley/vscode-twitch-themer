@@ -1,3 +1,21 @@
+# [3.4.0](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.3.3...v3.4.0) (2025-01-18)
+
+
+### Bug Fixes
+
+* fixing linting ([762514a](https://github.com/michaeljolley/vscode-twitch-themer/commit/762514a3fe52555fd0d1989501c6bf3f807aeb49))
+* fixing linting ([72fd3bf](https://github.com/michaeljolley/vscode-twitch-themer/commit/72fd3bf2d2fb8b3d88b039cabb146e678ef6ce24))
+* fixing linting ([9ba2cb8](https://github.com/michaeljolley/vscode-twitch-themer/commit/9ba2cb8082013e89fde76ab9458956ae25015198))
+* fixing linting ([714d0cb](https://github.com/michaeljolley/vscode-twitch-themer/commit/714d0cb2ac1e4fcff76b8fc58578092bc5a303ee))
+* generating release ([ba82794](https://github.com/michaeljolley/vscode-twitch-themer/commit/ba82794cc52acef8a2b02d098012de44fcffbcf4))
+
+
+### Features
+
+* Bumping version ([aae8177](https://github.com/michaeljolley/vscode-twitch-themer/commit/aae8177d99b80d510156a6b49a5e3a60490ac7f8))
+* Version bump ([93a54e5](https://github.com/michaeljolley/vscode-twitch-themer/commit/93a54e5815246bb7130117f12780c10a773cac31))
+* Version bump ([d20c939](https://github.com/michaeljolley/vscode-twitch-themer/commit/d20c939f0ef03d083bac4808b0ad097c76b5ef01))
+
 ## [3.3.3](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.3.2...v3.3.3) (2025-01-17)
 
 
