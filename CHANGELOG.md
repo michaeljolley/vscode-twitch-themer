@@ -1,3 +1,10 @@
+# [3.5.0](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.4.0...v3.5.0) (2025-01-18)
+
+
+### Features
+
+* Version bump ([6e3638d](https://github.com/michaeljolley/vscode-twitch-themer/commit/6e3638d4ab215786d96938afe1486b290c7ce61d))
+
 # [3.4.0](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.3.3...v3.4.0) (2025-01-18)
 
 
