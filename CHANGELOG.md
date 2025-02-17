@@ -1,3 +1,11 @@
+## [3.5.1](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.5.0...v3.5.1) (2025-02-17)
+
+
+### Bug Fixes
+
+* Merge pull request [#212](https://github.com/michaeljolley/vscode-twitch-themer/issues/212) from michaeljolley/dependabot/npm_and_yarn/undici-6.21.1 ([121b85a](https://github.com/michaeljolley/vscode-twitch-themer/commit/121b85a370800477643659e7bda57a6f668fe9e8))
+* Merge pull request [#213](https://github.com/michaeljolley/vscode-twitch-themer/issues/213) from michaeljolley/dependabot/npm_and_yarn/esbuild-0.25.0 ([55b4599](https://github.com/michaeljolley/vscode-twitch-themer/commit/55b459970b9e8e534ff5551f84bddc030535f667))
+
 # [3.5.0](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.4.0...v3.5.0) (2025-01-18)
 
 
