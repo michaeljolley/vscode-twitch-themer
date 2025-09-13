@@ -214,7 +214,7 @@
   },
   "dependencies": {
     "@vscode/extension-telemetry": "^0.9.8",
-    "axios": "^1.8.2",
+    "axios": "^1.12.0",
     "comfy.js": "^1.1.16"
   }
 }
