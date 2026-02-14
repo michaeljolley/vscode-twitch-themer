@@ -1,3 +1,10 @@
+## [3.5.2](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.5.1...v3.5.2) (2026-02-14)
+
+
+### Performance Improvements
+
+* Updating package dependencies ([d07c649](https://github.com/michaeljolley/vscode-twitch-themer/commit/d07c649f0f09e5ff088f648389008b8b63d4d85f))
+
 ## [3.5.1](https://github.com/michaeljolley/vscode-twitch-themer/compare/v3.5.0...v3.5.1) (2025-02-17)
 
 
