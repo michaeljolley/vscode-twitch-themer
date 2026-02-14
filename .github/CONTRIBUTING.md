@@ -46,4 +46,4 @@ Some things that will increase the chance that your pull request is accepted:
 - **Write/update tests.**
 - Write a [good commit message](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html).
 
-[readme]: https://github.com/MichaelJolley/vscode-twitch-themer/tree/main#readme
+[readme]: https://github.com/michaeljolley/vscode-twitch-themer/tree/main#readme
