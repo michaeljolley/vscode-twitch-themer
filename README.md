@@ -1,6 +1,7 @@
 # Twitch Themer
 
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/MichaelJolley.vscode-twitch-themer?color=blue&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=MichaelJolley.vscode-twitch-themer) [![CI](https://img.shields.io/github/actions/workflow/status/michaeljolley/vscode-twitch-themer/CI.yml?logo=github)](https://github.com/michaeljolley/vscode-twitch-themer/actions/workflows/CI.yml) [![MIT](https://img.shields.io/badge/license-MIT-orange.png?color=blue&style=flat-round)](https://opensource.org/licenses/MIT)
+![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/MichaelJolley.vscode-twitch-themer) ![Open VSX Version](https://img.shields.io/open-vsx/v/MichaelJolley/vscode-twitch-themer)
+ [![CI](https://img.shields.io/github/actions/workflow/status/michaeljolley/vscode-twitch-themer/CI.yml?logo=github)](https://github.com/michaeljolley/vscode-twitch-themer/actions/workflows/CI.yml) [![MIT](https://img.shields.io/badge/license-MIT-orange.png?color=blue&style=flat-round)](https://opensource.org/licenses/MIT)
 
 A Visual Studio Code extension that listens to Twitch chat and allows viewers to
 change the streamers VS Code theme by using the **!theme** command.
