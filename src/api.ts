@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import axios from "axios";
 import Logger from "./logger";
 import {
   LogLevel,
@@ -34,7 +33,7 @@ export default abstract class API {
       if (accessToken && twitchChannelId) {
         const url = `https://api.twitch.tv/helix/channels/followers?user_id=${twitchUserId}&broadcaster_id=${twitchChannelId}`;
         try {
-          const res = await axios.get(url, {
+          const res = await fetch(url, {
             headers: {
               // eslint-disable-next-line @typescript-eslint/naming-convention
               Authorization: `Bearer ${accessToken}`,
@@ -42,8 +41,8 @@ export default abstract class API {
               "client-id": twitchAPIClientId,
             },
           });
-          if (res.status === 200) {
-            const { data } = res;
+          if (res.ok) {
+            const data = (await res.json()) as { data?: unknown[] };
             return data && data.data && data.data.length > 0 ? true : false;
           }
         } catch (err: unknown) {
@@ -74,7 +73,7 @@ export default abstract class API {
       const channelLogin = channelToJoin || login;
 
       const url = `https://api.twitch.tv/helix/users?login=${channelLogin}`;
-      const res = await axios.get(url, {
+      const res = await fetch(url, {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           Authorization: `Bearer ${accessToken}`,
@@ -83,9 +82,9 @@ export default abstract class API {
         },
       });
 
-      if (res.status === 200) {
-        const { data } = res;
-        return data && data.length > 0 ? data[0].id : undefined;
+      if (res.ok) {
+        const json = (await res.json()) as { data?: { id: string }[] };
+        return json.data && json.data.length > 0 ? json.data[0].id : undefined;
       }
     } catch (err: unknown) {
       Logger.log(
@@ -112,7 +111,7 @@ export default abstract class API {
   }> {
     const url = `https://marketplace.visualstudio.com/items?itemName=${extensionName}`;
     try {
-      let res = await axios.get(url, {
+      let res = await fetch(url, {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           Accept: "*/*",
@@ -124,7 +123,7 @@ export default abstract class API {
         return { available: false, reason: ThemeNotAvailableReasons.notFound };
       }
 
-      const body = res.data;
+      const body = await res.text();
       if (!body) {
         return { available: false, reason: ThemeNotAvailableReasons.notFound };
       }
@@ -159,8 +158,8 @@ export default abstract class API {
         ".git",
         "",
       )}/HEAD/package.json`;
-      res = await axios.get(repoUrl);
-      if (res.status !== 200) {
+      res = await fetch(repoUrl);
+      if (!res.ok) {
         return {
           available: false,
           reason: ThemeNotAvailableReasons.packageJsonNotDownloaded,
@@ -168,10 +167,12 @@ export default abstract class API {
       }
 
       try {
-        const packageJson = res.data;
+        const packageJson = (await res.json()) as {
+          contributes?: { themes?: { label: string }[] };
+        };
 
         if (
-          !packageJson.contributes.themes ||
+          !packageJson.contributes?.themes ||
           packageJson.contributes.themes.length === 0
         ) {
           return {
@@ -207,7 +208,7 @@ export default abstract class API {
 
     if (accessToken && currentUserId) {
       const url = `https://api.twitch.tv/helix/streams?user_id=${currentUserId}`;
-      const res = await axios.get(url, {
+      const res = await fetch(url, {
         headers: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           Authorization: `Bearer ${accessToken}`,
@@ -215,9 +216,9 @@ export default abstract class API {
           "client-id": twitchAPIClientId,
         },
       });
-      if (res.status === 200) {
-        const { data } = res;
-        return data && data.length > 0 ? true : false;
+      if (res.ok) {
+        const json = (await res.json()) as { data?: unknown[] };
+        return json.data && json.data.length > 0 ? true : false;
       }
     }
     return false;
